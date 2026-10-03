@@ -1,5 +1,19 @@
 import 'package:flutter/material.dart';
+import 'home_page.dart';
 import 'register_page.dart';
+
+/// Halaman Login — mengikuti frame "Login - GlucoSafe" di Figma.
+/// Simpan di: lib/pages/login_page.dart
+
+class _C {
+  static const bg = Color(0xFFFAF8FF);
+  static const ink = Color(0xFF131B2E);
+  static const slate = Color(0xFF505F76);
+  static const hint = Color(0xFF6D7A77);
+  static const border = Color(0xFFE2E8F0);
+  static const brand = Color(0xFF00685F);
+  static const brand2 = Color(0xFF0D9488);
+}
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -21,270 +35,265 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  void _goToRegister() {
+    _emailController.clear();
+    _passwordController.clear();
+    setState(() {
+      _emailErrorText = null;
+    });
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const RegisterPage()),
+    );
+  }
+
+  void _login() {
+    final email = _emailController.text.trim();
+    if (email.isEmpty || _emailErrorText != null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('Periksa kembali email Anda')),
+        );
+      return;
+    }
+    // TODO: panggil API login (Anggota 3) sebelum pindah halaman.
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
+    );
+  }
+
+  OutlineInputBorder _border(Color c, [double w = 1]) => OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: c, width: w),
+      );
+
+  InputDecoration _decoration(String hint, {Widget? suffix, String? error}) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(fontSize: 14, color: _C.hint),
+      errorText: error,
+      errorStyle: const TextStyle(fontSize: 12),
+      filled: true,
+      fillColor: Colors.white,
+      isDense: true,
+      contentPadding: EdgeInsets.fromLTRB(17, 15.5, suffix != null ? 4 : 17, 15.5),
+      suffixIcon: suffix,
+      suffixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+      border: _border(_C.border),
+      enabledBorder: _border(_C.border),
+      focusedBorder: _border(_C.brand2, 1.5),
+      errorBorder: _border(Colors.red.shade400),
+      focusedErrorBorder: _border(Colors.red.shade400, 1.5),
+    );
+  }
+
+  Widget _label(String text) => Text(
+        text,
+        style: const TextStyle(
+          fontSize: 13,
+          height: 16 / 13,
+          letterSpacing: .13,
+          fontWeight: FontWeight.w500,
+          color: _C.ink,
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(
-        0xFFF7F7F9,
-      ), // Warna background terang sesuai desain
+      backgroundColor: _C.bg,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Ikon Logo GlucoSafe
-              Center(
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey.shade300, width: 2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.water_drop_outlined,
-                    size: 40,
-                    color: Colors.red,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Judul & Subjudul
-              const Text(
-                'GlucoSafe',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Skrining Risiko Diabetes',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.blueGrey),
-              ),
-              const SizedBox(height: 12),
-
-              // Field Email
-              const Text(
-                'EMAIL',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueGrey,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                onChanged: (value) {
-                  setState(() {
-                    if (value.isNotEmpty && !value.endsWith('@gmail.com')) {
-                      _emailErrorText = 'Email harus berakhiran @gmail.com';
-                    } else {
-                      _emailErrorText = null;
-                    }
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: 'contoh@email.com',
-                  hintStyle: const TextStyle(color: Colors.black54),
-                  errorText: _emailErrorText,
-                  filled: true,
-                  fillColor: Colors.white,
-                  suffixIcon: const Icon(
-                    Icons.email_outlined,
-                    color: Colors.grey,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Field Kata Sandi
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 340),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Logo + judul
+                  const Center(child: _LogoBox(size: 48, radius: 8, padding: 6)),
+                  const SizedBox(height: 16),
                   const Text(
-                    'KATA SANDI',
+                    'GlucoSafe',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueGrey,
+                      fontSize: 26,
+                      height: 32 / 26,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -.65,
+                      color: _C.ink,
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Masuk ke akun Anda',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, height: 20 / 14, color: _C.slate),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Email
+                  _label('Email'),
+                  const SizedBox(height: 4),
+                  TextField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    style: const TextStyle(fontSize: 14, color: _C.ink),
+                    onChanged: (value) {
                       setState(() {
-                        _obscureText = !_obscureText;
+                        if (value.isNotEmpty && !value.endsWith('@gmail.com')) {
+                          _emailErrorText = 'Email harus berakhiran @gmail.com';
+                        } else {
+                          _emailErrorText = null;
+                        }
                       });
                     },
-                    child: const Text(
-                      'Tampilkan',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blueGrey,
+                    decoration: _decoration('nama@email.com', error: _emailErrorText),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Kata sandi + lupa kata sandi
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _label('Kata Sandi'),
+                      GestureDetector(
+                        onTap: () {
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(const SnackBar(
+                                content: Text('Halaman lupa kata sandi belum dibuat')));
+                        },
+                        child: const Text(
+                          'Lupa kata sandi?',
+                          style: TextStyle(
+                            fontSize: 11,
+                            height: 14 / 11,
+                            letterSpacing: .44,
+                            fontWeight: FontWeight.w600,
+                            color: _C.brand,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  TextField(
+                    controller: _passwordController,
+                    obscureText: _obscureText,
+                    style: const TextStyle(fontSize: 14, color: _C.ink),
+                    decoration: _decoration(
+                      '••••••••',
+                      suffix: IconButton(
+                        tooltip: 'Tampilkan kata sandi',
+                        iconSize: 18,
+                        color: _C.slate,
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                        ),
+                        onPressed: () => setState(() => _obscureText = !_obscureText),
                       ),
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _passwordController,
-                obscureText: _obscureText,
-                decoration: InputDecoration(
-                  hintText: '••••••••',
-                  hintStyle: const TextStyle(color: Colors.black54),
-                  filled: true,
-                  fillColor: Colors.white,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscureText
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
-                      color: Colors.grey,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscureText = !_obscureText;
-                      });
-                    },
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
+                  const SizedBox(height: 24),
 
-              // Lupa Kata Sandi
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: const Size(50, 30),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: const Text(
-                    'Lupa Kata Sandi?',
-                    style: TextStyle(
-                      color: Colors.blueGrey,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
+                  // Tombol Masuk
+                  ElevatedButton(
+                    onPressed: _login,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _C.brand2,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size.fromHeight(48),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      elevation: 1,
+                      shadowColor: const Color(0x0D000000),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Tombol Login
-              ElevatedButton(
-                onPressed: () {
-                  if (_emailErrorText == null && _emailController.text.isNotEmpty) {
-                    // TODO: Lanjut ke dashboard atau proses login lainnya
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text(
-                      'Login',
+                    child: const Text(
+                      'Masuk',
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        height: 24 / 16,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Icon(Icons.arrow_forward, size: 20),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Tombol Register
-              ElevatedButton(
-                onPressed: () {
-                  _emailController.clear();
-                  _passwordController.clear();
-                  setState(() {
-                    _emailErrorText = null;
-                  });
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const RegisterPage()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey.shade200,
-                  foregroundColor: Colors.blueGrey.shade800,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
                   ),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  'Register',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(height: 32),
+                  const SizedBox(height: 32),
 
-              // Footer Daftar
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Belum punya akun? ',
-                    style: TextStyle(color: Colors.blueGrey),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      _emailController.clear();
-                      _passwordController.clear();
-                      setState(() {
-                        _emailErrorText = null;
-                      });
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const RegisterPage()),
-                      );
-                    },
-                    child: const Text(
-                      'Daftar di sini',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                        decoration: TextDecoration.underline,
+                  // Footer
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Belum punya akun? ',
+                        style: TextStyle(fontSize: 14, height: 20 / 14, color: _C.slate),
                       ),
-                    ),
+                      GestureDetector(
+                        onTap: _goToRegister,
+                        child: const Text(
+                          'Daftar',
+                          style: TextStyle(
+                            fontSize: 13,
+                            height: 16 / 13,
+                            letterSpacing: .13,
+                            fontWeight: FontWeight.w600,
+                            color: _C.brand2,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Kotak logo putih. Jika file logo belum ada, tampil logo pengganti.
+/// Untuk logo asli: taruh PNG di assets/images/logo.png lalu daftarkan di pubspec.yaml.
+class _LogoBox extends StatelessWidget {
+  const _LogoBox({required this.size, required this.radius, required this.padding});
+  final double size;
+  final double radius;
+  final double padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      padding: EdgeInsets.all(padding),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(radius),
+        boxShadow: const [
+          BoxShadow(color: Color(0x0D000000), blurRadius: 2, offset: Offset(0, 1)),
+        ],
+      ),
+      child: Image.asset(
+        'assets/images/logo.png',
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stack) => Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(radius * .7),
+            gradient: const LinearGradient(
+              colors: [Color(0xFF14B8A6), Color(0xFF0F766E)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: const Icon(Icons.water_drop_rounded, color: Colors.white, size: 20),
         ),
       ),
     );
