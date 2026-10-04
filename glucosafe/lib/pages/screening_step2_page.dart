@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/screening_form.dart';
 import '../models/screening_state.dart';
 import '../widgets/screening_step_scaffold.dart';
+import 'screening_step_3_page.dart';
 
 /// Skrining langkah 2 dari 4: Riwayat Diagnosis.
 /// Simpan di: lib/pages/screening_step2_page.dart
@@ -69,11 +70,10 @@ class ScreeningStep2Page extends StatelessWidget {
       callback();
       return;
     }
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(content: Text('Langkah 3 belum dihubungkan')),
-      );
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ScreeningStep3Page()),
+    );
   }
 
   void _back(BuildContext context) {
