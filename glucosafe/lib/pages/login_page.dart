@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'register_page.dart';
+import '../models/screening_state.dart';
+import 'screening_step1_page.dart';
 
 /// Halaman Login — mengikuti frame "Login - GlucoSafe" di Figma.
 /// Simpan di: lib/pages/login_page.dart
@@ -60,7 +62,19 @@ class _LoginPageState extends State<LoginPage> {
     // TODO: panggil API login (Anggota 3) sebelum pindah halaman.
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const HomePage()),
+      MaterialPageRoute(
+        builder: (context) => HomePage(
+          onStartScreening: () {
+            resetScreeningForm(); // mulai dari isian kosong
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const ScreeningStep1Page(),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 
