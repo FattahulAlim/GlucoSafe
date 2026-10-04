@@ -4,6 +4,7 @@ import '../models/screening_form.dart';
 import '../models/screening_options.dart';
 import '../models/screening_state.dart';
 import '../widgets/screening_step_scaffold.dart';
+import 'screening_step2_page.dart';
 
 /// Skrining langkah 1 dari 4: Data Diri.
 /// Simpan di: lib/pages/screening_step1_page.dart
@@ -84,11 +85,10 @@ class _ScreeningStep1PageState extends State<ScreeningStep1Page> {
       onNext();
       return;
     }
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(content: Text('Langkah 2 belum dihubungkan')),
-      );
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ScreeningStep2Page()),
+    );
   }
 
   @override
