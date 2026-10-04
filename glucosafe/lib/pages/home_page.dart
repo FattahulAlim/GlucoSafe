@@ -246,19 +246,27 @@ class _Header extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // TODO: ganti dengan logo asli -> Image.asset('assets/logo.png', width: 32, height: 32)
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              gradient: const LinearGradient(
-                  colors: [Color(0xFF14B8A6), Color(0xFF0F766E)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              'assets/images/logo.png',
+              width: 32,
+              height: 32,
+              fit: BoxFit.cover,
+              cacheWidth: 96,
+              errorBuilder: (context, error, stack) => Container(
+                width: 32,
+                height: 32,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: [Color(0xFF14B8A6), Color(0xFF0F766E)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight),
+                ),
+                child: const Icon(Icons.water_drop_rounded,
+                    size: 18, color: Colors.white),
+              ),
             ),
-            child: const Icon(Icons.water_drop_rounded,
-                size: 18, color: Colors.white),
           ),
           const SizedBox(width: 8),
           const Expanded(
