@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'history_page.dart';
+import 'screening_step1_page.dart';
 
 /// Halaman Beranda GlucoSafe — nilai diambil langsung dari frame
 /// "Beranda - GlucoSafe" di Figma (warna, ukuran, jarak, font Inter).
@@ -192,8 +194,15 @@ class HomePage extends StatelessWidget {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(12),
                             onTap: onStartScreening ??
-                                () => _soon(
-                                    context, 'Form skrining belum dihubungkan'),
+                                () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ScreeningStep1Page(),
+                                    ),
+                                  );
+                                },
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -218,7 +227,14 @@ class HomePage extends StatelessWidget {
             ),
             _BottomNav(
               onHistory: onOpenHistory ??
-                  () => _soon(context, 'Halaman Riwayat belum dihubungkan'),
+                  () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HistoryPage(),
+                      ),
+                    );
+                  },
             ),
           ],
         ),
