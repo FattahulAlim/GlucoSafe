@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'screening_result_page.dart';
 
 class _C {
   static const bg = Color(0xFFFAF8FF);
@@ -300,7 +301,12 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                     height: 52,
                     child: ElevatedButton(
                       onPressed: () {
-                        // TODO: Handle submit
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ScreeningResultPage(),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _C.brand,
