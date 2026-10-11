@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import '../models/screening_form.dart';
 import '../models/screening_state.dart';
+import '../widgets/app_colors.dart';
 import '../widgets/screening_step_scaffold.dart';
 import 'screening_step_3_page.dart';
 
 /// Skrining langkah 2 dari 4: Riwayat Diagnosis.
 /// Simpan di: lib/pages/screening_step2_page.dart
-
-const _toggleBg = Color(0xFFEEF0FB);
 
 /// Satu pertanyaan: teks, cara membaca nilainya dari form, dan cara menyimpannya.
 class _Question {
@@ -122,8 +121,8 @@ class ScreeningStep2Page extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () => _back(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _toggleBg,
-                        foregroundColor: ScreeningColors.ink,
+                        backgroundColor: AppColors.toggleBg,
+                        foregroundColor: AppColors.ink,
                         elevation: 0,
                         minimumSize: const Size(0, 54),
                         shape: buttonShape,
@@ -137,9 +136,9 @@ class ScreeningStep2Page extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: canContinue ? () => _next(context) : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ScreeningColors.brand,
+                        backgroundColor: AppColors.brand,
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor: ScreeningColors.disabled,
+                        disabledBackgroundColor: AppColors.disabled,
                         disabledForegroundColor: Colors.white,
                         elevation: 0,
                         minimumSize: const Size(0, 54),
@@ -159,7 +158,7 @@ class ScreeningStep2Page extends StatelessWidget {
                       'Jawab semua pertanyaan untuk melanjutkan.',
                       style: TextStyle(
                         fontSize: 14,
-                        color: ScreeningColors.slate,
+                        color: AppColors.slate,
                       ),
                     ),
                   ),
@@ -190,7 +189,7 @@ class _QuestionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: ScreeningColors.border),
+        border: Border.all(color: AppColors.border),
       ),
       child: Row(
         children: [
@@ -201,7 +200,7 @@ class _QuestionCard extends StatelessWidget {
                 fontSize: 16,
                 height: 1.35,
                 fontWeight: FontWeight.w500,
-                color: ScreeningColors.ink,
+                color: AppColors.ink,
               ),
             ),
           ),
@@ -237,7 +236,7 @@ class _YesNoToggle extends StatelessWidget {
       label: '$question: $label',
       excludeSemantics: true,
       child: Material(
-        color: selected ? ScreeningColors.brand : Colors.transparent,
+        color: selected ? AppColors.brand : Colors.transparent,
         borderRadius: BorderRadius.circular(10),
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
@@ -251,7 +250,7 @@ class _YesNoToggle extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: selected ? Colors.white : ScreeningColors.slate,
+                color: selected ? Colors.white : AppColors.slate,
               ),
             ),
           ),
@@ -265,7 +264,7 @@ class _YesNoToggle extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: _toggleBg,
+        color: AppColors.toggleBg,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(

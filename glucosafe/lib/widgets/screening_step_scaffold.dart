@@ -1,24 +1,5 @@
 import 'package:flutter/material.dart';
-
-/// Warna halaman pemeriksaan (mengikuti palet login dan home tim).
-/// Dipakai juga oleh langkah 2 sampai 4.
-class ScreeningColors {
-  static const bg = Color(0xFFFAF8FF);
-  static const ink = Color(0xFF131B2E);
-  static const slate = Color(0xFF505F76);
-  static const hint = Color(0xFF6D7A77);
-  static const border = Color(0xFFE2E8F0);
-  static const brand = Color(0xFF00685F);
-  static const brand2 = Color(0xFF0D9488);
-  static const track = Color(0xFFCCFBF1);
-  static const okBg = Color(0xFFF0FDFA);
-  static const okBorder = Color(0xFFCCFBF1);
-  static const warn = Color(0xFFEA580C);
-  static const warnBg = Color(0xFFFFEDD5);
-  static const warnBorder = Color(0xFFFED7AA);
-  static const error = Color(0xFFDC2626);
-  static const disabled = Color(0xFFCBD5E1);
-}
+import 'app_colors.dart';
 
 /// Kerangka halaman langkah pemeriksaan.
 class ScreeningStepScaffold extends StatelessWidget {
@@ -52,7 +33,7 @@ class ScreeningStepScaffold extends StatelessWidget {
     final percent = (step / totalSteps * 100).round();
 
     return Scaffold(
-      backgroundColor: ScreeningColors.bg,
+      backgroundColor: AppColors.formBg,
       body: SafeArea(
         child: GestureDetector(
           behavior: HitTestBehavior.translucent,
@@ -89,14 +70,14 @@ class ScreeningStepScaffold extends StatelessWidget {
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,
                                         letterSpacing: 0.5,
-                                        color: ScreeningColors.brand2,
+                                        color: AppColors.brand2,
                                       ),
                                     ),
                                     Text(
                                       '$percent% Selesai',
                                       style: const TextStyle(
                                         fontSize: 14,
-                                        color: ScreeningColors.brand2,
+                                        color: AppColors.brand2,
                                       ),
                                     ),
                                   ],
@@ -107,8 +88,8 @@ class ScreeningStepScaffold extends StatelessWidget {
                                   child: LinearProgressIndicator(
                                     value: step / totalSteps,
                                     minHeight: 8,
-                                    color: ScreeningColors.brand,
-                                    backgroundColor: ScreeningColors.track,
+                                    color: AppColors.brand,
+                                    backgroundColor: AppColors.trackLight,
                                   ),
                                 ),
                               ],
@@ -121,7 +102,7 @@ class ScreeningStepScaffold extends StatelessWidget {
                               fontSize: 24,
                               height: 32 / 24,
                               fontWeight: FontWeight.w700,
-                              color: ScreeningColors.ink,
+                              color: AppColors.ink,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -130,7 +111,7 @@ class ScreeningStepScaffold extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 16,
                               height: 24 / 16,
-                              color: ScreeningColors.slate,
+                              color: AppColors.slate,
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -160,14 +141,14 @@ class _Header extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(4, 8, 16, 8),
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(bottom: BorderSide(color: ScreeningColors.border)),
+        border: Border(bottom: BorderSide(color: AppColors.border)),
       ),
       child: Row(
         children: [
           IconButton(
             onPressed: onBack,
             tooltip: 'Kembali',
-            icon: const Icon(Icons.arrow_back, color: ScreeningColors.ink),
+            icon: const Icon(Icons.arrow_back, color: AppColors.ink),
           ),
           const _Logo(),
           const SizedBox(width: 10),
@@ -180,12 +161,12 @@ class _Header extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: ScreeningColors.brand,
+                    color: AppColors.brand,
                   ),
                 ),
                 Text(
                   'Skrining Mandiri',
-                  style: TextStyle(fontSize: 14, color: ScreeningColors.brand2),
+                  style: TextStyle(fontSize: 14, color: AppColors.brand2),
                 ),
               ],
             ),
@@ -193,7 +174,7 @@ class _Header extends StatelessWidget {
           Tooltip(
             message: 'Profil',
             child: Material(
-              color: ScreeningColors.brand,
+              color: AppColors.brand,
               shape: const CircleBorder(),
               child: InkWell(
                 customBorder: const CircleBorder(),

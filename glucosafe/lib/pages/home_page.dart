@@ -1,77 +1,14 @@
 import 'package:flutter/material.dart';
+import '../models/risk_level.dart';
+import '../widgets/app_colors.dart';
+import '../widgets/headbar.dart';
+import '../widgets/navbar.dart';
 import 'history_page.dart';
 import 'screening_step1_page.dart';
 
 /// Halaman Beranda GlucoSafe — nilai diambil langsung dari frame
 /// "Beranda - GlucoSafe" di Figma (warna, ukuran, jarak, font Inter).
 /// Simpan di: lib/pages/home_page.dart
-
-// ───────────────────────── Warna (dari Figma) ─────────────────────────
-class AppColors {
-  static const bg = Color(0xFFF0FDFA);
-  static const ink = Color(0xFF131B2E);
-  static const mute = Color(0xFF3D4947);
-  static const slate = Color(0xFF475569);
-  static const brand = Color(0xFF00685F);
-  static const brand2 = Color(0xFF0D9488);
-  static const pillLav = Color(0xFFEAEDFF);
-  static const infoBg = Color(0xFFF2F3FF);
-  static const track = Color(0xFFE2E8F0);
-  static const ok = Color(0xFF16A34A);
-  static const okBg = Color(0xFFDCFCE7);
-  static const mid = Color(0xFFF59E0B);
-  static const midText = Color(0xFFD97706);
-  static const midBg = Color(0xFFFEF3C7);
-  static const midInk = Color(0xFFB45309);
-  static const hi = Color(0xFFDC2626);
-  static const hiBg = Color(0xFFFEE2E2);
-  static const tipBg = Color(0xFFE0F2FE);
-  static const tipTitle = Color(0xFF0369A1);
-  static const tipDot = Color(0xFF0284C7);
-  static const tipBody = Color(0xFF0C4A6E);
-}
-
-// ───────────────────────── Tingkat risiko ─────────────────────────
-enum Risk { rendah, sedang, tinggi }
-
-Risk riskOf(double percent) =>
-    percent >= 60 ? Risk.tinggi : (percent >= 30 ? Risk.sedang : Risk.rendah);
-
-extension RiskStyle on Risk {
-  String get label => switch (this) {
-        Risk.rendah => 'Risiko Rendah',
-        Risk.sedang => 'Risiko Sedang',
-        Risk.tinggi => 'Risiko Tinggi',
-      };
-  Color get color => switch (this) {
-        Risk.rendah => AppColors.ok,
-        Risk.sedang => AppColors.mid,
-        Risk.tinggi => AppColors.hi,
-      };
-  Color get bgColor => switch (this) {
-        Risk.rendah => AppColors.okBg,
-        Risk.sedang => AppColors.midBg,
-        Risk.tinggi => AppColors.hiBg,
-      };
-  Color get badgeText => switch (this) {
-        Risk.rendah => AppColors.ok,
-        Risk.sedang => AppColors.midInk,
-        Risk.tinggi => AppColors.hi,
-      };
-  Color get chartText => switch (this) {
-        Risk.rendah => AppColors.ok,
-        Risk.sedang => AppColors.midText,
-        Risk.tinggi => AppColors.hi,
-      };
-  String get message => switch (this) {
-        Risk.rendah =>
-          'Kondisi metabolik Anda terpantau stabil\ndalam batas aman.',
-        Risk.sedang =>
-          'Ada kecenderungan risiko sedang yang\ndapat dicegah dengan perbaikan gaya hidup.',
-        Risk.tinggi =>
-          'Sangat dianjurkan berkonsultasi dengan\ndokter atau fasilitas kesehatan.',
-      };
-}
 
 // ───────────────────────── Halaman ─────────────────────────
 class HomePage extends StatelessWidget {
@@ -121,7 +58,8 @@ class HomePage extends StatelessWidget {
         bottom: false,
         child: Column(
           children: [
-            _Header(
+            HeadBar(
+              title: 'Beranda',
               onProfile: onOpenProfile ??
                   () => _soon(context, 'Halaman Profil belum dihubungkan'),
             ),
@@ -225,7 +163,8 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ),
-            _BottomNav(
+            NavBar(
+              currentIndex: 0,
               onHistory: onOpenHistory ??
                   () {
                     Navigator.pushReplacement(
@@ -236,137 +175,6 @@ class HomePage extends StatelessWidget {
                     );
                   },
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ───────────────────────── Header & Navigasi ─────────────────────────
-class _Header extends StatelessWidget {
-  const _Header({required this.onProfile});
-  final VoidCallback onProfile;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 64,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: const BoxDecoration(
-        color: Color(0xD9FFFFFF),
-        boxShadow: [
-          BoxShadow(
-              color: Color(0x0A000000), blurRadius: 8, offset: Offset(0, 1)),
-        ],
-      ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
-              'assets/images/logo.png',
-              width: 32,
-              height: 32,
-              fit: BoxFit.cover,
-              cacheWidth: 96,
-              errorBuilder: (context, error, stack) => Container(
-                width: 32,
-                height: 32,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [Color(0xFF14B8A6), Color(0xFF0F766E)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight),
-                ),
-                child: const Icon(Icons.water_drop_rounded,
-                    size: 18, color: Colors.white),
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          const Expanded(
-            child: Text('Beranda',
-                style: TextStyle(
-                    fontSize: 18,
-                    height: 26 / 18,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.ink)),
-          ),
-          Semantics(
-            button: true,
-            label: 'Buka profil pengguna',
-            child: InkWell(
-              onTap: onProfile,
-              customBorder: const CircleBorder(),
-              child: SizedBox(
-                width: 44,
-                height: 44,
-                child: Center(
-                  child: Container(
-                    width: 32,
-                    height: 32,
-                    decoration: const BoxDecoration(
-                        color: AppColors.brand, shape: BoxShape.circle),
-                    child: const Icon(Icons.person_rounded,
-                        size: 16, color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _BottomNav extends StatelessWidget {
-  const _BottomNav({required this.onHistory});
-  final VoidCallback onHistory;
-
-  Widget _item(IconData icon, String label, bool active, VoidCallback? onTap) {
-    final c = active ? AppColors.brand : AppColors.mute;
-    return InkWell(
-      onTap: onTap,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minWidth: 64, minHeight: 48),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 20, color: c),
-            const SizedBox(height: 2),
-            Text(label,
-                style: TextStyle(
-                    fontSize: 12,
-                    height: 16 / 12,
-                    letterSpacing: .24,
-                    fontWeight: FontWeight.w600,
-                    color: c)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-      decoration: const BoxDecoration(
-        color: Color(0xE6FFFFFF),
-        boxShadow: [
-          BoxShadow(
-              color: Color(0x0D0F172A), blurRadius: 12, offset: Offset(0, -2)),
-        ],
-      ),
-      child: SizedBox(
-        height: 68,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _item(Icons.home_outlined, 'Beranda', true, null),
-            _item(Icons.history_rounded, 'Riwayat', false, onHistory),
           ],
         ),
       ),

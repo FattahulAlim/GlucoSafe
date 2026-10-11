@@ -1,14 +1,7 @@
 import 'package:flutter/material.dart';
-import 'screening_step_4_page.dart';
 
-class _C {
-  static const bg = Color(0xFFFAF8FF);
-  static const ink = Color(0xFF131B2E);
-  static const mute = Color(0xFF3D4947);
-  static const brand = Color(0xFF00685F);
-  static const inactiveBg = Color(0xFFEEF0FA);
-  static const progressBg = Color(0xFFE0DDF8);
-}
+import '../widgets/app_colors.dart';
+import 'screening_step_4_page.dart';
 
 class ScreeningStep3Page extends StatefulWidget {
   const ScreeningStep3Page({super.key});
@@ -35,7 +28,11 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(color: Color(0x05000000), blurRadius: 4, offset: Offset(0, 2)),
+          BoxShadow(
+            color: Color(0x05000000),
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
         ],
       ),
       child: Column(
@@ -43,13 +40,17 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
         children: [
           Text(
             question,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: _C.ink),
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppColors.ink,
+            ),
           ),
           const SizedBox(height: 16),
           Container(
             height: 48,
             decoration: BoxDecoration(
-              color: _C.inactiveBg,
+              color: AppColors.inactiveBg,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -59,7 +60,9 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
                     onTap: () => onChanged(false),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: value == false ? _C.brand : Colors.transparent,
+                        color: value == false
+                            ? AppColors.brand
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       alignment: Alignment.center,
@@ -68,7 +71,7 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: value == false ? Colors.white : _C.mute,
+                          color: value == false ? Colors.white : AppColors.mute,
                         ),
                       ),
                     ),
@@ -79,7 +82,9 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
                     onTap: () => onChanged(true),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: value == true ? _C.brand : Colors.transparent,
+                        color: value == true
+                            ? AppColors.brand
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       alignment: Alignment.center,
@@ -88,7 +93,7 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: value == true ? Colors.white : _C.mute,
+                          color: value == true ? Colors.white : AppColors.mute,
                         ),
                       ),
                     ),
@@ -96,7 +101,7 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -105,12 +110,12 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.bg,
+      backgroundColor: AppColors.formBg,
       appBar: AppBar(
-        backgroundColor: _C.bg,
+        backgroundColor: AppColors.formBg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: _C.ink),
+          icon: const Icon(Icons.arrow_back, color: AppColors.ink),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -118,15 +123,23 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: _C.brand,
+                color: AppColors.brand,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.water_drop, color: Colors.white, size: 16),
+              child: const Icon(
+                Icons.water_drop,
+                color: Colors.white,
+                size: 16,
+              ),
             ),
             const SizedBox(width: 8),
             const Text(
               'Skrining',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: _C.ink),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.ink,
+              ),
             ),
           ],
         ),
@@ -134,7 +147,7 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
-              backgroundColor: _C.brand,
+              backgroundColor: AppColors.brand,
               radius: 16,
               child: const Icon(Icons.person, color: Colors.white, size: 20),
             ),
@@ -145,14 +158,31 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
         children: [
           // Progress Bar
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             child: Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const [
-                    Text('LANGKAH 3 DARI 4', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _C.brand)),
-                    Text('75% Selesai', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _C.brand)),
+                    Text(
+                      'LANGKAH 3 DARI 4',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.brand,
+                      ),
+                    ),
+                    Text(
+                      '75% Selesai',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.brand,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -160,7 +190,7 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
                   height: 4,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: _C.progressBg,
+                    color: AppColors.progressBg,
                     borderRadius: BorderRadius.circular(2),
                   ),
                   child: FractionallySizedBox(
@@ -168,7 +198,7 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
                     widthFactor: 0.75,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: _C.brand,
+                        color: AppColors.brand,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -177,7 +207,7 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
               ],
             ),
           ),
-          
+
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -186,15 +216,19 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
                 children: [
                   const Text(
                     'Pola Gaya Hidup',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: _C.ink),
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.ink,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   const Text(
                     'Kebiasaan aktivitas fisik dan nutrisi Anda sehari-hari.',
-                    style: TextStyle(fontSize: 14, color: _C.mute),
+                    style: TextStyle(fontSize: 14, color: AppColors.mute),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   _buildToggleQuestion(
                     question: 'Merokok minimal 100 batang seumur hidup?',
                     value: _isSmoking,
@@ -219,13 +253,11 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
               ),
             ),
           ),
-          
+
           // Bottom Buttons
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: _C.bg,
-            ),
+            decoration: BoxDecoration(color: AppColors.formBg),
             child: Row(
               children: [
                 Expanded(
@@ -233,13 +265,18 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _C.inactiveBg,
-                      foregroundColor: _C.ink,
+                      backgroundColor: AppColors.inactiveBg,
+                      foregroundColor: AppColors.ink,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    child: const Text('Kembali', style: TextStyle(fontWeight: FontWeight.w600)),
+                    child: const Text(
+                      'Kembali',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -255,18 +292,23 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _C.brand,
+                      backgroundColor: AppColors.brand,
                       foregroundColor: Colors.white,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    child: const Text('Lanjut', style: TextStyle(fontWeight: FontWeight.w600)),
+                    child: const Text(
+                      'Lanjut',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
