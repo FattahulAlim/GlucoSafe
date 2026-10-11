@@ -4,6 +4,7 @@ import '../widgets/app_colors.dart';
 import '../widgets/headbar.dart';
 import '../widgets/navbar.dart';
 import 'history_page.dart';
+import 'profile_page.dart';
 import 'screening_step1_page.dart';
 
 /// Halaman Beranda GlucoSafe — nilai diambil langsung dari frame
@@ -42,12 +43,6 @@ class HomePage extends StatelessWidget {
   final VoidCallback? onOpenProfile;
   final VoidCallback? onOpenHistory;
 
-  void _soon(BuildContext c, String msg) {
-    ScaffoldMessenger.of(c)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(msg)));
-  }
-
   @override
   Widget build(BuildContext context) {
     final risk = riskOf(lastPercent);
@@ -61,7 +56,14 @@ class HomePage extends StatelessWidget {
             HeadBar(
               title: 'Beranda',
               onProfile: onOpenProfile ??
-                  () => _soon(context, 'Halaman Profil belum dihubungkan'),
+                  () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfilePage(),
+                      ),
+                    );
+                  },
             ),
             Expanded(
               child: SingleChildScrollView(

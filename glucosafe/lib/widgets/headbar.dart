@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../pages/profile_page.dart';
 import 'app_colors.dart';
 
 /// Komponen App Bar / Header atas untuk aplikasi GlucoSafe.
@@ -13,6 +14,7 @@ class HeadBar extends StatelessWidget implements PreferredSizeWidget {
     this.showLogo = true,
     this.showProfile = true,
     this.onProfile,
+    this.profileAvatar,
     this.titleWidget,
   });
 
@@ -37,6 +39,9 @@ class HeadBar extends StatelessWidget implements PreferredSizeWidget {
   /// Aksi ketika avatar profil ditekan
   final VoidCallback? onProfile;
 
+  /// Widget custom untuk avatar profil di pojok kanan
+  final Widget? profileAvatar;
+
   /// Widget kustom pengganti judul jika membutuhkan layout khusus
   final Widget? titleWidget;
 
@@ -44,11 +49,12 @@ class HeadBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(64);
 
   void _defaultProfileTap(BuildContext context) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(content: Text('Halaman Profil belum dihubungkan')),
-      );
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ProfilePage(),
+      ),
+    );
   }
 
   @override
@@ -164,25 +170,26 @@ class HeadBar extends StatelessWidget implements PreferredSizeWidget {
                 child: InkWell(
                   onTap: onProfile ?? () => _defaultProfileTap(context),
                   customBorder: const CircleBorder(),
-                  child: const SizedBox(
+                  child: SizedBox(
                     width: 44,
                     height: 44,
                     child: Center(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: AppColors.brand,
-                          shape: BoxShape.circle,
-                        ),
-                        child: SizedBox(
-                          width: 32,
-                          height: 32,
-                          child: Icon(
-                            Icons.person_rounded,
-                            size: 16,
-                            color: Colors.white,
+                      child: profileAvatar ??
+                          const DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: AppColors.brand,
+                              shape: BoxShape.circle,
+                            ),
+                            child: SizedBox(
+                              width: 32,
+                              height: 32,
+                              child: Icon(
+                                Icons.person_rounded,
+                                size: 16,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
                     ),
                   ),
                 ),

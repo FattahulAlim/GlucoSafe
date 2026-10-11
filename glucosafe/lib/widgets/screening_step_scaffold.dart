@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../pages/profile_page.dart';
 import 'app_colors.dart';
 
 /// Kerangka halaman langkah pemeriksaan.
@@ -22,12 +23,6 @@ class ScreeningStepScaffold extends StatelessWidget {
   final VoidCallback? onBack;
   final VoidCallback? onProfileTap;
 
-  void _soon(BuildContext c, String msg) {
-    ScaffoldMessenger.of(c)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(msg)));
-  }
-
   @override
   Widget build(BuildContext context) {
     final percent = (step / totalSteps * 100).round();
@@ -43,7 +38,12 @@ class ScreeningStepScaffold extends StatelessWidget {
               _Header(
                 onBack: onBack ?? () => Navigator.of(context).maybePop(),
                 onProfile: onProfileTap ??
-                    () => _soon(context, 'Halaman Profil belum dihubungkan'),
+                    () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProfilePage(),
+                          ),
+                        ),
               ),
               Expanded(
                 child: SingleChildScrollView(

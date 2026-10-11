@@ -4,6 +4,7 @@ import '../widgets/app_colors.dart';
 import '../widgets/headbar.dart';
 import '../widgets/navbar.dart';
 import 'home_page.dart';
+import 'profile_page.dart';
 
 /// Halaman Riwayat GlucoSafe — Tampilan Riwayat Pemeriksaan Berkala.
 /// Simpan di: lib/pages/history_page.dart
@@ -92,7 +93,14 @@ class _HistoryPageState extends State<HistoryPage> {
             HeadBar(
               title: 'Riwayat',
               onProfile: widget.onOpenProfile ??
-                  () => _showMessage(context, 'Halaman Profil belum dihubungkan'),
+                  () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfilePage(),
+                      ),
+                    );
+                  },
             ),
 
             // Content Body

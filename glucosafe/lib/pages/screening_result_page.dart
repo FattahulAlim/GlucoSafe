@@ -7,6 +7,7 @@ import '../widgets/app_colors.dart';
 import '../widgets/headbar.dart';
 import 'history_page.dart';
 import 'home_page.dart';
+import 'profile_page.dart';
 
 /// Halaman Hasil Skrining GlucoSafe.
 /// Simpan di: lib/pages/screening_result_page.dart
@@ -72,8 +73,12 @@ class ScreeningResultPage extends StatelessWidget {
               title: 'Hasil Skrining',
               showBackButton: true,
               onBack: () => Navigator.maybePop(context),
-              onProfile: () =>
-                  _showMessage(context, 'Halaman Profil belum dihubungkan'),
+              onProfile: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfilePage(),
+                ),
+              ),
             ),
 
             // Scrollable Content
