@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../models/screening_form.dart';
 import '../models/screening_options.dart';
 import '../models/screening_state.dart';
+import '../widgets/app_colors.dart';
 import '../widgets/screening_step_scaffold.dart';
 import 'screening_step2_page.dart';
 
@@ -96,8 +98,7 @@ class _ScreeningStep1PageState extends State<ScreeningStep1Page> {
     return ScreeningStepScaffold(
       step: 1,
       title: 'Data Diri',
-      subtitle:
-          'Lengkapi informasi fisik dan profil dasar Anda untuk mempermudah perhitungan faktor risiko diabetes.',
+      subtitle: 'Lengkapi informasi fisik dan profil dasar Anda untuk mempermudah perhitungan faktor risiko diabetes.',
       onBack: widget.onBack,
       onProfileTap: widget.onProfileTap,
       child: ValueListenableBuilder<ScreeningForm>(
@@ -112,7 +113,7 @@ class _ScreeningStep1PageState extends State<ScreeningStep1Page> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: ScreeningColors.border),
+              border: Border.all(color: AppColors.border),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,8 +147,8 @@ class _ScreeningStep1PageState extends State<ScreeningStep1Page> {
                         focusNode: _heightFocus,
                         errorText: _heightError(form),
                         onChanged: (text) => updateScreeningForm(
-                          (f) => f.copyWith(
-                              heightCm: parseLocalizedDouble(text)),
+                          (f) =>
+                              f.copyWith(heightCm: parseLocalizedDouble(text)),
                         ),
                       ),
                     ),
@@ -160,8 +161,8 @@ class _ScreeningStep1PageState extends State<ScreeningStep1Page> {
                         focusNode: _weightFocus,
                         errorText: _weightError(form),
                         onChanged: (text) => updateScreeningForm(
-                          (f) => f.copyWith(
-                              weightKg: parseLocalizedDouble(text)),
+                          (f) =>
+                              f.copyWith(weightKg: parseLocalizedDouble(text)),
                         ),
                       ),
                     ),
@@ -175,9 +176,9 @@ class _ScreeningStep1PageState extends State<ScreeningStep1Page> {
                 ElevatedButton(
                   onPressed: canContinue ? _next : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ScreeningColors.brand,
+                    backgroundColor: AppColors.brand,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: ScreeningColors.disabled,
+                    disabledBackgroundColor: AppColors.disabled,
                     disabledForegroundColor: Colors.white,
                     minimumSize: const Size.fromHeight(54),
                     elevation: 0,
@@ -204,10 +205,7 @@ class _ScreeningStep1PageState extends State<ScreeningStep1Page> {
                     child: Center(
                       child: Text(
                         'Lengkapi semua isian untuk melanjutkan.',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: ScreeningColors.slate,
-                        ),
+                        style: TextStyle(fontSize: 14, color: AppColors.slate),
                       ),
                     ),
                   ),
@@ -221,9 +219,9 @@ class _ScreeningStep1PageState extends State<ScreeningStep1Page> {
 }
 
 OutlineInputBorder _border(Color c, [double w = 1]) => OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: c, width: w),
-    );
+  borderRadius: BorderRadius.circular(12),
+  borderSide: BorderSide(color: c, width: w),
+);
 
 InputDecoration _decoration({String? suffix, String? error}) {
   return InputDecoration(
@@ -233,11 +231,11 @@ InputDecoration _decoration({String? suffix, String? error}) {
     filled: true,
     fillColor: Colors.white,
     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-    border: _border(ScreeningColors.border),
-    enabledBorder: _border(ScreeningColors.border),
-    focusedBorder: _border(ScreeningColors.brand2, 1.5),
-    errorBorder: _border(ScreeningColors.error),
-    focusedErrorBorder: _border(ScreeningColors.error, 1.5),
+    border: _border(AppColors.border),
+    enabledBorder: _border(AppColors.border),
+    focusedBorder: _border(AppColors.brand2, 1.5),
+    errorBorder: _border(AppColors.error),
+    focusedErrorBorder: _border(AppColors.error, 1.5),
   );
 }
 
@@ -254,7 +252,7 @@ class _FieldLabel extends StatelessWidget {
         style: const TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w600,
-          color: ScreeningColors.ink,
+          color: AppColors.ink,
         ),
       ),
     );
@@ -281,10 +279,10 @@ class _OptionDropdown extends StatelessWidget {
       isExpanded: true,
       menuMaxHeight: 320,
       icon: const Icon(Icons.keyboard_arrow_down_rounded),
-      style: const TextStyle(fontSize: 16, color: ScreeningColors.ink),
+      style: const TextStyle(fontSize: 16, color: AppColors.ink),
       hint: Text(
         hint,
-        style: const TextStyle(fontSize: 16, color: ScreeningColors.hint),
+        style: const TextStyle(fontSize: 16, color: AppColors.hint),
       ),
       decoration: _decoration(),
       items: [
@@ -326,7 +324,7 @@ class _NumberField extends StatelessWidget {
           inputFormatters: [
             FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
           ],
-          style: const TextStyle(fontSize: 16, color: ScreeningColors.ink),
+          style: const TextStyle(fontSize: 16, color: AppColors.ink),
           decoration: _decoration(suffix: suffix, error: errorText),
           onChanged: onChanged,
         ),
@@ -343,10 +341,9 @@ class _BmiCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final category = bmiCategoryOf(bmi);
     final isNormal = category == BmiCategory.normal;
-    final accent = isNormal ? ScreeningColors.brand : ScreeningColors.warn;
-    final background = isNormal ? ScreeningColors.okBg : ScreeningColors.warnBg;
-    final border =
-        isNormal ? ScreeningColors.okBorder : ScreeningColors.warnBorder;
+    final accent = isNormal ? AppColors.brand : AppColors.warn;
+    final background = isNormal ? AppColors.okBg : AppColors.warnBg;
+    final border = isNormal ? AppColors.okBorder : AppColors.warnBorder;
     final summary = 'BMI: ${bmi.toStringAsFixed(1)} kg/m² • ${category.label}';
 
     return Semantics(
@@ -367,7 +364,7 @@ class _BmiCard extends StatelessWidget {
               'Hasil BMI',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: ScreeningColors.ink,
+                color: AppColors.ink,
               ),
             ),
             const SizedBox(width: 12),

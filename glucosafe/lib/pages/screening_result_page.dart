@@ -1,62 +1,15 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+
+import '../models/recommendation_item.dart';
+import '../widgets/app_colors.dart';
+import '../widgets/headbar.dart';
 import 'history_page.dart';
 import 'home_page.dart';
 
 /// Halaman Hasil Skrining GlucoSafe.
 /// Simpan di: lib/pages/screening_result_page.dart
-
-class ResultColors {
-  static const bg = Color(0xFFF0FDFA);
-  static const ink = Color(0xFF131B2E);
-  static const slate = Color(0xFF475569);
-  static const mute = Color(0xFF64748B);
-  static const brand = Color(0xFF00685F);
-  static const brandDark = Color(0xFF00534C);
-
-  // Status & Aksentuasi
-  static const greenText = Color(0xFF047857);
-  static const greenBg = Color(0xFFD1FAE5);
-  static const greenCircle = Color(0xFF16A34A);
-
-  // Alert Box (Orange/Peach)
-  static const alertBg = Color(0xFFFFF7ED);
-  static const alertBorder = Color(0xFFFED7AA);
-  static const alertText = Color(0xFFC2410C);
-
-  // Lavender / Pill
-  static const pillBg = Color(0xFFF1F5F9);
-  static const cardBg = Colors.white;
-
-  // Recommendation Card Colors
-  static const nutrisiBg = Color(0xFFD1FAE5);
-  static const nutrisiIcon = Color(0xFF047857);
-
-  static const fisikBg = Color(0xFFE0F2FE);
-  static const fisikIcon = Color(0xFF0284C7);
-
-  static const periksaBg = Color(0xFFF3E8FF);
-  static const periksaIcon = Color(0xFF7E22CE);
-}
-
-/// Model data rekomendasi
-class RecommendationItem {
-  final String title;
-  final String category;
-  final String description;
-  final IconData icon;
-  final Color iconBg;
-  final Color iconColor;
-
-  const RecommendationItem({
-    required this.title,
-    required this.category,
-    required this.description,
-    required this.icon,
-    required this.iconBg,
-    required this.iconColor,
-  });
-}
 
 class ScreeningResultPage extends StatelessWidget {
   const ScreeningResultPage({
@@ -78,29 +31,26 @@ class ScreeningResultPage extends StatelessWidget {
     RecommendationItem(
       title: 'Kurangi Gula &\nKarbohidrat Olahan',
       category: 'Nutrisi',
-      description:
-          'Mulai batasi makanan manis dan minuman kemasan untuk mencegah kenaikan kadar glukosa.',
+      description: 'Mulai batasi makanan manis dan minuman kemasan untuk mencegah kenaikan kadar glukosa.',
       icon: Icons.restaurant_rounded,
-      iconBg: ResultColors.nutrisiBg,
-      iconColor: ResultColors.nutrisiIcon,
+      iconBg: AppColors.nutrisiBg,
+      iconColor: AppColors.nutrisiIcon,
     ),
     RecommendationItem(
       title: 'Tingkatkan Aktivitas\nFisik',
       category: 'Aktivitas Fisik',
-      description:
-          'Rutin bergerak 30 menit per hari, seperti jalan cepat atau bersepeda santai.',
+      description: 'Rutin bergerak 30 menit per hari, seperti jalan cepat atau bersepeda santai.',
       icon: Icons.fitness_center_rounded,
-      iconBg: ResultColors.fisikBg,
-      iconColor: ResultColors.fisikIcon,
+      iconBg: AppColors.fisikBg,
+      iconColor: AppColors.fisikIcon,
     ),
     RecommendationItem(
       title: 'Skrining Mandiri Lebih\nAwal',
       category: 'Pemeriksaan',
-      description:
-          'Lakukan pemeriksaan berkala dalam 1-2 bulan ke depan untuk memantau perubahan tren.',
+      description: 'Lakukan pemeriksaan berkala dalam 1-2 bulan ke depan untuk memantau perubahan tren.',
       icon: Icons.calendar_month_rounded,
-      iconBg: ResultColors.periksaBg,
-      iconColor: ResultColors.periksaIcon,
+      iconBg: AppColors.periksaBg,
+      iconColor: AppColors.periksaIcon,
     ),
   ];
 
@@ -113,20 +63,26 @@ class ScreeningResultPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ResultColors.bg,
+      backgroundColor: AppColors.bg,
       body: SafeArea(
         child: Column(
           children: [
             // Header Bar
-            _Header(
+            HeadBar(
+              title: 'Hasil Skrining',
+              showBackButton: true,
               onBack: () => Navigator.maybePop(context),
-              onProfile: () => _showMessage(context, 'Halaman Profil belum dihubungkan'),
+              onProfile: () =>
+                  _showMessage(context, 'Halaman Profil belum dihubungkan'),
             ),
 
             // Scrollable Content
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -149,7 +105,7 @@ class ScreeningResultPage extends StatelessWidget {
                             fontSize: 16,
                             height: 22 / 16,
                             fontWeight: FontWeight.w700,
-                            color: ResultColors.ink,
+                            color: AppColors.ink,
                           ),
                         ),
                         Text(
@@ -158,7 +114,7 @@ class ScreeningResultPage extends StatelessWidget {
                             fontSize: 13,
                             height: 18 / 13,
                             fontWeight: FontWeight.w600,
-                            color: ResultColors.greenText,
+                            color: AppColors.greenText,
                           ),
                         ),
                       ],
@@ -171,7 +127,8 @@ class ScreeningResultPage extends StatelessWidget {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: dummyRecommendations.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 12),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         return _RecommendationCard(
                           item: dummyRecommendations[index],
@@ -188,7 +145,7 @@ class ScreeningResultPage extends StatelessWidget {
                         Icon(
                           Icons.info_outline_rounded,
                           size: 16,
-                          color: ResultColors.mute,
+                          color: AppColors.mute,
                         ),
                         SizedBox(width: 8),
                         Expanded(
@@ -197,7 +154,7 @@ class ScreeningResultPage extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               height: 16 / 12,
-                              color: ResultColors.mute,
+                              color: AppColors.mute,
                             ),
                           ),
                         ),
@@ -211,9 +168,13 @@ class ScreeningResultPage extends StatelessWidget {
                       width: double.infinity,
                       height: 52,
                       child: ElevatedButton.icon(
-                        onPressed: onSaveToHistory ??
+                        onPressed:
+                            onSaveToHistory ??
                             () {
-                              _showMessage(context, 'Hasil skrining disimpan ke riwayat');
+                              _showMessage(
+                                context,
+                                'Hasil skrining disimpan ke riwayat',
+                              );
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
@@ -222,7 +183,7 @@ class ScreeningResultPage extends StatelessWidget {
                               );
                             },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ResultColors.brand,
+                          backgroundColor: AppColors.brand,
                           foregroundColor: Colors.white,
                           elevation: 1,
                           shadowColor: const Color(0x1F000000),
@@ -252,7 +213,8 @@ class ScreeningResultPage extends StatelessWidget {
                       width: double.infinity,
                       height: 52,
                       child: OutlinedButton.icon(
-                        onPressed: onRestartScreening ??
+                        onPressed:
+                            onRestartScreening ??
                             () {
                               _showMessage(context, 'Memulai skrining ulang');
                               Navigator.pushReplacement(
@@ -263,19 +225,16 @@ class ScreeningResultPage extends StatelessWidget {
                               );
                             },
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: ResultColors.brand,
+                          foregroundColor: AppColors.brand,
                           side: const BorderSide(
-                            color: ResultColors.brand,
+                            color: AppColors.brand,
                             width: 1.5,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        icon: const Icon(
-                          Icons.refresh_rounded,
-                          size: 20,
-                        ),
+                        icon: const Icon(Icons.refresh_rounded, size: 20),
                         label: const Text(
                           'Skrining Ulang',
                           style: TextStyle(
@@ -302,108 +261,6 @@ class ScreeningResultPage extends StatelessWidget {
 /// Alias class name jika dipanggil sebagai `HasilSkriningPage`
 typedef HasilSkriningPage = ScreeningResultPage;
 
-// ───────────────────────── Header ─────────────────────────
-class _Header extends StatelessWidget {
-  const _Header({
-    required this.onBack,
-    required this.onProfile,
-  });
-
-  final VoidCallback onBack;
-  final VoidCallback onProfile;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 64,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: const BoxDecoration(
-        color: Color(0xD9FFFFFF),
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x0A000000),
-            blurRadius: 8,
-            offset: Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Tombol Kembali
-          IconButton(
-            onPressed: onBack,
-            icon: const Icon(
-              Icons.chevron_left_rounded,
-              size: 28,
-              color: ResultColors.ink,
-            ),
-            tooltip: 'Kembali',
-          ),
-
-          // Logo App
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              gradient: const LinearGradient(
-                colors: [Color(0xFF14B8A6), Color(0xFF0F766E)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: const Icon(
-              Icons.water_drop_rounded,
-              size: 18,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(width: 10),
-
-          // Judul Halaman
-          const Expanded(
-            child: Text(
-              'Hasil Skrining',
-              style: TextStyle(
-                fontSize: 18,
-                height: 26 / 18,
-                fontWeight: FontWeight.w700,
-                color: ResultColors.ink,
-              ),
-            ),
-          ),
-
-          // Tombol Profil User
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: Semantics(
-              button: true,
-              label: 'Buka profil pengguna',
-              child: InkWell(
-                onTap: onProfile,
-                customBorder: const CircleBorder(),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: const BoxDecoration(
-                    color: ResultColors.brand,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.person_rounded,
-                    size: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 // ───────────────────────── Card Ringkasan Hasil ─────────────────────────
 class _ResultSummaryCard extends StatelessWidget {
   const _ResultSummaryCard({
@@ -422,7 +279,7 @@ class _ResultSummaryCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: ResultColors.cardBg,
+        color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [
           BoxShadow(
@@ -445,7 +302,7 @@ class _ResultSummaryCard extends StatelessWidget {
                   size: const Size(170, 170),
                   painter: _ResultGaugePainter(
                     percent: percent,
-                    color: ResultColors.greenCircle,
+                    color: AppColors.greenCircle,
                   ),
                 ),
                 Column(
@@ -458,7 +315,7 @@ class _ResultSummaryCard extends StatelessWidget {
                         height: 44 / 40,
                         letterSpacing: -1,
                         fontWeight: FontWeight.w800,
-                        color: ResultColors.ink,
+                        color: AppColors.ink,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -470,7 +327,7 @@ class _ResultSummaryCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           height: 16 / 12,
-                          color: ResultColors.slate,
+                          color: AppColors.slate,
                         ),
                       ),
                     ),
@@ -486,7 +343,7 @@ class _ResultSummaryCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             decoration: BoxDecoration(
-              color: ResultColors.greenBg,
+              color: AppColors.greenBg,
               borderRadius: BorderRadius.circular(999),
             ),
             child: Row(
@@ -496,7 +353,7 @@ class _ResultSummaryCard extends StatelessWidget {
                   width: 8,
                   height: 8,
                   decoration: const BoxDecoration(
-                    color: ResultColors.greenCircle,
+                    color: AppColors.greenCircle,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -507,7 +364,7 @@ class _ResultSummaryCard extends StatelessWidget {
                     fontSize: 14,
                     height: 18 / 14,
                     fontWeight: FontWeight.w700,
-                    color: ResultColors.greenText,
+                    color: AppColors.greenText,
                   ),
                 ),
               ],
@@ -521,12 +378,9 @@ class _ResultSummaryCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: ResultColors.alertBg,
+              color: AppColors.alertBg,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: ResultColors.alertBorder,
-                width: 1,
-              ),
+              border: Border.all(color: AppColors.alertBorder, width: 1),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -536,7 +390,7 @@ class _ResultSummaryCard extends StatelessWidget {
                   height: 20,
                   margin: const EdgeInsets.only(top: 2),
                   decoration: const BoxDecoration(
-                    color: ResultColors.alertText,
+                    color: AppColors.alertText,
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
@@ -557,7 +411,7 @@ class _ResultSummaryCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       height: 18 / 13,
-                      color: ResultColors.ink,
+                      color: AppColors.ink,
                     ),
                   ),
                 ),
@@ -574,7 +428,7 @@ class _ResultSummaryCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               height: 20 / 14,
-              color: ResultColors.slate,
+              color: AppColors.slate,
             ),
           ),
 
@@ -585,7 +439,7 @@ class _ResultSummaryCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: ResultColors.pillBg,
+              color: AppColors.pillBg,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -595,13 +449,13 @@ class _ResultSummaryCard extends StatelessWidget {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: ResultColors.greenBg,
+                    color: AppColors.greenBg,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: const Icon(
                     Icons.fact_check_outlined,
                     size: 18,
-                    color: ResultColors.greenText,
+                    color: AppColors.greenText,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -613,7 +467,7 @@ class _ResultSummaryCard extends StatelessWidget {
                       fontSize: 13,
                       height: 18 / 13,
                       fontWeight: FontWeight.w600,
-                      color: ResultColors.slate,
+                      color: AppColors.slate,
                     ),
                   ),
                 ),
@@ -638,7 +492,7 @@ class _RecommendationCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ResultColors.cardBg,
+        color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
@@ -662,11 +516,7 @@ class _RecommendationCard extends StatelessWidget {
                   color: item.iconBg,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  item.icon,
-                  size: 24,
-                  color: item.iconColor,
-                ),
+                child: Icon(item.icon, size: 24, color: item.iconColor),
               ),
               const SizedBox(width: 12),
 
@@ -678,7 +528,7 @@ class _RecommendationCard extends StatelessWidget {
                     fontSize: 15,
                     height: 20 / 15,
                     fontWeight: FontWeight.w700,
-                    color: ResultColors.ink,
+                    color: AppColors.ink,
                   ),
                 ),
               ),
@@ -687,9 +537,12 @@ class _RecommendationCard extends StatelessWidget {
 
               // Category Badge Pill Right
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
-                  color: ResultColors.pillBg,
+                  color: AppColors.pillBg,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -698,7 +551,7 @@ class _RecommendationCard extends StatelessWidget {
                     fontSize: 11,
                     height: 14 / 11,
                     fontWeight: FontWeight.w600,
-                    color: ResultColors.slate,
+                    color: AppColors.slate,
                   ),
                 ),
               ),
@@ -713,7 +566,7 @@ class _RecommendationCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 13,
               height: 18 / 13,
-              color: ResultColors.slate,
+              color: AppColors.slate,
             ),
           ),
         ],

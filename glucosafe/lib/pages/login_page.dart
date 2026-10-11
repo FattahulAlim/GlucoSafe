@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/app_colors.dart';
 import 'home_page.dart';
 import 'register_page.dart';
 import '../models/screening_state.dart';
@@ -6,16 +7,6 @@ import 'screening_step1_page.dart';
 
 /// Halaman Login — mengikuti frame "Login - GlucoSafe" di Figma.
 /// Simpan di: lib/pages/login_page.dart
-
-class _C {
-  static const bg = Color(0xFFFAF8FF);
-  static const ink = Color(0xFF131B2E);
-  static const slate = Color(0xFF505F76);
-  static const hint = Color(0xFF6D7A77);
-  static const border = Color(0xFFE2E8F0);
-  static const brand = Color(0xFF00685F);
-  static const brand2 = Color(0xFF0D9488);
-}
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -86,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
   InputDecoration _decoration(String hint, {Widget? suffix, String? error}) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(fontSize: 14, color: _C.hint),
+      hintStyle: const TextStyle(fontSize: 14, color: AppColors.hint),
       errorText: error,
       errorStyle: const TextStyle(fontSize: 12),
       filled: true,
@@ -95,9 +86,9 @@ class _LoginPageState extends State<LoginPage> {
       contentPadding: EdgeInsets.fromLTRB(17, 15.5, suffix != null ? 4 : 17, 15.5),
       suffixIcon: suffix,
       suffixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-      border: _border(_C.border),
-      enabledBorder: _border(_C.border),
-      focusedBorder: _border(_C.brand2, 1.5),
+      border: _border(AppColors.border),
+      enabledBorder: _border(AppColors.border),
+      focusedBorder: _border(AppColors.brand2, 1.5),
       errorBorder: _border(Colors.red.shade400),
       focusedErrorBorder: _border(Colors.red.shade400, 1.5),
     );
@@ -110,14 +101,14 @@ class _LoginPageState extends State<LoginPage> {
           height: 16 / 13,
           letterSpacing: .13,
           fontWeight: FontWeight.w500,
-          color: _C.ink,
+          color: AppColors.ink,
         ),
       );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.bg,
+      backgroundColor: AppColors.formBg,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -138,14 +129,14 @@ class _LoginPageState extends State<LoginPage> {
                       height: 32 / 26,
                       fontWeight: FontWeight.w600,
                       letterSpacing: -.65,
-                      color: _C.ink,
+                      color: AppColors.ink,
                     ),
                   ),
                   const SizedBox(height: 4),
                   const Text(
                     'Masuk ke akun Anda',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, height: 20 / 14, color: _C.slate),
+                    style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.slate),
                   ),
                   const SizedBox(height: 32),
 
@@ -155,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
                   TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    style: const TextStyle(fontSize: 14, color: _C.ink),
+                    style: const TextStyle(fontSize: 14, color: AppColors.ink),
                     onChanged: (value) {
                       setState(() {
                         if (value.isNotEmpty && !value.endsWith('@gmail.com')) {
@@ -188,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
                             height: 14 / 11,
                             letterSpacing: .44,
                             fontWeight: FontWeight.w600,
-                            color: _C.brand,
+                            color: AppColors.brand,
                           ),
                         ),
                       ),
@@ -198,13 +189,13 @@ class _LoginPageState extends State<LoginPage> {
                   TextField(
                     controller: _passwordController,
                     obscureText: _obscureText,
-                    style: const TextStyle(fontSize: 14, color: _C.ink),
+                    style: const TextStyle(fontSize: 14, color: AppColors.ink),
                     decoration: _decoration(
                       '••••••••',
                       suffix: IconButton(
                         tooltip: 'Tampilkan kata sandi',
                         iconSize: 18,
-                        color: _C.slate,
+                        color: AppColors.slate,
                         icon: Icon(
                           _obscureText
                               ? Icons.visibility_off_outlined
@@ -220,7 +211,7 @@ class _LoginPageState extends State<LoginPage> {
                   ElevatedButton(
                     onPressed: _login,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _C.brand2,
+                      backgroundColor: AppColors.brand2,
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(48),
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -247,7 +238,7 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       const Text(
                         'Belum punya akun? ',
-                        style: TextStyle(fontSize: 14, height: 20 / 14, color: _C.slate),
+                        style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.slate),
                       ),
                       GestureDetector(
                         onTap: _goToRegister,
@@ -258,7 +249,7 @@ class _LoginPageState extends State<LoginPage> {
                             height: 16 / 13,
                             letterSpacing: .13,
                             fontWeight: FontWeight.w600,
-                            color: _C.brand2,
+                            color: AppColors.brand2,
                           ),
                         ),
                       ),

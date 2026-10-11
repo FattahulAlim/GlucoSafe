@@ -1,16 +1,7 @@
 import 'package:flutter/material.dart';
-import 'screening_result_page.dart';
 
-class _C {
-  static const bg = Color(0xFFFAF8FF);
-  static const ink = Color(0xFF131B2E);
-  static const mute = Color(0xFF3D4947);
-  static const brand = Color(0xFF00685F);
-  static const inactiveBg = Color(0xFFEEF0FA);
-  static const progressBg = Color(0xFFE0DDF8);
-  static const cardBg = Colors.white;
-  static const lightPill = Color(0xFFE0F5F2);
-}
+import '../widgets/app_colors.dart';
+import 'screening_result_page.dart';
 
 class ScreeningStep4Page extends StatefulWidget {
   const ScreeningStep4Page({super.key});
@@ -37,10 +28,14 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _C.cardBg,
+        color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(color: Color(0x05000000), blurRadius: 4, offset: Offset(0, 2)),
+          BoxShadow(
+            color: Color(0x05000000),
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
         ],
       ),
       child: Column(
@@ -48,12 +43,16 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
         children: [
           const Text(
             'Kondisi kesehatan secara umum',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: _C.ink),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppColors.ink,
+            ),
           ),
           const SizedBox(height: 4),
           const Text(
             'Bagaimana Anda menilai kondisi kesehatan Anda saat ini?',
-            style: TextStyle(fontSize: 13, color: _C.mute),
+            style: TextStyle(fontSize: 13, color: AppColors.mute),
           ),
           const SizedBox(height: 16),
           Row(
@@ -66,7 +65,9 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                   width: 60,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: isSelected ? _C.brand : const Color(0xFFF6F5FE),
+                    color: isSelected
+                        ? AppColors.brand
+                        : const Color(0xFFF6F5FE),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -74,7 +75,7 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                     children: [
                       Icon(
                         _healthOptions[index]['icon'],
-                        color: isSelected ? Colors.white : _C.mute,
+                        color: isSelected ? Colors.white : AppColors.mute,
                         size: 28,
                       ),
                       const SizedBox(height: 8),
@@ -84,7 +85,7 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
-                          color: isSelected ? Colors.white : _C.mute,
+                          color: isSelected ? Colors.white : AppColors.mute,
                           height: 1.2,
                         ),
                       ),
@@ -93,7 +94,7 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                 ),
               );
             }),
-          )
+          ),
         ],
       ),
     );
@@ -108,10 +109,14 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _C.cardBg,
+        color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(color: Color(0x05000000), blurRadius: 4, offset: Offset(0, 2)),
+          BoxShadow(
+            color: Color(0x05000000),
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
         ],
       ),
       child: Column(
@@ -127,41 +132,48 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: _C.ink),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.ink,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     const Text(
                       '(dalam 30 hari terakhir)',
-                      style: TextStyle(fontSize: 13, color: _C.mute),
+                      style: TextStyle(fontSize: 13, color: AppColors.mute),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: _C.lightPill,
+                  color: AppColors.lightPill,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
                   '${value.toInt()} Hari',
                   style: const TextStyle(
-                    color: _C.brand,
+                    color: AppColors.brand,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
                 ),
-              )
+              ),
             ],
           ),
           const SizedBox(height: 16),
           SliderTheme(
             data: SliderThemeData(
-              activeTrackColor: _C.progressBg,
-              inactiveTrackColor: _C.progressBg,
-              thumbColor: _C.brand,
+              activeTrackColor: AppColors.progressBg,
+              inactiveTrackColor: AppColors.progressBg,
+              thumbColor: AppColors.brand,
               trackHeight: 8,
-              overlayColor: _C.brand.withOpacity(0.2),
+              overlayColor: AppColors.brand.withValues(alpha: 0.2),
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
             ),
             child: Slider(
@@ -177,12 +189,21 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: const [
-                Text('0 Hari', style: TextStyle(fontSize: 12, color: _C.mute)),
-                Text('15 Hari', style: TextStyle(fontSize: 12, color: _C.mute)),
-                Text('30 Hari', style: TextStyle(fontSize: 12, color: _C.mute)),
+                Text(
+                  '0 Hari',
+                  style: TextStyle(fontSize: 12, color: AppColors.mute),
+                ),
+                Text(
+                  '15 Hari',
+                  style: TextStyle(fontSize: 12, color: AppColors.mute),
+                ),
+                Text(
+                  '30 Hari',
+                  style: TextStyle(fontSize: 12, color: AppColors.mute),
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -191,12 +212,12 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.bg,
+      backgroundColor: AppColors.formBg,
       appBar: AppBar(
-        backgroundColor: _C.bg,
+        backgroundColor: AppColors.formBg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: _C.ink),
+          icon: const Icon(Icons.arrow_back, color: AppColors.ink),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -204,15 +225,23 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: _C.brand,
+                color: AppColors.brand,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.water_drop, color: Colors.white, size: 16),
+              child: const Icon(
+                Icons.water_drop,
+                color: Colors.white,
+                size: 16,
+              ),
             ),
             const SizedBox(width: 8),
             const Text(
               'Skrining',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: _C.ink),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.ink,
+              ),
             ),
           ],
         ),
@@ -220,7 +249,7 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
-              backgroundColor: _C.brand,
+              backgroundColor: AppColors.brand,
               radius: 16,
               child: const Icon(Icons.person, color: Colors.white, size: 20),
             ),
@@ -231,14 +260,31 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
         children: [
           // Progress Bar
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             child: Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const [
-                    Text('LANGKAH 4 DARI 4', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _C.brand)),
-                    Text('100% Selesai', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: _C.brand)),
+                    Text(
+                      'LANGKAH 4 DARI 4',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.brand,
+                      ),
+                    ),
+                    Text(
+                      '100% Selesai',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.brand,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -246,7 +292,7 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                   height: 4,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: _C.progressBg,
+                    color: AppColors.progressBg,
                     borderRadius: BorderRadius.circular(2),
                   ),
                   child: FractionallySizedBox(
@@ -254,7 +300,7 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                     widthFactor: 1.0,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: _C.brand,
+                        color: AppColors.brand,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -263,7 +309,7 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
               ],
             ),
           ),
-          
+
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -272,15 +318,19 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                 children: [
                   const Text(
                     'Kondisi Umum',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: _C.ink),
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.ink,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   const Text(
                     'Evaluasi menyeluruh untuk melengkapi profil risiko kesehatan Anda.',
-                    style: TextStyle(fontSize: 14, color: _C.mute),
+                    style: TextStyle(fontSize: 14, color: AppColors.mute),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   _buildHealthEmoticons(),
                   _buildSliderCard(
                     title: 'Hari kesehatan mental terganggu',
@@ -290,11 +340,12 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                   _buildSliderCard(
                     title: 'Hari kesehatan fisik tidak fit',
                     value: _physicalHealthDays,
-                    onChanged: (val) => setState(() => _physicalHealthDays = val),
+                    onChanged: (val) =>
+                        setState(() => _physicalHealthDays = val),
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Submit Button
                   SizedBox(
                     width: double.infinity,
@@ -309,15 +360,23 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _C.brand,
+                        backgroundColor: AppColors.brand,
                         foregroundColor: Colors.white,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
-                          Text('Cek Risiko Saya', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                          Text(
+                            'Cek Risiko Saya',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                           SizedBox(width: 8),
                           Icon(Icons.arrow_forward),
                         ],
@@ -325,15 +384,22 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Back to previous step
                   Center(
                     child: TextButton.icon(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.arrow_back, size: 18, color: _C.mute),
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        size: 18,
+                        color: AppColors.mute,
+                      ),
                       label: const Text(
                         'Kembali ke Langkah Sebelumnya',
-                        style: TextStyle(color: _C.mute, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: AppColors.mute,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
