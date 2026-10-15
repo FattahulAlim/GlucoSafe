@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import '../pages/profile_page.dart';
-import 'app_colors.dart';
+﻿import 'package:flutter/material.dart';
+import '../../features/profile/presentation/pages/profile_page.dart';
+import '../theme/app_colors.dart';
 
 /// Komponen App Bar / Header atas untuk aplikasi GlucoSafe.
 /// Dapat digunakan langsung di dalam Column maupun sebagai `appBar:` pada Scaffold.

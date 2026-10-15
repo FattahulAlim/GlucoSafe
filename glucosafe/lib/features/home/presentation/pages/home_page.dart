@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
-import '../models/risk_level.dart';
-import '../widgets/app_colors.dart';
-import '../widgets/headbar.dart';
-import '../widgets/navbar.dart';
-import 'history_page.dart';
-import 'profile_page.dart';
-import 'screening_step1_page.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../screening/domain/risk_level.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/headbar.dart';
+import '../../../../core/widgets/navbar.dart';
+import '../../../history/presentation/pages/history_page.dart';
+import '../../../profile/presentation/pages/profile_page.dart';
+import '../../../screening/presentation/pages/screening_step1_page.dart';
 
 /// Halaman Beranda GlucoSafe — nilai diambil langsung dari frame
 /// "Beranda - GlucoSafe" di Figma (warna, ukuran, jarak, font Inter).

@@ -1,6 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glucosafe/models/screening_form.dart';
-import 'package:glucosafe/models/screening_options.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:glucosafe/features/screening/domain/screening_form.dart';
+import 'package:glucosafe/features/screening/domain/screening_options.dart';
 
 ScreeningForm _complete() => const ScreeningForm(
       sex: 1,

@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import '../models/user_profile.dart';
-import '../widgets/app_colors.dart';
+﻿import 'package:flutter/material.dart';
+import '../../domain/user_profile.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../widgets/profile_avatar.dart';
 
 /// Halaman Edit Profil Pengguna GlucoSafe.

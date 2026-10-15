@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'app_colors.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Widget Avatar Profil yang reusable.
 /// Mendukung inisial teks (seperti 'RW'), background kustom,

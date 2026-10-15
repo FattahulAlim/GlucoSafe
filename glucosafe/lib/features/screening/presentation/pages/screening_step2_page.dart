@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import '../models/screening_form.dart';
-import '../models/screening_state.dart';
-import '../widgets/app_colors.dart';
+﻿import 'package:flutter/material.dart';
+import '../../domain/screening_form.dart';
+import '../../domain/screening_state.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../widgets/screening_step_scaffold.dart';
-import 'screening_step_3_page.dart';
+import './screening_step_3_page.dart';
 
 /// Skrining langkah 2 dari 4: Riwayat Diagnosis.
 /// Simpan di: lib/pages/screening_step2_page.dart

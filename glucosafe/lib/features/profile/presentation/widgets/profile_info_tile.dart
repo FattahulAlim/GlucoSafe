@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'app_colors.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Item baris informasi profil yang reusable.
 /// Menampilkan icon dalam kotak soft-rounded, label judul,

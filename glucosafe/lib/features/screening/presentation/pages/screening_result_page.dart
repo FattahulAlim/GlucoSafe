@@ -1,13 +1,13 @@
-import 'dart:math' as math;
+﻿import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../models/recommendation_item.dart';
-import '../widgets/app_colors.dart';
-import '../widgets/headbar.dart';
-import 'history_page.dart';
-import 'home_page.dart';
-import 'profile_page.dart';
+import '../../domain/recommendation_item.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/headbar.dart';
+import '../../../history/presentation/pages/history_page.dart';
+import '../../../home/presentation/pages/home_page.dart';
+import '../../../profile/presentation/pages/profile_page.dart';
 
 /// Halaman Hasil Skrining GlucoSafe.
 /// Simpan di: lib/pages/screening_result_page.dart

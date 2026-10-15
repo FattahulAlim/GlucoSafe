@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../models/screening_form.dart';
-import '../models/screening_options.dart';
-import '../models/screening_state.dart';
-import '../widgets/app_colors.dart';
+import '../../domain/screening_form.dart';
+import '../../domain/screening_options.dart';
+import '../../domain/screening_state.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../widgets/screening_step_scaffold.dart';
-import 'screening_step2_page.dart';
+import './screening_step2_page.dart';
 
 /// Skrining langkah 1 dari 4: Data Diri.
 /// Simpan di: lib/pages/screening_step1_page.dart
