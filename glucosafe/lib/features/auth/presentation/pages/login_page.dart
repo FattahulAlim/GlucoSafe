@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
     // TODO: panggil API login (Anggota 3) sebelum pindah halaman.
-    Navigator.pushReplacement(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
         builder: (context) => HomePage(
@@ -66,6 +66,7 @@ class _LoginPageState extends State<LoginPage> {
           },
         ),
       ),
+      (route) => false, // hapus Welcome dan Login dari riwayat navigasi
     );
   }
 

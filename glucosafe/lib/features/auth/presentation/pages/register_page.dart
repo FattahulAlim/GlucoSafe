@@ -177,8 +177,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       // TODO: samakan path logo dengan login_page.dart
                       child: Image.asset(
                         'assets/images/logo.png',
-                        errorBuilder: (_, __, ___) =>
-                            const Icon(Icons.water_drop, color: _primary),
+                        errorBuilder: (_, _, _) => const Icon(Icons.water_drop, color: _primary),
                       ),
                     ),
                   ),

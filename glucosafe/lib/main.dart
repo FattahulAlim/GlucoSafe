@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'features/auth/presentation/pages/login_page.dart';
+import 'features/auth/presentation/pages/welcome_page.dart';
 
 void main() {
   runApp(const GlucoSafeApp());
@@ -17,7 +17,7 @@ class GlucoSafeApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Roboto', // Default font mirip wireframe
       ),
-      home: const LoginPage(),
+      home: const WelcomePage(),
       debugShowCheckedModeBanner: false, // Menghilangkan banner debug
     );
   }
