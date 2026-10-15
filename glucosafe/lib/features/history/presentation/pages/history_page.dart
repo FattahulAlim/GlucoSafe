@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-import '../models/history_record.dart';
-import '../widgets/app_colors.dart';
-import '../widgets/headbar.dart';
-import '../widgets/navbar.dart';
-import 'home_page.dart';
-import 'profile_page.dart';
+﻿import 'package:flutter/material.dart';
+import '../../domain/history_record.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/headbar.dart';
+import '../../../../core/widgets/navbar.dart';
+import '../../../home/presentation/pages/home_page.dart';
+import '../../../profile/presentation/pages/profile_page.dart';
 
 /// Halaman Riwayat GlucoSafe — Tampilan Riwayat Pemeriksaan Berkala.
 /// Simpan di: lib/pages/history_page.dart

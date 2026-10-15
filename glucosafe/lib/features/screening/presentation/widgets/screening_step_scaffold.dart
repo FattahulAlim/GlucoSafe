@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import '../pages/profile_page.dart';
-import 'app_colors.dart';
+﻿import 'package:flutter/material.dart';
+import '../../../profile/presentation/pages/profile_page.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Kerangka halaman langkah pemeriksaan.
 class ScreeningStepScaffold extends StatelessWidget {

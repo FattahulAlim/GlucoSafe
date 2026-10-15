@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glucosafe/pages/profile_page.dart';
+import 'package:glucosafe/features/profile/presentation/pages/profile_page.dart';
 
 void main() {
   testWidgets('Menampilkan komponen dan informasi profil pengguna dengan lengkap', (

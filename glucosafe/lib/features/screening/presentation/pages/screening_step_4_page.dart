@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
-import '../widgets/app_colors.dart';
-import 'screening_result_page.dart';
+import '../../../../core/theme/app_colors.dart';
+import './screening_result_page.dart';
 
 class ScreeningStep4Page extends StatefulWidget {
   const ScreeningStep4Page({super.key});

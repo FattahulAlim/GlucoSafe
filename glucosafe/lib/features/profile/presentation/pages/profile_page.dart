@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
-import '../models/user_profile.dart';
-import '../widgets/app_colors.dart';
-import '../widgets/headbar.dart';
-import '../widgets/logout_dialog.dart';
+﻿import 'package:flutter/material.dart';
+import '../../domain/user_profile.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/headbar.dart';
+import '../../../../core/widgets/logout_dialog.dart';
 import '../widgets/profile_action_button.dart';
 import '../widgets/profile_avatar.dart';
 import '../widgets/profile_info_tile.dart';
-import 'edit_profile_page.dart';
-import 'login_page.dart';
+import './edit_profile_page.dart';
+import '../../../auth/presentation/pages/login_page.dart';
 
 /// Halaman Profil Pengguna GlucoSafe.
 /// Menampilkan informasi akun pengguna, ringkasan pemeriksaan,

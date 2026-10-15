@@ -1,6 +1,6 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
+import '../theme/app_colors.dart';
 
 /// Dialog konfirmasi keluar dari akun dengan efek blur pada latar belakang.
 class LogoutDialog extends StatelessWidget {
