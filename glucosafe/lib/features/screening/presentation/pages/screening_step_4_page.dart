@@ -56,40 +56,49 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
           ),
           const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(_healthOptions.length, (index) {
               final isSelected = _generalHealthIndex == index;
-              return GestureDetector(
-                onTap: () => setState(() => _generalHealthIndex = index),
-                child: Container(
-                  width: 60,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.brand
-                        : const Color(0xFFF6F5FE),
-                    borderRadius: BorderRadius.circular(12),
+              return Expanded( // #fix-overflow
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    right: index == _healthOptions.length - 1 ? 0 : 6,
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        _healthOptions[index]['icon'],
-                        color: isSelected ? Colors.white : AppColors.mute,
-                        size: 28,
+                  child: GestureDetector(
+                    onTap: () => setState(() => _generalHealthIndex = index),
+                    child: Container(
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.brand
+                            : const Color(0xFFF6F5FE),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _healthOptions[index]['label'],
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: isSelected ? Colors.white : AppColors.mute,
-                          height: 1.2,
-                        ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _healthOptions[index]['icon'],
+                            color: isSelected ? Colors.white : AppColors.mute,
+                            size: 26,
+                          ),
+                          const SizedBox(height: 6),
+                          FittedBox( // #fix-overflow
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              _healthOptions[index]['label'],
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color:
+                                    isSelected ? Colors.white : AppColors.mute,
+                                height: 1.2,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               );
@@ -189,17 +198,25 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: const [
-                Text(
-                  '0 Hari',
-                  style: TextStyle(fontSize: 12, color: AppColors.mute),
+                Expanded( // #fix-overflow
+                  child: Text(
+                    '0 Hari',
+                    style: TextStyle(fontSize: 12, color: AppColors.mute),
+                  ),
                 ),
-                Text(
-                  '15 Hari',
-                  style: TextStyle(fontSize: 12, color: AppColors.mute),
+                Expanded( // #fix-overflow
+                  child: Text(
+                    '15 Hari',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 12, color: AppColors.mute),
+                  ),
                 ),
-                Text(
-                  '30 Hari',
-                  style: TextStyle(fontSize: 12, color: AppColors.mute),
+                Expanded( // #fix-overflow
+                  child: Text(
+                    '30 Hari',
+                    textAlign: TextAlign.right,
+                    style: TextStyle(fontSize: 12, color: AppColors.mute),
+                  ),
                 ),
               ],
             ),
@@ -269,12 +286,14 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const [
-                    Text(
-                      'LANGKAH 4 DARI 4',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.brand,
+                    Expanded( // #fix-overflow
+                      child: Text(
+                        'LANGKAH 4 DARI 4',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.brand,
+                        ),
                       ),
                     ),
                     Text(
@@ -367,19 +386,22 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text(
-                            'Cek Risiko Saya',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                      child: FittedBox( // #fix-overflow
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Text(
+                              'Cek Risiko Saya',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                          SizedBox(width: 8),
-                          Icon(Icons.arrow_forward),
-                        ],
+                            SizedBox(width: 8),
+                            Icon(Icons.arrow_forward),
+                          ],
+                        ),
                       ),
                     ),
                   ),

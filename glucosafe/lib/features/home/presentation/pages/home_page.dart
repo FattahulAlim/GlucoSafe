@@ -114,6 +114,7 @@ class HomePage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
                       child: Container(
+                        width: double.infinity, // #fix-overflow
                         height: 54,
                         decoration: BoxDecoration(
                           color: AppColors.brand,
@@ -149,12 +150,16 @@ class HomePage extends StatelessWidget {
                                 Icon(Icons.add_moderator_outlined,
                                     size: 18, color: Colors.white),
                                 SizedBox(width: 8),
-                                Text('Mulai Skrining Baru',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        height: 22 / 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white)),
+                                Flexible( // #fix-overflow
+                                  child: Text('Mulai Skrining Baru',
+                                      maxLines: 1, // #fix-overflow
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          height: 22 / 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white)),
+                                ),
                               ],
                             ),
                           ),

@@ -104,22 +104,28 @@ class ScreeningResultPage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Rekomendasi Langkah Nyata',
-                          style: TextStyle(
-                            fontSize: 16,
-                            height: 22 / 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.ink,
+                        const Expanded( // #fix-overflow
+                          child: Text(
+                            'Rekomendasi Langkah Nyata',
+                            style: TextStyle(
+                              fontSize: 16,
+                              height: 22 / 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.ink,
+                            ),
                           ),
                         ),
-                        Text(
-                          '${dummyRecommendations.length} Rekomendasi',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            height: 18 / 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.greenText,
+                        Flexible( // #fix-overflow
+                          child: Text(
+                            '${dummyRecommendations.length} Rekomendasi',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              height: 18 / 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.greenText,
+                            ),
                           ),
                         ),
                       ],
@@ -541,22 +547,26 @@ class _RecommendationCard extends StatelessWidget {
               const SizedBox(width: 8),
 
               // Category Badge Pill Right
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.pillBg,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  item.category,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    height: 14 / 11,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.slate,
+              Flexible( // #fix-overflow
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.pillBg,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    item.category,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      height: 14 / 11,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.slate,
+                    ),
                   ),
                 ),
               ),

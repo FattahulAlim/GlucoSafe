@@ -64,13 +64,15 @@ class ScreeningStepScaffold extends StatelessWidget {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      'LANGKAH $step DARI $totalSteps',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 0.5,
-                                        color: AppColors.brand2,
+                                    Expanded( // #fix-overflow
+                                      child: Text(
+                                        'LANGKAH $step DARI $totalSteps',
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 0.5,
+                                          color: AppColors.brand2,
+                                        ),
                                       ),
                                     ),
                                     Text(
