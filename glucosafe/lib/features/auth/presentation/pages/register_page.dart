@@ -67,6 +67,12 @@ class _RegisterPageState extends State<RegisterPage> {
   void _submit() {
     if (!_validate()) return;
 
+    // #fix-overflow: margin bawah dihitung dari tinggi layar; nilainya bisa
+    // negatif saat keyboard terbuka sehingga menuSnackBar gagal dirender.
+    // Batasi agar tidak pernah negatif.
+    final screenHeight = MediaQuery.of(context).size.height;
+    final bottomMargin = (screenHeight - 150).clamp(0.0, double.infinity);
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text(
@@ -76,7 +82,7 @@ class _RegisterPageState extends State<RegisterPage> {
         backgroundColor: Colors.green.shade600,
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).size.height - 150,
+          bottom: bottomMargin, // #fix-overflow
           left: 20,
           right: 20,
         ),
@@ -305,8 +311,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 24),
 
                   // Footer Login
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap( // #fix-overflow
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       const Text(
                         'Sudah punya akun? ',

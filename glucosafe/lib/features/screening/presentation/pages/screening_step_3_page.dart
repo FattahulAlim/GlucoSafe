@@ -167,12 +167,14 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const [
-                    Text(
-                      'LANGKAH 3 DARI 4',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.brand,
+                    Expanded( // #fix-overflow
+                      child: Text(
+                        'LANGKAH 3 DARI 4',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.brand,
+                        ),
                       ),
                     ),
                     Text(

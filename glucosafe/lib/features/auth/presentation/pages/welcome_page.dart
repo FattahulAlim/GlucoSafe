@@ -221,12 +221,17 @@ class _ExampleResultCard extends StatelessWidget {
                         CircleAvatar(
                             radius: 4, backgroundColor: AppColors.safe),
                         SizedBox(width: 6),
-                        Text(
-                          'Tidak Berisiko',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.safe,
+                        Flexible( // #fix-overflow
+                          child: FittedBox( // #fix-overflow
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Tidak Berisiko',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.safe,
+                              ),
+                            ),
                           ),
                         ),
                       ],

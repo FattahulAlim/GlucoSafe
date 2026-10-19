@@ -118,16 +118,20 @@ class _HistoryPageState extends State<HistoryPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Total ${dummyRecords.length} Pemeriksaan',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            height: 22 / 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.ink,
+                        Expanded( // #fix-overflow
+                          child: Text(
+                            'Total ${dummyRecords.length} Pemeriksaan',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              height: 22 / 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.ink,
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 8), // #fix-overflow
                         const Row(
+                          mainAxisSize: MainAxisSize.min, // #fix-overflow
                           children: [
                             Icon(
                               Icons.trending_down_rounded,
@@ -263,14 +267,18 @@ class _BannerCard extends StatelessWidget {
                       color: AppColors.greenText,
                     ),
                     const SizedBox(width: 6),
-                    Text(
-                      'PEMANTAUAN MANDIRI',
-                      style: TextStyle(
-                        fontSize: 13,
-                        height: 16 / 13,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: .5,
-                        color: AppColors.greenText,
+                    const Flexible( // #fix-overflow
+                      child: Text(
+                        'PEMANTAUAN MANDIRI',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13,
+                          height: 16 / 13,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: .5,
+                          color: AppColors.greenText,
+                        ),
                       ),
                     ),
                   ],
@@ -356,34 +364,40 @@ class _HistoryCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          record.percentage,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            height: 26 / 22,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -.3,
-                            color: AppColors.ink,
+                        Flexible( // #fix-overflow
+                          child: Text(
+                            record.percentage,
+                            style: const TextStyle(
+                              fontSize: 22,
+                              height: 26 / 22,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -.3,
+                              color: AppColors.ink,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),
                         // Badge Status Risiko
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: record.bgColor,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Text(
-                            record.status,
-                            style: TextStyle(
-                              fontSize: 12,
-                              height: 16 / 12,
-                              fontWeight: FontWeight.w700,
-                              color: record.textColor,
+                        Flexible( // #fix-overflow
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: record.bgColor,
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              record.status,
+                              maxLines: 1, // #fix-overflow
+                              overflow: TextOverflow.ellipsis, // #fix-overflow
+                              style: TextStyle(
+                                fontSize: 12,
+                                height: 16 / 12,
+                                fontWeight: FontWeight.w700,
+                                color: record.textColor,
+                              ),
                             ),
                           ),
                         ),
@@ -398,12 +412,16 @@ class _HistoryCard extends StatelessWidget {
                           color: AppColors.mute,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          record.date,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            height: 18 / 13,
-                            color: AppColors.mute,
+                        Flexible( // #fix-overflow
+                          child: Text(
+                            record.date,
+                            maxLines: 1, // #fix-overflow
+                            overflow: TextOverflow.ellipsis, // #fix-overflow
+                            style: const TextStyle(
+                              fontSize: 13,
+                              height: 18 / 13,
+                              color: AppColors.mute,
+                            ),
                           ),
                         ),
                         if (record.isLatest) ...[

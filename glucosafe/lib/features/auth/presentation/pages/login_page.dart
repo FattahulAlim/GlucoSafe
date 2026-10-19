@@ -165,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _label('Kata Sandi'),
+                      Expanded(child: _label('Kata Sandi')), // #fix-overflow
                       GestureDetector(
                         onTap: () {
                           ScaffoldMessenger.of(context)
@@ -234,8 +234,9 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 32),
 
                   // Footer
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap( // #fix-overflow
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       const Text(
                         'Belum punya akun? ',
