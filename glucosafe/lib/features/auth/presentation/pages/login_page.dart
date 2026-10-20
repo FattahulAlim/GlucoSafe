@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../data/dummy_user_database.dart';
 import '../../../home/presentation/pages/home_page.dart';
 import './register_page.dart';
 import '../../../screening/domain/screening_state.dart';
@@ -47,6 +48,15 @@ class _LoginPageState extends State<LoginPage> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(content: Text('Periksa kembali email Anda')),
+        );
+      return;
+    }
+    if (DummyUserDatabase.instance.login(email, _passwordController.text) ==
+        null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('Email atau kata sandi salah')),
         );
       return;
     }

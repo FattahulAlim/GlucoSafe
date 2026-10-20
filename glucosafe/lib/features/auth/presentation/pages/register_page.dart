@@ -1,4 +1,6 @@
 ﻿import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../data/dummy_user_database.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -8,14 +10,6 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  // Warna dari Figma (frame "Daftar - GlucoSafe").
-  // Nanti bisa dipindah ke core/theme/app_colors.dart
-  static const Color _bg = Color(0xFFFAF8FF);
-  static const Color _textDark = Color(0xFF131B2E);
-  static const Color _textSecondary = Color(0xFF3D4947);
-  static const Color _hint = Color(0xFF6D7A77);
-  static const Color _primary = Color(0xFF00685F);
-
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   final TextEditingController _nameController = TextEditingController();
@@ -67,6 +61,18 @@ class _RegisterPageState extends State<RegisterPage> {
   void _submit() {
     if (!_validate()) return;
 
+    final user = DummyUser(
+      name: _nameController.text.trim(),
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
+    if (!DummyUserDatabase.instance.register(user)) {
+      setState(() {
+        _emailErrorText = 'Email sudah terdaftar';
+      });
+      return;
+    }
+
     // #fix-overflow: margin bawah dihitung dari tinggi layar; nilainya bisa
     // negatif saat keyboard terbuka sehingga menuSnackBar gagal dirender.
     // Batasi agar tidak pernah negatif.
@@ -79,7 +85,7 @@ class _RegisterPageState extends State<RegisterPage> {
           'Pendaftaran berhasil! Silakan login.',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
         ),
-        backgroundColor: Colors.green.shade600,
+        backgroundColor: AppColors.brand2,
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.only(
           bottom: bottomMargin, // #fix-overflow
@@ -119,25 +125,31 @@ class _RegisterPageState extends State<RegisterPage> {
 
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: _hint, fontSize: 16),
+      hintStyle: const TextStyle(color: AppColors.hint, fontSize: 14),
       errorText: errorText,
+      errorStyle: const TextStyle(fontSize: 12),
       filled: true,
       fillColor: Colors.white,
       suffixIcon: suffix,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-      border: border(Colors.transparent),
-      enabledBorder: border(Colors.transparent),
-      focusedBorder: border(_primary, 1.5),
-      errorBorder: border(Colors.redAccent),
-      focusedErrorBorder: border(Colors.redAccent, 1.5),
+      isDense: true,
+      contentPadding: EdgeInsets.fromLTRB(17, 15.5, suffix != null ? 4 : 17, 15.5),
+      suffixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+      border: border(AppColors.border),
+      enabledBorder: border(AppColors.border),
+      focusedBorder: border(AppColors.brand2, 1.5),
+      errorBorder: border(Colors.red.shade400),
+      focusedErrorBorder: border(Colors.red.shade400, 1.5),
     );
   }
 
-  Widget _label(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Text(
-          text,
-          style: const TextStyle(fontSize: 14, color: _textDark, height: 20 / 14),
+  Widget _label(String text) => Text(
+        text,
+        style: const TextStyle(
+          fontSize: 13,
+          height: 16 / 13,
+          letterSpacing: .13,
+          fontWeight: FontWeight.w500,
+          color: AppColors.ink,
         ),
       );
 
@@ -146,78 +158,56 @@ class _RegisterPageState extends State<RegisterPage> {
         icon: Icon(
           obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
           size: 20,
-          color: _hint,
+          color: AppColors.slate,
         ),
       );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: AppColors.formBg,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 340),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Logo
-                  Center(
-                    child: Container(
-                      width: 56,
-                      height: 56,
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x0D000000),
-                            blurRadius: 2,
-                            offset: Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      // TODO: samakan path logo dengan login_page.dart
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        errorBuilder: (_, _, _) => const Icon(Icons.water_drop, color: _primary),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
+                  const Center(child: _LogoBox(size: 48, radius: 8, padding: 6)),
+                  const SizedBox(height: 16),
                   const Text(
-                    'Buat Akun',
+                    'GlucoSafe',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 26,
-                      fontWeight: FontWeight.w600,
-                      color: _textDark,
-                      letterSpacing: -0.65,
                       height: 32 / 26,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -0.65,
+                      color: AppColors.ink,
                     ),
                   ),
-                  const SizedBox(height: 7),
+                  const SizedBox(height: 4),
                   const Text(
                     'Isi data berikut untuk mulai memeriksa kesehatan Anda.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
-                      color: _textSecondary,
-                      height: 22.75 / 14,
+                      height: 20 / 14,
+                      color: AppColors.slate,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
 
                   // Nama Lengkap
                   _label('Nama Lengkap'),
+                  const SizedBox(height: 4),
                   TextField(
                     controller: _nameController,
                     textCapitalization: TextCapitalization.words,
                     textInputAction: TextInputAction.next,
+                    style: const TextStyle(fontSize: 14, color: AppColors.ink),
                     decoration: _decoration(
                       'Masukkan nama lengkap',
                       errorText: _nameErrorText,
@@ -227,10 +217,12 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   // Email
                   _label('Email'),
+                  const SizedBox(height: 4),
                   TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
+                    style: const TextStyle(fontSize: 14, color: AppColors.ink),
                     onChanged: (value) {
                       setState(() {
                         if (value.isNotEmpty && !value.endsWith('@gmail.com')) {
@@ -249,10 +241,12 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   // Kata Sandi
                   _label('Kata Sandi'),
+                  const SizedBox(height: 4),
                   TextField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     textInputAction: TextInputAction.next,
+                    style: const TextStyle(fontSize: 14, color: AppColors.ink),
                     decoration: _decoration(
                       'Minimal 8 karakter',
                       errorText: _passwordErrorText,
@@ -267,10 +261,12 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   // Ulangi Kata Sandi
                   _label('Ulangi Kata Sandi'),
+                  const SizedBox(height: 4),
                   TextField(
                     controller: _confirmPasswordController,
                     obscureText: _obscureConfirmPassword,
                     textInputAction: TextInputAction.done,
+                    style: const TextStyle(fontSize: 14, color: AppColors.ink),
                     onSubmitted: (_) => _submit(),
                     decoration: _decoration(
                       'Ulangi kata sandi',
@@ -286,14 +282,15 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   // Tombol Daftar
                   SizedBox(
-                    height: 52,
                     child: ElevatedButton(
                       onPressed: _submit,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _primary,
+                        backgroundColor: AppColors.brand2,
                         foregroundColor: Colors.white,
-                        elevation: 4,
-                        shadowColor: const Color(0x1A000000),
+                        minimumSize: const Size.fromHeight(48),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        elevation: 1,
+                        shadowColor: AppColors.border,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -302,8 +299,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         'Daftar',
                         style: TextStyle(
                           fontSize: 16,
+                          height: 24 / 16,
                           fontWeight: FontWeight.w600,
-                          letterSpacing: 0.4,
                         ),
                       ),
                     ),
@@ -317,7 +314,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     children: [
                       const Text(
                         'Sudah punya akun? ',
-                        style: TextStyle(fontSize: 14, color: _textSecondary),
+                        style: TextStyle(
+                          fontSize: 14,
+                          height: 20 / 14,
+                          color: AppColors.slate,
+                        ),
                       ),
                       GestureDetector(
                         onTap: () {
@@ -326,7 +327,13 @@ class _RegisterPageState extends State<RegisterPage> {
                         },
                         child: const Text(
                           'Masuk',
-                          style: TextStyle(fontSize: 14, color: _primary),
+                          style: TextStyle(
+                            fontSize: 13,
+                            height: 16 / 13,
+                            letterSpacing: .13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.brand2,
+                          ),
                         ),
                       ),
                     ],
@@ -334,6 +341,57 @@ class _RegisterPageState extends State<RegisterPage> {
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LogoBox extends StatelessWidget {
+  const _LogoBox({
+    required this.size,
+    required this.radius,
+    required this.padding,
+  });
+
+  final double size;
+  final double radius;
+  final double padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      padding: EdgeInsets.all(padding),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(radius),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.border.withValues(alpha: 0.5),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Image.asset(
+        'assets/images/logo.png',
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stack) => Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(radius * .7),
+            gradient: const LinearGradient(
+              colors: [AppColors.brand2, AppColors.brandDark],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: const Icon(
+            Icons.water_drop_rounded,
+            color: Colors.white,
+            size: 20,
           ),
         ),
       ),
