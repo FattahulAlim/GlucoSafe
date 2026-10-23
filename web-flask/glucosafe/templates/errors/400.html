@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Permintaan Tidak Valid &mdash; GlucoSafe{% endblock %}
+{% block content %}
+<div class="error-page">
+  <p class="eyebrow">Kode 400</p>
+  <h1>Permintaan Tidak Valid</h1>
+  <p class="lead">{{ message or 'Data yang dikirimkan tidak sesuai dengan format yang diharapkan.' }}</p>
+  <div class="hero-actions">
+    <a href="{{ url_for('pages.predict') }}" class="button button-primary">Kembali ke Formulir</a>
+    <a href="{{ url_for('pages.home') }}" class="button button-secondary">Beranda</a>
+  </div>
+</div>
+{% endblock %}

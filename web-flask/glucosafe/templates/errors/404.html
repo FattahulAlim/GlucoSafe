@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Halaman Tidak Ditemukan &mdash; GlucoSafe{% endblock %}
+{% block content %}
+<div class="error-page">
+  <p class="eyebrow">Kode 404</p>
+  <h1>Halaman Tidak Ditemukan</h1>
+  <p class="lead">Halaman yang Anda tuju tidak tersedia atau telah dipindahkan.</p>
+  <div class="hero-actions">
+    <a href="{{ url_for('pages.home') }}" class="button button-primary">Kembali ke Beranda</a>
+  </div>
+</div>
+{% endblock %}
