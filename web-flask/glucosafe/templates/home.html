@@ -1,122 +1,136 @@
 {% extends "base.html" %}
-{% block title %}Pengolahan Dataset &mdash; GlucoSafe{% endblock %}
+{% block title %}Olah Dataset &mdash; GlucoSafe{% endblock %}
 {% block content %}
 <section class="hero">
   <div class="hero-copy">
-    <p class="eyebrow">Mesin Pengolahan Data &bull; Persiapan Data Skrining</p>
-    <h1>Pengolahan &amp; Pembersihan Dataset</h1>
+    <p class="eyebrow">Dataset Pipeline &bull; GlucoSafe Mobile</p>
+    <h1>Olah Dataset &amp; Jalankan Model</h1>
     <p class="lead">
-      Panel ini bertugas memvalidasi, membersihkan missing value, mengeliminasi outlier, dan merekayasa fitur (kalkulasi BMI) dari dataset mentah untuk menyiapkan data latih model aplikasi mobile GlucoSafe.
+      Unggah dataset CSV, jalankan inferensi model ML secara batch, lalu simpan hasilnya ke database
+      agar dapat ditarik langsung oleh aplikasi mobile GlucoSafe sebagai hasil skrining pengguna.
     </p>
   </div>
 
-  <aside class="model-card" aria-label="Spesifikasi Pemrosesan">
-    <h2>Spesifikasi Standar Fitur</h2>
+  <aside class="model-card" aria-label="Status Layanan">
+    <h2>Status Layanan</h2>
     <dl class="model-meta">
-      <div><dt>Standar Fitur</dt><dd>15 Fitur BRFSS 2015</dd></div>
-      <div><dt>Metode Eksekusi</dt><dd>Streaming &amp; Memory-Efficient</dd></div>
-      <div><dt>Tujuan Akhir</dt><dd>Dataset Bersih Siap Latih</dd></div>
+      <div><dt>Model ML</dt><dd>{{ 'Siap' if status.model_ready else 'Belum Tersedia' }}</dd></div>
+      <div><dt>Database</dt><dd>{{ (db_name ~ ' (terhubung)') if db_connected else 'Tidak terhubung' }}</dd></div>
     </dl>
-    <p class="muted small">Data kotor dan anomali akan disaring otomatis.</p>
   </aside>
 </section>
 
 <section id="upload-section" class="section">
   <div class="upload-card">
     <h2>Unggah Dataset CSV</h2>
-    <p class="muted">
-      Pilih berkas CSV dataset Anda. Kolom dapat berupa format standar <code>HighBP, BMI, Age...</code> maupun format mentah yang memiliki kolom tinggi dan berat badan (otomatis dihitung menjadi BMI).
-    </p>
 
     <form method="post" action="{{ url_for('pages.process') }}" enctype="multipart/form-data" class="upload-form">
       <div class="drop-zone">
         <label for="csv_file" class="file-label">
-          <span class="file-title">Pilih atau seret berkas CSV mentah ke sini</span>
-          <span class="file-hint">ekstensi .csv</span>
+          <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 16V4"></path>
+            <path d="m7 9 5-5 5 5"></path>
+            <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path>
+          </svg>
+          <span class="file-title">Unggah Dataset</span>
+          <span class="file-hint">Maksimal {{ max_rows_display }} baris &bull; ekstensi .csv</span>
           <input type="file" id="csv_file" name="csv_file" accept=".csv,text/csv" required>
         </label>
       </div>
 
-      <div class="form-actions form-actions-single">
-        <button type="submit" class="button button-primary">
-          Mulai Bersihkan &amp; Olah Dataset
+      <div class="form-fields">
+        <label class="form-check">
+          <input type="checkbox" name="save_to_db" value="1" {% if db_connected %}checked{% endif %} {% if not db_connected %}disabled{% endif %}>
+          <span>
+            Simpan hasil prediksi ke database MySQL
+            {% if not db_connected %}<em class="muted">(database tidak terhubung)</em>{% endif %}
+          </span>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="button button-primary" {% if not status.model_ready %}disabled{% endif %}>
+          Olah Dataset &amp; Prediksi
         </button>
       </div>
+      {% if not status.model_ready %}
+        <p class="muted small">Tombol nonaktif karena artefak model belum tersedia di <code>model/artifacts/</code>.</p>
+      {% endif %}
     </form>
   </div>
 </section>
 
-{% if clean_data %}
+{% if batch %}
 <section class="section" id="output-section">
   <div class="result-wrapper">
     <div class="page-header">
-      <p class="eyebrow">Laporan Pengolahan Data</p>
+      <p class="eyebrow">Laporan Hasil Olah Data</p>
       <h1>Hasil Pengolahan Dataset</h1>
       <p class="muted">
-        Berkas: <strong>{{ clean_data.filename }}</strong> &bull;
-        Total dibaca: <strong>{{ clean_data.total_rows }} baris</strong>
+        Berkas: <strong>{{ batch.filename }}</strong> &bull;
+        Total baris: <strong>{{ batch.total_rows }}</strong>
       </p>
     </div>
+
+    {% if batch.db_error %}
+      <div class="alert alert-warning" role="status">{{ batch.db_error }}</div>
+    {% endif %}
 
     <div class="stats-grid">
       <div class="stat-card">
-        <span class="stat-label">Total Baris Mentah</span>
-        <span class="stat-value">{{ clean_data.total_rows }}</span>
+        <span class="stat-label">Total Baris</span>
+        <span class="stat-value">{{ batch.total_rows }}</span>
       </div>
       <div class="stat-card is-success">
-        <span class="stat-label">Data Bersih (Lolos)</span>
-        <span class="stat-value">{{ clean_data.clean_rows_count }}</span>
+        <span class="stat-label">Data Valid &amp; Diprediksi</span>
+        <span class="stat-value">{{ batch.valid_count }}</span>
       </div>
-      <div class="stat-card {% if clean_data.dropped_missing_count > 0 %}is-danger{% endif %}">
-        <span class="stat-label">Dibuang (Missing Value)</span>
-        <span class="stat-value">{{ clean_data.dropped_missing_count }}</span>
+      <div class="stat-card {% if batch.invalid_count > 0 %}is-danger{% endif %}">
+        <span class="stat-label">Data Tidak Valid</span>
+        <span class="stat-value">{{ batch.invalid_count }}</span>
       </div>
-      <div class="stat-card {% if clean_data.dropped_outlier_count > 0 %}is-danger{% endif %}">
-        <span class="stat-label">Dibuang (Outlier / Anomali)</span>
-        <span class="stat-value">{{ clean_data.dropped_outlier_count }}</span>
+      <div class="stat-card {% if batch.saved_to_db_count > 0 %}is-success{% endif %}">
+        <span class="stat-label">Tersimpan ke Database</span>
+        <span class="stat-value">{{ batch.saved_to_db_count }}</span>
       </div>
     </div>
 
+    {% if batch.label_counts %}
     <div class="summary-section">
-      <h2>Metrik Transformasi Fitur</h2>
+      <h2>Distribusi Label Prediksi</h2>
       <div class="label-chips">
-        <span class="label-chip is-low">
-          BMI Dihitung Otomatis: <strong>{{ clean_data.bmi_derived_count }} baris</strong>
-        </span>
-        <span class="label-chip is-mid">
-          Rata-rata BMI Dataset: <strong>{{ clean_data.avg_bmi }} kg/m²</strong>
-        </span>
-        <span class="label-chip">
-          Kolom Tersusun: <strong>{{ clean_data.output_headers|length }} fitur kanonik</strong>
-        </span>
+        {% for label, count in batch.label_counts.items() %}
+          <span class="label-chip">{{ label }}: <strong>{{ count }}</strong></span>
+        {% endfor %}
+        <span class="label-chip">Model: <strong>{{ batch.model_version or '-' }}</strong></span>
       </div>
     </div>
+    {% endif %}
 
     <div class="result-actions section-actions">
       <a href="{{ url_for('pages.download_csv', token=token) }}" class="button button-primary">
-        Unduh Dataset Bersih (Cleaned CSV)
+        Unduh CSV Hasil Prediksi
       </a>
       <a href="{{ url_for('pages.home') }}" class="button button-secondary">
-        Reset / Olah Berkas Lain
+        Olah Berkas Lain
       </a>
     </div>
 
+    {% if batch.preview_rows %}
     <div class="summary-section">
-      <h2>Pratinjau Dataset Bersih (20 Baris Pertama)</h2>
-      <p class="muted small">
-        Data ini telah diselaraskan dengan kontrak fitur 15 indikator kesehatan BRFSS 2015 untuk model skrining mobile.
-      </p>
+      <h2>Pratinjau Hasil (20 Baris Pertama)</h2>
+      <p class="muted small">Kolom <code>pred_label</code> dan <code>pred_score</code> dihasilkan oleh model ML.</p>
       <div class="table-scroll">
         <table class="data-table">
           <thead>
             <tr>
-              {% for key in clean_data.preview_rows[0].keys() %}
+              {% for key in batch.preview_rows[0].keys() %}
                 <th>{{ key }}</th>
               {% endfor %}
             </tr>
           </thead>
           <tbody>
-            {% for row in clean_data.preview_rows %}
+            {% for row in batch.preview_rows %}
               <tr>
                 {% for value in row.values() %}
                   <td>{{ value }}</td>
@@ -127,6 +141,32 @@
         </table>
       </div>
     </div>
+    {% endif %}
+
+    {% if batch.row_errors %}
+    <div class="summary-section">
+      <h2>Contoh Baris Tidak Valid (maks. 50)</h2>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr><th>Baris</th><th>Kesalahan</th></tr>
+          </thead>
+          <tbody>
+            {% for err in batch.row_errors %}
+              <tr>
+                <td>{{ err.row_number }}</td>
+                <td>
+                  {% for field, msg in err.errors.items() %}
+                    {{ field }}: {{ msg }}{% if not loop.last %}; {% endif %}
+                  {% endfor %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
   </div>
 </section>
 {% endif %}

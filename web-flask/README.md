@@ -1,48 +1,68 @@
-# GlucoSafe: Website Flask & API Machine Learning
+# GlucoSafe: Web Flask Pengolahan Dataset & Batch Inference
 
-Website pengujian model dan penyedia API machine learning untuk tim GlucoSafe dan aplikasi mobile Flutter, dibangun sesuai spesifikasi **PRD_GlucoSafe.md versi 1.3** dan acuan visual **design.md**.
+Layanan web untuk mengolah dataset CSV skala besar, menjalankan inferensi model ML
+secara batch, lalu menyimpan hasilnya ke database MySQL agar dapat ditarik oleh
+aplikasi mobile GlucoSafe.
 
-## Fitur Utama
+## Alur Kerja
 
-1. **Website Satu Halaman (`GET /`)**
-   - Header ringkas dengan status model aktual dari backend.
-   - Form data masukan 15 fitur (BRFSS 2015) untuk 1 data per permintaan (tanpa upload CSV/batch sesuai batasan MVP).
-   - Validasi langsung di sisi klien dan sisi server dengan fokus keyboard otomatis ke kesalahan pertama.
-   - Area hasil prediksi: label keluaran model, versi model, skor (bila tersedia), dan ringkasan data yang diuji.
-   - Keterangan tegas bahwa hasil adalah prediksi model, bukan diagnosis medis.
-   - Deteksi perubahan input setelah prediksi sukses: otomatis menandai data berubah agar hasil tidak tertukar.
+1. Admin mengunggah dataset CSV (format 15 fitur BRFSS 2015, hingga 500.000 baris).
+2. Web Flask memvalidasi setiap baris dan menjalankan model secara chunked (`10.000` baris/chunk).
+3. Hasil prediksi (`pred_label`, `pred_score`, `model_version`) ditulis ke CSV dan
+   disimpan ke tabel `screening_results`.
+4. Aplikasi mobile menarik riwayat/hasil melalui backend Node.js (`GET /api/screenings`).
 
-2. **API JSON Terpadu**
-   - `GET /api/health`: Memeriksa kesiapan layanan dan artefak model (`model_ready`, `model_version`, daftar fitur).
-   - `POST /api/predict`: Menerima `{ "features": { ... } }`, memvalidasi tipe/rentang nilai, menjalankan model terlatih, mengembalikan `{ "success": true, "prediction": "...", "model_version": "...", "score": ... }`.
-   - Kode status HTTP presisi:
-     - `200`: Berhasil diproses
-     - `400`: Input tidak valid (`VALIDATION_ERROR`, rincian per field)
-     - `415`: Format bukan application/json (`UNSUPPORTED_MEDIA_TYPE`)
-     - `503`: Model belum tersedia (`MODEL_NOT_READY`, tanpa hasil palsu)
-     - `500`: Kesalahan internal server (tanpa membocorkan traceback)
+### Penentuan `user_id` (Hybrid)
 
-3. **Desain Terarah (design.md & antislop)**
-   - Gaya formulir kerja terstruktur: `ENERGY 1 / RHYTHM 2 / MOTION 1`.
-   - Palet warna fokus: Teal `#006B63` sebagai aksen tunggal, merah `#A32626` khusus kesalahan, latar tenang `#F5F7F8`.
-   - Tanpa bayangan mengambang, tanpa gradien mencolok, tanpa border radius pil berlebihan, tanpa teks em dash.
-   - Tata letak 3:2 pada desktop, reflow otomatis 1 kolom pada layar kecil.
+- Jika CSV memiliki kolom `user_id` (atau `UserId`, `userid`, `id_user`), nilai per baris dipakai.
+- Jika kosong/tidak ada, dipakai **User ID Default** yang diisi pada form web.
+- Baris tanpa `user_id` sama sekali tetap diolah, tetapi tidak disimpan ke database.
+
+## Fitur
+
+- Upload dataset CSV dengan pemrosesan streaming (hemat RAM) hingga 500.000 baris.
+- Chunked batch inference dengan vektorisasi NumPy (`predict_matrix`).
+- Validasi ketat 15 fitur + perhitungan BMI otomatis dari tinggi/berat badan.
+- Penyimpanan otomatis ke MySQL (`screening_results`) dengan opsi checkbox pada form.
+- Unduh CSV hasil prediksi lengkap (streaming dari disk).
+- API JSON untuk integrasi mobile:
+  - `GET /api/health`
+  - `POST /api/predict` dengan payload `{ "features": { ... } }`
+
+## Konfigurasi
+
+Salin `.env.example` menjadi `.env`, lalu sesuaikan:
+
+```ini
+MODEL_DIR=model/artifacts
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=glucosafe
+```
+
+Letakkan artefak model (`model.joblib`, opsional `preprocessor.joblib`, `metadata.json`)
+di `model/artifacts/`. Jika belum ada, web menolak memprediksi (tidak memalsukan hasil).
 
 ## Menjalankan Aplikasi
 
 ```powershell
-cd "D:\KULIAH\Semester 5\Project Base Learning\web-flask"
+cd "D:\KULIAH\Semester 5\Project Base Learning\GlucoSafe\web-flask"
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt -r requirements-ml.txt
 .\.venv\Scripts\python.exe app.py
 ```
 
-Akses di browser:
-- Halaman web: `http://localhost:5000/`
-- Cek kesehatan model: `http://localhost:5000/api/health`
+Akses:
+- Dashboard: `http://localhost:5000/`
+- Health: `http://localhost:5000/api/health`
 
 ## Menjalankan Pengujian
 
 ```powershell
-cd "D:\KULIAH\Semester 5\Project Base Learning\web-flask"
+cd "D:\KULIAH\Semester 5\Project Base Learning\GlucoSafe\web-flask"
 .\.venv\Scripts\python.exe -m pytest tests -q
 ```
-Semua 10 skenario pengujian mencakup penanganan 415, 400, 503, validasi 15 field, hitung BMI otomatis, integrasi model mock, dan render template.
+
+Pengujian mencakup validasi fitur, upload CSV, inferensi batch, hybrid `user_id`,
+serta endpoint API.

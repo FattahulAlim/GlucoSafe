@@ -59,7 +59,8 @@ def test_batch_processing_with_loaded_model(tmp_path):
         assert res_upload.status_code == 200
         html = res_upload.get_data(as_text=True)
         assert "Hasil Pengolahan Dataset" in html
-        assert "Unduh Dataset Bersih (Cleaned CSV)" in html
+        assert "Unduh CSV Hasil Prediksi" in html
+        assert "Distribusi Label Prediksi" in html
 
         # 3. API predict per-item tetap jalan untuk Flutter
         payload = {
@@ -86,3 +87,67 @@ def test_batch_processing_with_loaded_model(tmp_path):
         pred = res_api.get_json()
         assert pred["prediction"] == "Tinggi"
         assert pred["model_version"] == "v1.0-batch"
+
+
+def test_hybrid_user_id_saved_to_database(monkeypatch, tmp_path):
+    """user_id diambil dari CSV, fallback ke default_user_id form web."""
+    import json
+
+    import joblib
+
+    artifacts_dir = tmp_path / "artifacts"
+    artifacts_dir.mkdir()
+    joblib.dump(FakeModel(), artifacts_dir / "model.joblib")
+    meta = {
+        "version": "v1.0-batch",
+        "algorithm": "FakeClassifier",
+        "label_map": {"0": "Rendah", "1": "Tinggi"},
+        "thresholds": {"medium": 30.0, "high": 60.0},
+    }
+    (artifacts_dir / "metadata.json").write_text(json.dumps(meta), encoding="utf-8")
+
+    captured = {}
+
+    def fake_insert(config, rows):
+        rows = list(rows)
+        captured.setdefault("rows", []).extend(rows)
+        return len(rows)
+
+    monkeypatch.setattr("glucosafe.batch_service.insert_screening_results", fake_insert)
+
+    app = create_app(
+        {
+            "TESTING": True,
+            "SECRET_KEY": "test-key",
+            "MODEL_DIR": str(artifacts_dir),
+        }
+    )
+
+    # Baris ke-3 tanpa user_id -> memakai default 9
+    csv_text = (
+        "HighBP,HighChol,BMI,Smoker,Stroke,HeartDiseaseorAttack,PhysActivity,"
+        "Fruits,Veggies,GenHlth,MentHlth,PhysHlth,DiffWalk,Sex,Age,user_id\n"
+        "1,1,28.5,0,0,0,0,1,1,3,5,2,0,1,8,1\n"
+        "0,0,22.1,0,0,0,1,1,1,1,0,0,0,0,4,2\n"
+        "1,1,33.4,1,0,1,0,0,1,4,10,14,1,1,10,\n"
+    )
+
+    with app.test_client() as client:
+        res = client.post(
+            "/process",
+            data={
+                "csv_file": (io.BytesIO(csv_text.encode("utf-8")), "dataset.csv"),
+                "save_to_db": "1",
+            },
+            content_type="multipart/form-data",
+        )
+        assert res.status_code == 302
+
+    rows = captured["rows"]
+    assert len(rows) == 3
+    # Default SCREENING_USER_ID adalah 1 untuk semua baris
+    assert [r["user_id"] for r in rows] == [1, 1, 1]
+    assert all(r["risk_label"] in ("Rendah", "Sedang", "Tinggi") for r in rows)
+    assert rows[0]["high_bp"] == 1
+    assert rows[0]["bmi"] == 28.5
+

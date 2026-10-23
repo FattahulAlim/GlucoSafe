@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}GlucoSafe &mdash; Panel Pengolahan Dataset ML{% endblock %}</title>
+  <title>{% block title %}GlucoSafe &mdash; Pengolahan Dataset ML{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -11,11 +11,11 @@
     <div class="container header-inner">
       <a class="brand" href="{{ url_for('pages.home') }}">
         <span class="brand-mark" aria-hidden="true">G</span>
-        <span class="brand-name">GlucoSafe <small class="brand-sub">Dataset Preprocessing Engine</small></span>
+        <span class="brand-name">GlucoSafe <small class="brand-sub">Dataset &amp; Model Pipeline</small></span>
       </a>
-      <span class="status-pill is-ready">
+      <span class="status-pill {% if model_status.model_ready %}is-ready{% else %}is-warning{% endif %}">
         <span class="status-dot" aria-hidden="true"></span>
-        Mesin Preprocessing Siap
+        {{ 'Model Siap' if model_status.model_ready else 'Model Belum Siap' }}
       </span>
     </div>
   </header>
@@ -36,8 +36,8 @@
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <p>GlucoSafe Dataset Preprocessing Engine &bull; Menyiapkan data latih &amp; standar fitur untuk aplikasi mobile.</p>
-      <p class="muted">BRFSS 2015 Feature Engineering &bull; Scalable up to 500k rows.</p>
+      <p>GlucoSafe &bull; Pengolahan Dataset CSV, Batch Inference &amp; Sinkronisasi ke Database Aplikasi Mobile.</p>
+      <p class="muted">BRFSS 2015 Features &bull; MySQL Sync &bull; Scalable up to 500k rows.</p>
     </div>
   </footer>
 </body>
