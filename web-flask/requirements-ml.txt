@@ -1,0 +1,8 @@
+# Machine learning runtime (install only after algorithm is chosen).
+#
+# The website and API work without these packages: when the artifacts are
+# missing or their runtime is not installed, the service reports
+# "Model belum tersedia" instead of returning a fake prediction.
+joblib>=1.4
+numpy>=1.26
+scikit-learn>=1.4
