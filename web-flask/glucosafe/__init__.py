@@ -31,6 +31,12 @@ def create_app(test_config=None):
         SECRET_KEY=os.environ.get("SECRET_KEY", "dev-only-insecure-secret-key"),
         MODEL_DIR=str(model_path),
         MAX_CONTENT_LENGTH=128 * 1024 * 1024,  # 128 MB untuk mendukung dataset besar (200k+ baris)
+        DB_HOST=os.environ.get("DB_HOST", "localhost"),
+        DB_PORT=int(os.environ.get("DB_PORT", "3306")),
+        DB_USER=os.environ.get("DB_USER", "root"),
+        DB_PASSWORD=os.environ.get("DB_PASSWORD", ""),
+        DB_NAME=os.environ.get("DB_NAME", "glucosafe"),
+        SCREENING_USER_ID=int(os.environ.get("SCREENING_USER_ID", "1")),
     )
 
     if test_config:

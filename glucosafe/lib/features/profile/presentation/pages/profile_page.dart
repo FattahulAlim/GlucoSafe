@@ -8,6 +8,7 @@ import '../widgets/profile_avatar.dart';
 import '../widgets/profile_info_tile.dart';
 import './edit_profile_page.dart';
 import '../../../auth/presentation/pages/login_page.dart';
+import '../../../auth/data/dummy_user_database.dart';
 
 /// Halaman Profil Pengguna GlucoSafe.
 /// Menampilkan informasi akun pengguna, ringkasan pemeriksaan,
@@ -15,12 +16,13 @@ import '../../../auth/presentation/pages/login_page.dart';
 class ProfilePage extends StatefulWidget {
   const ProfilePage({
     super.key,
-    this.profile = UserProfile.defaultUser,
+    this.profile,
     this.onBack,
   });
 
-  /// Data profil pengguna yang ditampilkan
-  final UserProfile profile;
+  /// Data profil pengguna yang ditampilkan. Jika null, memakai akun
+  /// yang sedang login (hasil Login/Register).
+  final UserProfile? profile;
 
   /// Callback kustom ketika tombol kembali ditekan
   final VoidCallback? onBack;
@@ -35,7 +37,16 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _currentProfile = widget.profile;
+    final current = DummyUserDatabase.instance.currentUser;
+    final accountProfile = current == null
+        ? null
+        : UserProfile(
+            name: current.name,
+            email: current.email,
+            initials: UserProfile.extractInitials(current.name),
+          );
+    _currentProfile =
+        widget.profile ?? accountProfile ?? UserProfile.defaultUser;
   }
 
   Future<void> _handleEditProfile() async {
@@ -47,6 +58,10 @@ class _ProfilePageState extends State<ProfilePage> {
     );
 
     if (updatedProfile != null && mounted) {
+      DummyUserDatabase.instance.updateCurrentUser(
+        name: updatedProfile.name,
+        email: updatedProfile.email,
+      );
       setState(() {
         _currentProfile = updatedProfile;
       });
@@ -63,6 +78,7 @@ class _ProfilePageState extends State<ProfilePage> {
     LogoutDialog.show(
       context,
       onConfirmLogout: () {
+        DummyUserDatabase.instance.logout();
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (_) => const LoginPage()),

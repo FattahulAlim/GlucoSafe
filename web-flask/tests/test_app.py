@@ -133,3 +133,16 @@ def test_api_predict_when_model_not_ready_returns_503(client):
     body = res.get_json()
     assert body["success"] is False
     assert body["error"]["code"] == "MODEL_NOT_READY"
+
+
+def test_fixed_user_id_extraction():
+    from glucosafe.batch_service import _extract_user_id
+
+    # Mode user tetap: semua baris memakai user default
+    assert _extract_user_id({"user_id": "42"}, default_user_id=1) == 1
+    assert _extract_user_id({"UserId": 7}, default_user_id=1) == 1
+
+    # Tanpa default: nilai CSV dipakai (fallback)
+    assert _extract_user_id({"UserId": 7}, default_user_id=None) == 7
+    assert _extract_user_id({}, default_user_id=5) == 5
+    assert _extract_user_id({}, default_user_id=None) is None
