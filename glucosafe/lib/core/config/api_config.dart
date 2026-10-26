@@ -3,7 +3,9 @@ import 'dart:io';
 class ApiConfig {
   static String get baseUrl {
     if (Platform.isAndroid) {
-      return 'http://10.0.2.2:3000';
+      // IP laptop di jaringan Wi-Fi untuk HP fisik:
+      return 'http://192.168.1.8:3000';
+      // Jika pakai Android Emulator, gunakan: 'http://10.0.2.2:3000'
     } else if (Platform.isIOS) {
       return 'http://localhost:3000';
     }

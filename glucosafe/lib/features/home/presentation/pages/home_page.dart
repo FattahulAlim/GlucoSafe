@@ -1,9 +1,9 @@
 ﻿import 'package:flutter/material.dart';
-import '../../../auth/data/dummy_user_database.dart';
 import '../../../screening/domain/risk_level.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/headbar.dart';
 import '../../../../core/widgets/navbar.dart';
+import '../../../../core/services/storage_service.dart';
 import '../../../history/presentation/pages/history_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
 import '../../../screening/presentation/pages/screening_step1_page.dart';
@@ -13,7 +13,7 @@ import '../../../screening/presentation/pages/screening_step1_page.dart';
 /// Simpan di: lib/pages/home_page.dart
 
 // ───────────────────────── Halaman ─────────────────────────
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({
     super.key,
     this.userName,
@@ -30,7 +30,6 @@ class HomePage extends StatelessWidget {
     this.onOpenHistory,
   });
 
-  // TODO: ganti nilai default ini dengan data dari API / penyimpanan riwayat.
   final String? userName;
   final double lastPercent;
   final String lastDate;
@@ -45,11 +44,31 @@ class HomePage extends StatelessWidget {
   final VoidCallback? onOpenHistory;
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String? _loadedName;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    final user = await StorageService().getUser();
+    if (user != null && mounted) {
+      setState(() {
+        _loadedName = user.name;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final risk = riskOf(lastPercent);
-    final displayName = userName ??
-        DummyUserDatabase.instance.currentUser?.name ??
-        'Pengguna';
+    final risk = riskOf(widget.lastPercent);
+    final displayName = widget.userName ?? _loadedName ?? 'Pengguna';
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -59,14 +78,15 @@ class HomePage extends StatelessWidget {
           children: [
             HeadBar(
               title: 'Beranda',
-              onProfile: onOpenProfile ??
-                  () {
-                    Navigator.push(
+              onProfile: widget.onOpenProfile ??
+                  () async {
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => const ProfilePage(),
                       ),
                     );
+                    _loadUser();
                   },
             ),
             Expanded(
@@ -104,16 +124,16 @@ class HomePage extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     _LastCheckCard(
-                      percent: lastPercent,
-                      date: lastDate,
+                      percent: widget.lastPercent,
+                      date: widget.lastDate,
                       risk: risk,
-                      idealWeight: idealWeight,
-                      bmiNote: bmiNote,
+                      idealWeight: widget.idealWeight,
+                      bmiNote: widget.bmiNote,
                     ),
                     const SizedBox(height: 16),
-                    _TrendCard(values: trendValues, labels: trendLabels),
+                    _TrendCard(values: widget.trendValues, labels: widget.trendLabels),
                     const SizedBox(height: 16),
-                    _TipCard(text: tip),
+                    _TipCard(text: widget.tip),
                     const SizedBox(height: 16),
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
@@ -138,7 +158,7 @@ class HomePage extends StatelessWidget {
                           color: Colors.transparent,
                           child: InkWell(
                             borderRadius: BorderRadius.circular(12),
-                            onTap: onStartScreening ??
+                            onTap: widget.onStartScreening ??
                                 () {
                                   Navigator.push(
                                     context,
@@ -176,7 +196,7 @@ class HomePage extends StatelessWidget {
             ),
             NavBar(
               currentIndex: 0,
-              onHistory: onOpenHistory ??
+              onHistory: widget.onOpenHistory ??
                   () {
                     Navigator.pushReplacement(
                       context,

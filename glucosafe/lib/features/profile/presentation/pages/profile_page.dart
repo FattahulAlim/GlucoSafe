@@ -3,12 +3,14 @@ import '../../domain/user_profile.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/headbar.dart';
 import '../../../../core/widgets/logout_dialog.dart';
+import '../../../../core/services/storage_service.dart';
+import '../../../../core/services/auth_service.dart';
+import '../../../../core/services/user_service.dart';
 import '../widgets/profile_action_button.dart';
 import '../widgets/profile_avatar.dart';
 import '../widgets/profile_info_tile.dart';
 import './edit_profile_page.dart';
 import '../../../auth/presentation/pages/login_page.dart';
-import '../../../auth/data/dummy_user_database.dart';
 
 /// Halaman Profil Pengguna GlucoSafe.
 /// Menampilkan informasi akun pengguna, ringkasan pemeriksaan,
@@ -20,8 +22,7 @@ class ProfilePage extends StatefulWidget {
     this.onBack,
   });
 
-  /// Data profil pengguna yang ditampilkan. Jika null, memakai akun
-  /// yang sedang login (hasil Login/Register).
+  /// Data profil pengguna yang ditampilkan. Jika null, mengambil dari backend/storage.
   final UserProfile? profile;
 
   /// Callback kustom ketika tombol kembali ditekan
@@ -32,21 +33,57 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  late UserProfile _currentProfile;
+  final StorageService _storageService = StorageService();
+  final UserService _userService = UserService();
+  final AuthService _authService = AuthService();
+
+  UserProfile _currentProfile = UserProfile.defaultUser;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    final current = DummyUserDatabase.instance.currentUser;
-    final accountProfile = current == null
-        ? null
-        : UserProfile(
-            name: current.name,
-            email: current.email,
-            initials: UserProfile.extractInitials(current.name),
+    if (widget.profile != null) {
+      _currentProfile = widget.profile!;
+      _isLoading = false;
+    } else {
+      _loadProfile();
+    }
+  }
+
+  Future<void> _loadProfile() async {
+    // 1. Muat dari local storage dulu agar langsung tampil cepat
+    final localUser = await _storageService.getUser();
+    if (localUser != null && mounted) {
+      setState(() {
+        _currentProfile = UserProfile(
+          name: localUser.name,
+          email: localUser.email,
+          initials: UserProfile.extractInitials(localUser.name),
+        );
+        _isLoading = false;
+      });
+    }
+
+    // 2. Refresh dari backend API
+    try {
+      final res = await _userService.getProfile();
+      if (res.success && res.data != null && mounted) {
+        final u = res.data!;
+        setState(() {
+          _currentProfile = UserProfile(
+            name: u.name,
+            email: u.email,
+            initials: UserProfile.extractInitials(u.name),
           );
-    _currentProfile =
-        widget.profile ?? accountProfile ?? UserProfile.defaultUser;
+          _isLoading = false;
+        });
+      }
+    } catch (_) {}
+
+    if (mounted && _isLoading) {
+      setState(() => _isLoading = false);
+    }
   }
 
   Future<void> _handleEditProfile() async {
@@ -58,10 +95,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
 
     if (updatedProfile != null && mounted) {
-      DummyUserDatabase.instance.updateCurrentUser(
-        name: updatedProfile.name,
-        email: updatedProfile.email,
-      );
       setState(() {
         _currentProfile = updatedProfile;
       });
@@ -77,8 +110,9 @@ class _ProfilePageState extends State<ProfilePage> {
   void _handleLogout() {
     LogoutDialog.show(
       context,
-      onConfirmLogout: () {
-        DummyUserDatabase.instance.logout();
+      onConfirmLogout: () async {
+        await _authService.logout();
+        if (!mounted) return;
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (_) => const LoginPage()),
