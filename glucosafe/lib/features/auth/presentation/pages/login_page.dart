@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../data/dummy_user_database.dart';
 import '../../../home/presentation/pages/home_page.dart';
 import './register_page.dart';
 import '../../../screening/domain/screening_state.dart';
@@ -50,8 +51,17 @@ class _LoginPageState extends State<LoginPage> {
         );
       return;
     }
+    if (DummyUserDatabase.instance.login(email, _passwordController.text) ==
+        null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('Email atau kata sandi salah')),
+        );
+      return;
+    }
     // TODO: panggil API login (Anggota 3) sebelum pindah halaman.
-    Navigator.pushReplacement(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
         builder: (context) => HomePage(
@@ -66,6 +76,7 @@ class _LoginPageState extends State<LoginPage> {
           },
         ),
       ),
+      (route) => false, // hapus Welcome dan Login dari riwayat navigasi
     );
   }
 
@@ -164,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _label('Kata Sandi'),
+                      Expanded(child: _label('Kata Sandi')), // #fix-overflow
                       GestureDetector(
                         onTap: () {
                           ScaffoldMessenger.of(context)
@@ -233,8 +244,9 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 32),
 
                   // Footer
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap( // #fix-overflow
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       const Text(
                         'Belum punya akun? ',

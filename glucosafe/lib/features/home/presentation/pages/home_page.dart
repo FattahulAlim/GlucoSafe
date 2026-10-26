@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import '../../../auth/data/dummy_user_database.dart';
 import '../../../screening/domain/risk_level.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/headbar.dart';
@@ -15,7 +16,7 @@ import '../../../screening/presentation/pages/screening_step1_page.dart';
 class HomePage extends StatelessWidget {
   const HomePage({
     super.key,
-    this.userName = 'Rahmawati',
+    this.userName,
     this.lastPercent = 28,
     this.lastDate = '14 Okt 2023',
     this.idealWeight = '62–66 kg',
@@ -30,7 +31,7 @@ class HomePage extends StatelessWidget {
   });
 
   // TODO: ganti nilai default ini dengan data dari API / penyimpanan riwayat.
-  final String userName;
+  final String? userName;
   final double lastPercent;
   final String lastDate;
   final String idealWeight;
@@ -46,6 +47,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final risk = riskOf(lastPercent);
+    final displayName = userName ??
+        DummyUserDatabase.instance.currentUser?.name ??
+        'Pengguna';
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -76,7 +80,7 @@ class HomePage extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            'Halo, Bu $userName',
+                            'Halo, $displayName',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -114,6 +118,7 @@ class HomePage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
                       child: Container(
+                        width: double.infinity, // #fix-overflow
                         height: 54,
                         decoration: BoxDecoration(
                           color: AppColors.brand,
@@ -149,12 +154,16 @@ class HomePage extends StatelessWidget {
                                 Icon(Icons.add_moderator_outlined,
                                     size: 18, color: Colors.white),
                                 SizedBox(width: 8),
-                                Text('Mulai Skrining Baru',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        height: 22 / 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white)),
+                                Flexible( // #fix-overflow
+                                  child: Text('Mulai Skrining Baru',
+                                      maxLines: 1, // #fix-overflow
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          height: 22 / 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white)),
+                                ),
                               ],
                             ),
                           ),

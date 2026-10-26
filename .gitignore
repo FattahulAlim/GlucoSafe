@@ -6,3 +6,13 @@ backend/.env.*
 !backend/.env.example
 backend/coverage/
 backend/npm-debug.log*
+
+# Flask Web / Data Preprocessing
+web-flask/.env
+web-flask/.env.*
+!web-flask/.env.example
+web-flask/.venv/
+web-flask/instance/
+web-flask/.pytest_cache/
+web-flask/**/__pycache__/
+

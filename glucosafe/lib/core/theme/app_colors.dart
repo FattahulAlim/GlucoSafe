@@ -75,6 +75,19 @@ class AppColors {
   static const fisikIcon = Color(0xFF0284C7);
   static const periksaBg = Color(0xFFF3E8FF);
   static const periksaIcon = Color(0xFF7E22CE);
+
+  // Welcome Screen
+  static const Color welcomeBg = Color(0xFFF0FDFA);
+  static const Color mint = Color(0xFFCCFBF1);
+  static const Color ringTrack = Color(0xFFE2E8F0);
+  static const Color safe = Color(0xFF16A34A);
+  static const Color safeBg = Color(0xFFDCFCE7);
+  static const Color infoBlue = Color(0xFF2563EB);
+  static const Color infoBlueBg = Color(0xFFE0F2FE);
+  static const Color warnOrange = Color(0xFFEA580C);
+  static const Color warnOrangeBg = Color(0xFFFFEDD5);
+  static const Color accentPurple = Color(0xFF7C3AED);
+  static const Color accentPurpleBg = Color(0xFFEDE9FE);
 }
 
 /// Alias kompatibilitas

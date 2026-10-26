@@ -1,0 +1,20 @@
+# Simpan artefak model machine learning di folder ini.
+#
+# Berkas yang didukung secara otomatis oleh model_service.py:
+# 1. model.joblib atau model.pkl
+# 2. scaler.joblib atau preprocessor.joblib (opsional)
+# 3. metadata.json (opsional)
+#
+# Contoh metadata.json:
+# {
+#   "version": "v1.0",
+#   "algorithm": "RandomForestClassifier",
+#   "label_map": {
+#     "0": "Rendah",
+#     "1": "Tinggi"
+#   },
+#   "thresholds": {
+#     "medium": 30.0,
+#     "high": 65.0
+#   }
+# }
