@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import '../../domain/user_profile.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/services/user_service.dart';
 import '../widgets/profile_avatar.dart';
 
 /// Halaman Edit Profil Pengguna GlucoSafe.
@@ -19,11 +20,13 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
+  final UserService _userService = UserService();
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
   late String _initials;
   String? _photoAsset;
   bool _hasChanges = false;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -71,7 +74,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       );
   }
 
-  void _saveChanges() {
+  Future<void> _saveChanges() async {
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
 
@@ -93,14 +96,44 @@ class _EditProfilePageState extends State<EditProfilePage> {
       return;
     }
 
-    final updatedProfile = widget.profile.copyWith(
-      name: name,
-      email: email,
-      initials: UserProfile.extractInitials(name),
-      photoAsset: _photoAsset,
-    );
+    setState(() => _isSaving = true);
 
-    Navigator.pop(context, updatedProfile);
+    try {
+      final res = await _userService.updateProfile(name: name, email: email);
+
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+
+      if (res.success && res.data != null) {
+        final updatedProfile = widget.profile.copyWith(
+          name: res.data!.name,
+          email: res.data!.email,
+          initials: UserProfile.extractInitials(res.data!.name),
+          photoAsset: _photoAsset,
+        );
+        Navigator.pop(context, updatedProfile);
+      } else {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(res.message),
+              backgroundColor: Colors.red,
+            ),
+          );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('Gagal memperbarui profil: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+    }
   }
 
   @override
@@ -332,7 +365,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: _saveChanges,
+                        onPressed: _isSaving ? null : _saveChanges,
                         style: ElevatedButton.styleFrom(
                           elevation: 0,
                           backgroundColor: const Color(0xFFD6E2FB),
@@ -342,25 +375,35 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.check_rounded,
-                              size: 18,
-                              color: Color(0xFF475569),
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Simpan Perubahan',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF334155),
+                        child: _isSaving
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Color(0xFF334155)),
+                                ),
+                              )
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.check_rounded,
+                                    size: 18,
+                                    color: Color(0xFF475569),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Simpan Perubahan',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF334155),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
                       ),
                     ),
 
