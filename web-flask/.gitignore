@@ -5,4 +5,7 @@ __pycache__/
 instance/
 .pytest_cache/
 model/artifacts/*
+!model/artifacts/*.joblib
+!model/artifacts/*.json
 !model/artifacts/.gitkeep
+

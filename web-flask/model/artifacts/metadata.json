@@ -1,0 +1,33 @@
+{
+  "version": "v1.0-svm",
+  "algorithm": "Support Vector Machine (RBF)",
+  "features": [
+    "HighBP",
+    "HighChol",
+    "BMI",
+    "Smoker",
+    "Stroke",
+    "HeartDiseaseorAttack",
+    "PhysActivity",
+    "Fruits",
+    "Veggies",
+    "GenHlth",
+    "MentHlth",
+    "PhysHlth",
+    "DiffWalk",
+    "Sex",
+    "Age"
+  ],
+  "label_map": {
+    "0": "Rendah",
+    "1": "Tinggi"
+  },
+  "thresholds": {
+    "medium": 35.0,
+    "high": 65.0
+  },
+  "metrics": {
+    "accuracy": 0.7378,
+    "training_samples": 15000
+  }
+}
