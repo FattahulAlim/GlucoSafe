@@ -10,6 +10,7 @@ import '../widgets/profile_action_button.dart';
 import '../widgets/profile_avatar.dart';
 import '../widgets/profile_info_tile.dart';
 import './edit_profile_page.dart';
+import './change_password_page.dart';
 import '../../../auth/presentation/pages/login_page.dart';
 
 /// Halaman Profil Pengguna GlucoSafe.
@@ -105,6 +106,13 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       );
     }
+  }
+
+  void _handleChangePassword() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ChangePasswordPage()),
+    );
   }
 
   void _handleLogout() {
@@ -285,6 +293,15 @@ class _ProfilePageState extends State<ProfilePage> {
                       text: 'Edit Profil',
                       icon: Icons.edit_outlined,
                       onPressed: _handleEditProfile,
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Tombol Aksi: Ganti Kata Sandi
+                    ProfileActionButton.outline(
+                      text: 'Ganti Kata Sandi',
+                      icon: Icons.lock_outline,
+                      onPressed: _handleChangePassword,
                     ),
 
                     const SizedBox(height: 12),

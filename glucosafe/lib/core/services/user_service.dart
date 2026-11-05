@@ -1,5 +1,6 @@
 import '../config/api_config.dart';
 import '../models/api_response.dart';
+import '../models/auth_models.dart';
 import '../models/user.dart';
 import 'api_client.dart';
 import 'storage_service.dart';
@@ -61,5 +62,23 @@ class UserService {
     }
 
     return response;
+  }
+
+  Future<ApiResponse<dynamic>> changePassword(
+    ChangePasswordRequest request,
+  ) async {
+    final token = await _storage.getToken();
+    if (token == null) {
+      return ApiResponse<dynamic>(
+        success: false,
+        message: 'Pengguna belum login.',
+      );
+    }
+
+    return await _apiClient.post<dynamic>(
+      '${ApiConfig.usersPath}/me/password',
+      request.toJson(),
+      token: token,
+    );
   }
 }
