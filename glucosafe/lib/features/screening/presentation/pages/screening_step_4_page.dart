@@ -1,6 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
+import '../../../../core/services/screening_service.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../domain/screening_state.dart';
 import './screening_result_page.dart';
 
 class ScreeningStep4Page extends StatefulWidget {
@@ -14,6 +16,7 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
   int? _generalHealthIndex; // 0=Sangat Baik, 1=Baik, 2=Cukup, 3=Kurang, 4=Buruk
   double _mentalHealthDays = 3;
   double _physicalHealthDays = 2;
+  bool _isLoading = false;
 
   final List<Map<String, dynamic>> _healthOptions = [
     {'label': 'Sangat\nBaik', 'icon': Icons.sentiment_very_satisfied},
@@ -22,6 +25,105 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
     {'label': 'Kurang', 'icon': Icons.sentiment_dissatisfied},
     {'label': 'Buruk', 'icon': Icons.sentiment_very_dissatisfied},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    final form = screeningFormNotifier.value;
+    if (form.genHlth != null && form.genHlth! >= 1 && form.genHlth! <= 5) {
+      _generalHealthIndex = form.genHlth! - 1;
+    }
+    if (form.mentHlth != null) {
+      _mentalHealthDays = form.mentHlth!.toDouble().clamp(0, 30);
+    }
+    if (form.physHlth != null) {
+      _physicalHealthDays = form.physHlth!.toDouble().clamp(0, 30);
+    }
+  }
+
+  void _saveToNotifier() {
+    updateScreeningForm((f) => f.copyWith(
+          genHlth: _generalHealthIndex == null ? null : _generalHealthIndex! + 1,
+          mentHlth: _mentalHealthDays.toInt(),
+          physHlth: _physicalHealthDays.toInt(),
+        ));
+  }
+
+  Future<void> _submitScreening() async {
+    if (_generalHealthIndex == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Pilih kondisi kesehatan umum Anda terlebih dahulu.'),
+          backgroundColor: AppColors.warn,
+        ),
+      );
+      return;
+    }
+
+    _saveToNotifier();
+
+    final form = screeningFormNotifier.value;
+    if (!form.isComplete) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Mohon lengkapi seluruh langkah skrining sebelum melanjutkan.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final screeningService = ScreeningService();
+      final response = await screeningService.submitScreening(form);
+
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+
+      if (response.success && response.data != null) {
+        final screeningResult = response.data!;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.message.isNotEmpty
+                ? response.message
+                : 'Skrining berhasil disimpan.'),
+            backgroundColor: AppColors.ok,
+          ),
+        );
+
+        // Pindah ke halaman hasil dengan data dari backend
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ScreeningResultPage(
+              result: screeningResult,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.message.isNotEmpty
+                ? response.message
+                : 'Gagal menyimpan hasil skrining.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Terjadi kesalahan: ${e.toString()}'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
 
   Widget _buildHealthEmoticons() {
     return Container(
@@ -58,13 +160,16 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
           Row(
             children: List.generate(_healthOptions.length, (index) {
               final isSelected = _generalHealthIndex == index;
-              return Expanded( // #fix-overflow
+              return Expanded(
                 child: Padding(
                   padding: EdgeInsets.only(
                     right: index == _healthOptions.length - 1 ? 0 : 6,
                   ),
                   child: GestureDetector(
-                    onTap: () => setState(() => _generalHealthIndex = index),
+                    onTap: () {
+                      setState(() => _generalHealthIndex = index);
+                      _saveToNotifier();
+                    },
                     child: Container(
                       height: 80,
                       decoration: BoxDecoration(
@@ -82,7 +187,7 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                             size: 26,
                           ),
                           const SizedBox(height: 6),
-                          FittedBox( // #fix-overflow
+                          FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
                               _healthOptions[index]['label'],
@@ -190,7 +295,10 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
               min: 0,
               max: 30,
               divisions: 30,
-              onChanged: onChanged,
+              onChanged: (val) {
+                onChanged(val);
+                _saveToNotifier();
+              },
             ),
           ),
           Padding(
@@ -198,20 +306,20 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: const [
-                Expanded( // #fix-overflow
+                Expanded(
                   child: Text(
                     '0 Hari',
                     style: TextStyle(fontSize: 12, color: AppColors.mute),
                   ),
                 ),
-                Expanded( // #fix-overflow
+                Expanded(
                   child: Text(
                     '15 Hari',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 12, color: AppColors.mute),
                   ),
                 ),
-                Expanded( // #fix-overflow
+                Expanded(
                   child: Text(
                     '30 Hari',
                     textAlign: TextAlign.right,
@@ -235,7 +343,10 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.ink),
-          onPressed: () => Navigator.pop(context),
+          onPressed: _isLoading ? null : () {
+            _saveToNotifier();
+            Navigator.pop(context);
+          },
         ),
         title: Row(
           children: [
@@ -286,7 +397,7 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const [
-                    Expanded( // #fix-overflow
+                    Expanded(
                       child: Text(
                         'LANGKAH 4 DARI 4',
                         style: TextStyle(
@@ -370,39 +481,43 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ScreeningResultPage(),
-                          ),
-                        );
-                      },
+                      onPressed: _isLoading ? null : _submitScreening,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.brand,
                         foregroundColor: Colors.white,
+                        disabledBackgroundColor: AppColors.disabled,
+                        disabledForegroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: FittedBox( // #fix-overflow
-                        fit: BoxFit.scaleDown,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Text(
-                              'Cek Risiko Saya',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Text(
+                                    'Cek Risiko Saya',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Icon(Icons.arrow_forward),
+                                ],
                               ),
                             ),
-                            SizedBox(width: 8),
-                            Icon(Icons.arrow_forward),
-                          ],
-                        ),
-                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -410,7 +525,10 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                   // Back to previous step
                   Center(
                     child: TextButton.icon(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: _isLoading ? null : () {
+                        _saveToNotifier();
+                        Navigator.pop(context);
+                      },
                       icon: const Icon(
                         Icons.arrow_back,
                         size: 18,

@@ -1,8 +1,11 @@
-﻿import 'dart:math' as math;
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
 import '../../domain/recommendation_item.dart';
+import '../../domain/risk_level.dart';
+import '../../domain/screening_result.dart';
+import '../../domain/screening_state.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/headbar.dart';
 import '../../../history/presentation/pages/history_page.dart';
@@ -10,18 +13,20 @@ import '../../../home/presentation/pages/home_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
 
 /// Halaman Hasil Skrining GlucoSafe.
-/// Simpan di: lib/pages/screening_result_page.dart
+/// Menerima data hasil langsung dari backend (ScreeningResult).
 
 class ScreeningResultPage extends StatelessWidget {
   const ScreeningResultPage({
     super.key,
+    this.result,
     this.percent = 48.0,
-    this.statusText = 'Tidak Berisiko',
+    this.statusText = 'Risiko Rendah',
     this.indicatorCount = 15,
     this.onSaveToHistory,
     this.onRestartScreening,
   });
 
+  final ScreeningResult? result;
   final double percent;
   final String statusText;
   final int indicatorCount;
@@ -63,6 +68,16 @@ class ScreeningResultPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double actualPercent = result?.riskPercent ?? percent;
+    final String actualStatus = result != null
+        ? (result!.riskLabel.toLowerCase().startsWith('risiko')
+            ? result!.riskLabel
+            : 'Risiko ${result!.riskLabel}')
+        : statusText;
+    final List<RecommendationItem> recList = (result != null && result!.recommendations.isNotEmpty)
+        ? result!.recommendations
+        : dummyRecommendations;
+
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: SafeArea(
@@ -93,8 +108,8 @@ class ScreeningResultPage extends StatelessWidget {
                   children: [
                     // Main Result Summary Card
                     _ResultSummaryCard(
-                      percent: percent,
-                      statusText: statusText,
+                      percent: actualPercent,
+                      statusText: actualStatus,
                       indicatorCount: indicatorCount,
                     ),
 
@@ -104,7 +119,7 @@ class ScreeningResultPage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Expanded( // #fix-overflow
+                        const Expanded(
                           child: Text(
                             'Rekomendasi Langkah Nyata',
                             style: TextStyle(
@@ -115,9 +130,9 @@ class ScreeningResultPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Flexible( // #fix-overflow
+                        Flexible(
                           child: Text(
-                            '${dummyRecommendations.length} Rekomendasi',
+                            '${recList.length} Rekomendasi',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -137,12 +152,12 @@ class ScreeningResultPage extends StatelessWidget {
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: dummyRecommendations.length,
+                      itemCount: recList.length,
                       separatorBuilder: (context, index) =>
                           const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         return _RecommendationCard(
-                          item: dummyRecommendations[index],
+                          item: recList[index],
                         );
                       },
                     ),
@@ -179,12 +194,11 @@ class ScreeningResultPage extends StatelessWidget {
                       width: double.infinity,
                       height: 52,
                       child: ElevatedButton.icon(
-                        onPressed:
-                            onSaveToHistory ??
+                        onPressed: onSaveToHistory ??
                             () {
                               _showMessage(
                                 context,
-                                'Hasil skrining disimpan ke riwayat',
+                                'Hasil skrining tersimpan di riwayat',
                               );
                               Navigator.pushReplacement(
                                 context,
@@ -224,15 +238,16 @@ class ScreeningResultPage extends StatelessWidget {
                       width: double.infinity,
                       height: 52,
                       child: OutlinedButton.icon(
-                        onPressed:
-                            onRestartScreening ??
+                        onPressed: onRestartScreening ??
                             () {
-                              _showMessage(context, 'Memulai skrining ulang');
-                              Navigator.pushReplacement(
+                              resetScreeningForm();
+                              _showMessage(context, 'Memulai skrining baru');
+                              Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const HomePage(),
                                 ),
+                                (route) => false,
                               );
                             },
                         style: OutlinedButton.styleFrom(
@@ -286,6 +301,8 @@ class _ResultSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final risk = riskOf(percent);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -313,7 +330,7 @@ class _ResultSummaryCard extends StatelessWidget {
                   size: const Size(170, 170),
                   painter: _ResultGaugePainter(
                     percent: percent,
-                    color: AppColors.greenCircle,
+                    color: risk.color,
                   ),
                 ),
                 Column(
@@ -354,7 +371,7 @@ class _ResultSummaryCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.greenBg,
+              color: risk.bgColor,
               borderRadius: BorderRadius.circular(999),
             ),
             child: Row(
@@ -363,19 +380,19 @@ class _ResultSummaryCard extends StatelessWidget {
                 Container(
                   width: 8,
                   height: 8,
-                  decoration: const BoxDecoration(
-                    color: AppColors.greenCircle,
+                  decoration: BoxDecoration(
+                    color: risk.color,
                     shape: BoxShape.circle,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   statusText,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     height: 18 / 14,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.greenText,
+                    color: risk.badgeText,
                   ),
                 ),
               ],
@@ -384,14 +401,14 @@ class _ResultSummaryCard extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // Alert Warning Box (Orange/Peach)
+          // Alert Warning Box
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.alertBg,
+              color: risk.bgColor,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.alertBorder, width: 1),
+              border: Border.all(color: risk.color.withValues(alpha: 0.25), width: 1),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,8 +417,8 @@ class _ResultSummaryCard extends StatelessWidget {
                   width: 20,
                   height: 20,
                   margin: const EdgeInsets.only(top: 2),
-                  decoration: const BoxDecoration(
-                    color: AppColors.alertText,
+                  decoration: BoxDecoration(
+                    color: risk.color,
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
@@ -416,10 +433,10 @@ class _ResultSummaryCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Hasil Anda mendekati ambang batas. Meski saat ini belum masuk kategori berisiko, tetap jaga gaya hidup sehat.',
-                    style: TextStyle(
+                    risk.message.replaceAll('\n', ' '),
+                    style: const TextStyle(
                       fontSize: 13,
                       height: 18 / 13,
                       color: AppColors.ink,
@@ -433,10 +450,14 @@ class _ResultSummaryCard extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Paragraph Penjelasan
-          const Text(
-            'Hasil skrining saat ini masih berada dalam kategori tidak berisiko, namun perlu kewaspadaan ekstra terhadap konsumsi gula harian dan riwayat kebugaran tubuh.',
+          Text(
+            percent < 30
+                ? 'Hasil skrining saat ini berada dalam batas normal. Pertahankan kebiasaan hidup sehat, olahraga rutin, dan konsumsi makanan bergizi.'
+                : percent < 60
+                    ? 'Hasil skrining menunjukkan beberapa faktor risiko. Disarankan untuk memantau asupan gula, memperbanyak aktivitas fisik, dan cek kesehatan secara berkala.'
+                    : 'Hasil skrining menunjukkan potensi risiko tinggi. Sangat dianjurkan untuk segera berkonsultasi dengan dokter atau fasilitas kesehatan terdekat.',
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               height: 20 / 14,
               color: AppColors.slate,
@@ -547,7 +568,7 @@ class _RecommendationCard extends StatelessWidget {
               const SizedBox(width: 8),
 
               // Category Badge Pill Right
-              Flexible( // #fix-overflow
+              Flexible(
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -599,36 +620,42 @@ class _ResultGaugePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    const stroke = 16.0;
-    final center = size.center(Offset.zero);
-    final radius = (size.width - stroke) / 2;
+    final strokeWidth = 14.0;
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (size.width - strokeWidth) / 2;
 
-    // Track Background
-    canvas.drawCircle(
-      center,
-      radius,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = stroke
-        ..color = const Color(0xFFE2E8F0),
-    );
+    // Background track ring
+    final bgPaint = Paint()
+      ..color = AppColors.trackLight
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
 
-    // Progress Sweep (memutar dari atas / -pi/2)
-    final sweep = 2 * math.pi * (percent.clamp(0, 100) / 100);
+    // Foreground progress arc
+    final fgPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    // Full circle from top (-pi / 2)
+    const startAngle = -math.pi / 2;
+    const sweepAngleFull = 2 * math.pi;
+
+    canvas.drawCircle(center, radius, bgPaint);
+
+    final sweepAngleProgress = sweepAngleFull * (percent.clamp(0.0, 100.0) / 100.0);
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2,
-      sweep,
+      startAngle,
+      sweepAngleProgress,
       false,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = stroke
-        ..strokeCap = StrokeCap.round
-        ..color = color,
+      fgPaint,
     );
   }
 
   @override
-  bool shouldRepaint(_ResultGaugePainter old) =>
-      old.percent != percent || old.color != color;
+  bool shouldRepaint(covariant _ResultGaugePainter oldDelegate) {
+    return oldDelegate.percent != percent || oldDelegate.color != color;
+  }
 }
