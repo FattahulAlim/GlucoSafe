@@ -149,7 +149,7 @@ class ScreeningForm {
     );
   }
 
-  /// Body request untuk API prediksi. Hanya boleh dipanggil jika isComplete.
+  /// Body request untuk API prediksi Python/ML langsung. Hanya boleh dipanggil jika isComplete.
   Map<String, num> toJson() {
     if (!isComplete) {
       throw StateError('Isian pemeriksaan belum lengkap');
@@ -170,6 +170,31 @@ class ScreeningForm {
       'DiffWalk': diffWalk!,
       'Sex': sex!,
       'Age': age!,
+    };
+  }
+
+  /// Body request untuk backend POST /api/screenings (sesuai schema validator backend)
+  Map<String, dynamic> toBackendJson() {
+    if (!isComplete) {
+      throw StateError('Isian pemeriksaan belum lengkap');
+    }
+    return {
+      'sex': sex!,
+      'age': age!,
+      'height_cm': heightCm!,
+      'weight_kg': weightKg!,
+      'high_bp': highBp!,
+      'high_chol': highChol!,
+      'stroke': stroke!,
+      'heart_disease': heartDiseaseOrAttack!,
+      'diff_walk': diffWalk!,
+      'smoker': smoker!,
+      'phys_activity': physActivity!,
+      'fruits': fruits!,
+      'veggies': veggies!,
+      'gen_hlth': genHlth!,
+      'ment_hlth': mentHlth!,
+      'phys_hlth': physHlth!,
     };
   }
 }

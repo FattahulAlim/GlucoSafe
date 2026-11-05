@@ -1,6 +1,7 @@
 
 /**
- * Hitung mock risk berdasarkan fitur — dipakai saat ML_MOCK_MODE=true.
+ * Hitung mock risk berdasarkan fitur — dipakai saat ML_MOCK_MODE=true
+ * atau saat ML API belum aktif.
  * Bukan model nyata; hanya untuk keperluan testing integrasi FE↔BE.
  */
 function _mockPredict(features) {
@@ -39,14 +40,20 @@ async function predictDiabetesRisk(features) {
     throw new Error('ML_API_URL belum dikonfigurasi.');
   }
 
-  const response = await fetch(`${mlApiUrl}/predict`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(features),
-    signal: AbortSignal.timeout(10000),
-  });
+  let response;
+  try {
+    response = await fetch(`${mlApiUrl}/predict`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(features),
+      signal: AbortSignal.timeout(10000),
+    });
+  } catch (err) {
+    console.warn(`[mlService] Gagal menghubungi ML API di ${mlApiUrl} (${err.message}). Menggunakan kalkulasi mock fallback.`);
+    return _mockPredict(features);
+  }
 
   if (!response.ok) {
     throw new Error(`ML API mengembalikan status ${response.status}.`);
