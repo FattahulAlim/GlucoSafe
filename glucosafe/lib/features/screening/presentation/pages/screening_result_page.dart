@@ -19,46 +19,15 @@ class ScreeningResultPage extends StatelessWidget {
   const ScreeningResultPage({
     super.key,
     this.result,
-    this.percent = 48.0,
-    this.statusText = 'Risiko Rendah',
     this.indicatorCount = 15,
     this.onSaveToHistory,
     this.onRestartScreening,
   });
 
   final ScreeningResult? result;
-  final double percent;
-  final String statusText;
   final int indicatorCount;
   final VoidCallback? onSaveToHistory;
   final VoidCallback? onRestartScreening;
-
-  final List<RecommendationItem> dummyRecommendations = const [
-    RecommendationItem(
-      title: 'Kurangi Gula &\nKarbohidrat Olahan',
-      category: 'Nutrisi',
-      description: 'Mulai batasi makanan manis dan minuman kemasan untuk mencegah kenaikan kadar glukosa.',
-      icon: Icons.restaurant_rounded,
-      iconBg: AppColors.nutrisiBg,
-      iconColor: AppColors.nutrisiIcon,
-    ),
-    RecommendationItem(
-      title: 'Tingkatkan Aktivitas\nFisik',
-      category: 'Aktivitas Fisik',
-      description: 'Rutin bergerak 30 menit per hari, seperti jalan cepat atau bersepeda santai.',
-      icon: Icons.fitness_center_rounded,
-      iconBg: AppColors.fisikBg,
-      iconColor: AppColors.fisikIcon,
-    ),
-    RecommendationItem(
-      title: 'Skrining Mandiri Lebih\nAwal',
-      category: 'Pemeriksaan',
-      description: 'Lakukan pemeriksaan berkala dalam 1-2 bulan ke depan untuk memantau perubahan tren.',
-      icon: Icons.calendar_month_rounded,
-      iconBg: AppColors.periksaBg,
-      iconColor: AppColors.periksaIcon,
-    ),
-  ];
 
   void _showMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context)
@@ -68,15 +37,16 @@ class ScreeningResultPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double actualPercent = result?.riskPercent ?? percent;
-    final String actualStatus = result != null
-        ? (result!.riskLabel.toLowerCase().startsWith('risiko')
-            ? result!.riskLabel
-            : 'Risiko ${result!.riskLabel}')
-        : statusText;
-    final List<RecommendationItem> recList = (result != null && result!.recommendations.isNotEmpty)
-        ? result!.recommendations
-        : dummyRecommendations;
+    final screeningResult = result;
+    if (screeningResult == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Hasil Skrining')),
+        body: const Center(child: Text('Hasil skrining belum tersedia.')),
+      );
+    }
+    final actualPercent = screeningResult.riskPercent;
+    final actualStatus = 'Risiko ${screeningResult.riskLabel}';
+    final recList = screeningResult.recommendations;
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -149,18 +119,24 @@ class ScreeningResultPage extends StatelessWidget {
                     const SizedBox(height: 12),
 
                     // Recommendation Cards List
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: recList.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        return _RecommendationCard(
-                          item: recList[index],
-                        );
-                      },
-                    ),
+                    if (recList.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Text(
+                          'Tidak ada rekomendasi tambahan untuk hasil ini.',
+                          style: TextStyle(color: AppColors.slate),
+                        ),
+                      )
+                    else
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: recList.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 12),
+                        itemBuilder: (context, index) =>
+                            _RecommendationCard(item: recList[index]),
+                      ),
 
                     const SizedBox(height: 20),
 
