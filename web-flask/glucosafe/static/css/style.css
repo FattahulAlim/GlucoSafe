@@ -322,7 +322,19 @@ code {
   margin-top: 0.25rem;
 }
 
-.file-label input[type="file"] {
+.selected-file {
+  display: block;
+  max-width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.file-label input[type="file"] { 
   display: none;
 }
 
