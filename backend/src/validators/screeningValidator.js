@@ -23,6 +23,9 @@ const screeningSchema = z.object({
   gen_hlth: z.number().int().min(1).max(5),
   ment_hlth: z.number().int().min(0).max(30),
   phys_hlth: z.number().int().min(0).max(30),
+
+  risk_percent: z.number().min(0).max(100).optional(),
+  risk_label: z.enum(['Rendah', 'Sedang', 'Tinggi']).optional(),
 }).strict();
 
 module.exports = { screeningSchema };

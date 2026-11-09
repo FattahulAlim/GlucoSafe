@@ -6,16 +6,17 @@ import '../../domain/recommendation_item.dart';
 import '../../domain/risk_level.dart';
 import '../../domain/screening_result.dart';
 import '../../domain/screening_state.dart';
+import '../../../../core/services/screening_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/headbar.dart';
 import '../../../history/presentation/pages/history_page.dart';
-import '../../../home/presentation/pages/home_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
+import 'screening_step1_page.dart';
 
 /// Halaman Hasil Skrining GlucoSafe.
 /// Menerima data hasil langsung dari backend (ScreeningResult).
 
-class ScreeningResultPage extends StatelessWidget {
+class ScreeningResultPage extends StatefulWidget {
   const ScreeningResultPage({
     super.key,
     this.result,
@@ -29,15 +30,68 @@ class ScreeningResultPage extends StatelessWidget {
   final VoidCallback? onSaveToHistory;
   final VoidCallback? onRestartScreening;
 
+  @override
+  State<ScreeningResultPage> createState() => _ScreeningResultPageState();
+}
+
+class _ScreeningResultPageState extends State<ScreeningResultPage> {
+  bool _isSaving = false;
+
   void _showMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(message)));
   }
 
+  Future<void> _handleSave() async {
+    if (widget.onSaveToHistory != null) {
+      widget.onSaveToHistory!();
+      return;
+    }
+
+    final screeningResult = widget.result;
+    if (screeningResult == null) return;
+
+    setState(() => _isSaving = true);
+
+    try {
+      final form = screeningFormNotifier.value;
+      final response = await ScreeningService().saveScreening(
+        form: form,
+        riskPercent: screeningResult.riskPercent,
+        riskLabel: screeningResult.riskLabel,
+      );
+
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+
+      if (response.success) {
+        resetScreeningForm();
+        _showMessage(context, 'Hasil skrining berhasil disimpan ke riwayat.');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const HistoryPage(),
+          ),
+        );
+      } else {
+        _showMessage(
+          context,
+          response.message.isNotEmpty
+              ? response.message
+              : 'Gagal menyimpan ke riwayat.',
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      _showMessage(context, 'Terjadi kesalahan: ${e.toString()}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final screeningResult = result;
+    final screeningResult = widget.result;
     if (screeningResult == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Hasil Skrining')),
@@ -80,7 +134,7 @@ class ScreeningResultPage extends StatelessWidget {
                     _ResultSummaryCard(
                       percent: actualPercent,
                       statusText: actualStatus,
-                      indicatorCount: indicatorCount,
+                      indicatorCount: widget.indicatorCount,
                     ),
 
                     const SizedBox(height: 24),
@@ -170,35 +224,35 @@ class ScreeningResultPage extends StatelessWidget {
                       width: double.infinity,
                       height: 52,
                       child: ElevatedButton.icon(
-                        onPressed: onSaveToHistory ??
-                            () {
-                              _showMessage(
-                                context,
-                                'Hasil skrining tersimpan di riwayat',
-                              );
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const HistoryPage(),
-                                ),
-                              );
-                            },
+                        onPressed: _isSaving ? null : _handleSave,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.brand,
                           foregroundColor: Colors.white,
+                          disabledBackgroundColor: AppColors.disabled,
+                          disabledForegroundColor: Colors.white,
                           elevation: 1,
                           shadowColor: const Color(0x1F000000),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        icon: const Icon(
-                          Icons.bookmark_outline_rounded,
-                          size: 20,
-                        ),
-                        label: const Text(
-                          'Simpan ke Riwayat',
-                          style: TextStyle(
+                        icon: _isSaving
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor:
+                                      AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
+                            : const Icon(
+                                Icons.bookmark_outline_rounded,
+                                size: 20,
+                              ),
+                        label: Text(
+                          _isSaving ? 'Menyimpan...' : 'Simpan ke Riwayat',
+                          style: const TextStyle(
                             fontSize: 16,
                             height: 22 / 16,
                             fontWeight: FontWeight.w700,
@@ -214,16 +268,15 @@ class ScreeningResultPage extends StatelessWidget {
                       width: double.infinity,
                       height: 52,
                       child: OutlinedButton.icon(
-                        onPressed: onRestartScreening ??
+                        onPressed: widget.onRestartScreening ??
                             () {
-                              resetScreeningForm();
-                              _showMessage(context, 'Memulai skrining baru');
                               Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const HomePage(),
+                                  builder: (context) =>
+                                      const ScreeningStep1Page(),
                                 ),
-                                (route) => false,
+                                (route) => route.isFirst,
                               );
                             },
                         style: OutlinedButton.styleFrom(

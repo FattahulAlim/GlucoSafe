@@ -77,7 +77,7 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
 
     try {
       final screeningService = ScreeningService();
-      final response = await screeningService.submitScreening(form);
+      final response = await screeningService.predictScreening(form);
 
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -85,16 +85,7 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
       if (response.success && response.data != null) {
         final screeningResult = response.data!;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response.message.isNotEmpty
-                ? response.message
-                : 'Skrining berhasil disimpan.'),
-            backgroundColor: AppColors.ok,
-          ),
-        );
-
-        // Pindah ke halaman hasil dengan data dari backend
+        // Pindah ke halaman hasil dengan data prediksi (belum disimpan ke DB)
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -108,7 +99,7 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
           SnackBar(
             content: Text(response.message.isNotEmpty
                 ? response.message
-                : 'Gagal menyimpan hasil skrining.'),
+                : 'Gagal mendapatkan prediksi skrining.'),
             backgroundColor: AppColors.error,
           ),
         );
