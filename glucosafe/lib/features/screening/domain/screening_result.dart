@@ -6,6 +6,8 @@ class ScreeningResult {
   final double riskPercent;
   final String riskLabel;
   final double? bmi;
+  final double? heightCm;
+  final double? weightKg;
   final List<RecommendationItem> recommendations;
 
   const ScreeningResult({
@@ -14,8 +16,18 @@ class ScreeningResult {
     required this.riskPercent,
     required this.riskLabel,
     this.bmi,
+    this.heightCm,
+    this.weightKg,
     this.recommendations = const [],
   });
+
+  /// MySQL sering mengirim kolom DECIMAL sebagai teks ("28.00"),
+  /// jadi terima angka maupun teks.
+  static double? _toDouble(dynamic value) {
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value);
+    return null;
+  }
 
   factory ScreeningResult.fromJson(Map<String, dynamic> json) {
     final rawRecs = json['recommendations'];
@@ -31,9 +43,11 @@ class ScreeningResult {
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString())
           : null,
-      riskPercent: (json['risk_percent'] as num?)?.toDouble() ?? 0.0,
+      riskPercent: _toDouble(json['risk_percent']) ?? 0.0,
       riskLabel: json['risk_label'] as String? ?? 'Rendah',
-      bmi: (json['bmi'] as num?)?.toDouble(),
+      bmi: _toDouble(json['bmi']),
+      heightCm: _toDouble(json['height_cm']),
+      weightKg: _toDouble(json['weight_kg']),
       recommendations: recList,
     );
   }
@@ -49,4 +63,3 @@ class ScreeningResult {
     };
   }
 }
-

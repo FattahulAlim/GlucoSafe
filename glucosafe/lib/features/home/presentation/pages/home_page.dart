@@ -1,47 +1,46 @@
 ﻿import 'package:flutter/material.dart';
 import '../../../screening/domain/risk_level.dart';
+import '../../../screening/domain/screening_result.dart';
+import '../../../../core/models/api_response.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/headbar.dart';
 import '../../../../core/widgets/navbar.dart';
+import '../../../../core/services/screening_service.dart';
 import '../../../../core/services/storage_service.dart';
 import '../../../history/presentation/pages/history_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
 import '../../../screening/presentation/pages/screening_step1_page.dart';
+import '../../domain/home_summary.dart';
 
-/// Halaman Beranda GlucoSafe — nilai diambil langsung dari frame
-/// "Beranda - GlucoSafe" di Figma (warna, ukuran, jarak, font Inter).
-/// Simpan di: lib/pages/home_page.dart
+/// Halaman Beranda GlucoSafe. Ringkasan (pemeriksaan terakhir, grafik
+/// perkembangan, BMI) diambil dari riwayat skrining di backend.
+/// Simpan di: lib/features/home/presentation/pages/home_page.dart
+
+enum _LoadStatus { loading, success, error }
 
 // ───────────────────────── Halaman ─────────────────────────
 class HomePage extends StatefulWidget {
   const HomePage({
     super.key,
     this.userName,
-    this.lastPercent = 28,
-    this.lastDate = '14 Okt 2023',
-    this.idealWeight = '62–66 kg',
-    this.bmiNote = 'BMI Terjaga',
-    this.trendValues = const [36, 32, 30, 31, 28],
-    this.trendLabels = const ['Jun', 'Jul', 'Agu', 'Sep', 'Okt'],
     this.tip =
         'Berjalan santai 30 menit sehari dapat meningkatkan sensitivitas insulin dan menjaga kebugaran tubuh.',
     this.onStartScreening,
     this.onOpenProfile,
     this.onOpenHistory,
+    this.loadHistory,
   });
 
   final String? userName;
-  final double lastPercent;
-  final String lastDate;
-  final String idealWeight;
-  final String bmiNote;
-  final List<double> trendValues;
-  final List<String> trendLabels;
   final String tip;
 
   final VoidCallback? onStartScreening;
   final VoidCallback? onOpenProfile;
   final VoidCallback? onOpenHistory;
+
+  /// Pengambil data riwayat. Bawaannya memanggil ScreeningService;
+  /// bisa diganti saat test.
+  final Future<ApiResponse<List<ScreeningResult>>> Function()? loadHistory;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -49,11 +48,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String? _loadedName;
+  _LoadStatus _status = _LoadStatus.loading;
+  HomeSummary? _summary;
+  String _errorMessage = '';
 
   @override
   void initState() {
     super.initState();
     _loadUser();
+    _loadSummary();
   }
 
   Future<void> _loadUser() async {
@@ -65,9 +68,85 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _loadSummary() async {
+    final load = widget.loadHistory ?? ScreeningService().getHistory;
+    try {
+      final response = await load();
+      if (!mounted) return;
+      if (response.success) {
+        setState(() {
+          _summary = HomeSummary.fromHistory(response.data ?? const []);
+          _status = _LoadStatus.success;
+        });
+      } else {
+        setState(() {
+          _errorMessage = response.message;
+          _status = _LoadStatus.error;
+        });
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = 'Gagal memuat ringkasan. Coba lagi.';
+        _status = _LoadStatus.error;
+      });
+    }
+  }
+
+  void _retry() {
+    setState(() => _status = _LoadStatus.loading);
+    _loadSummary();
+  }
+
+  String get _subtitle {
+    final summary = _summary;
+    if (_status != _LoadStatus.success) {
+      return 'Pantau kondisi kesehatan Anda dengan pemeriksaan berkala.';
+    }
+    if (summary == null) {
+      return 'Belum ada pemeriksaan. Mulai pemeriksaan pertama Anda.';
+    }
+    return switch (summary.risk) {
+      Risk.rendah =>
+        'Semangat sehat! Tubuh Anda dalam ritme yang sangat baik hari ini.',
+      Risk.sedang || Risk.tinggi =>
+        'Terus pantau kesehatan Anda dan lakukan pemeriksaan secara berkala.',
+    };
+  }
+
+  List<Widget> _summarySection() {
+    switch (_status) {
+      case _LoadStatus.loading:
+        return const [_LoadingCard(), SizedBox(height: 16)];
+      case _LoadStatus.error:
+        return [
+          _ErrorCard(message: _errorMessage, onRetry: _retry),
+          const SizedBox(height: 16),
+        ];
+      case _LoadStatus.success:
+        final summary = _summary;
+        if (summary == null) {
+          return const [_EmptyCard(), SizedBox(height: 16)];
+        }
+        return [
+          _LastCheckCard(
+            percent: summary.lastPercent,
+            date: summary.lastDate,
+            risk: summary.risk,
+            infoLabel: summary.infoLabel,
+            infoValue: summary.infoValue,
+            infoNote: summary.infoNote,
+          ),
+          const SizedBox(height: 16),
+          _TrendCard(
+              values: summary.trendValues, labels: summary.trendLabels),
+          const SizedBox(height: 16),
+        ];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final risk = riskOf(widget.lastPercent);
     final displayName = widget.userName ?? _loadedName ?? 'Pengguna';
 
     return Scaffold(
@@ -90,107 +169,104 @@ class _HomePageState extends State<HomePage> {
                   },
             ),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Sapaan
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            'Halo, $displayName',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 22,
-                              height: 30 / 22,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -.22,
-                              color: AppColors.ink,
+              child: RefreshIndicator(
+                onRefresh: _loadSummary,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Sapaan
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              'Halo, $displayName',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 22,
+                                height: 30 / 22,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -.22,
+                                color: AppColors.ink,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        const Text('🌱', style: TextStyle(fontSize: 18)),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    const Text(
-                      'Semangat sehat! Tubuh Anda dalam ritme yang sangat baik hari ini.',
-                      style: TextStyle(
-                          fontSize: 15, height: 22 / 15, color: AppColors.mute),
-                    ),
-                    const SizedBox(height: 16),
-                    _LastCheckCard(
-                      percent: widget.lastPercent,
-                      date: widget.lastDate,
-                      risk: risk,
-                      idealWeight: widget.idealWeight,
-                      bmiNote: widget.bmiNote,
-                    ),
-                    const SizedBox(height: 16),
-                    _TrendCard(values: widget.trendValues, labels: widget.trendLabels),
-                    const SizedBox(height: 16),
-                    _TipCard(text: widget.tip),
-                    const SizedBox(height: 16),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Container(
-                        width: double.infinity, // #fix-overflow
-                        height: 54,
-                        decoration: BoxDecoration(
-                          color: AppColors.brand,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: const [
-                            BoxShadow(
-                                color: Color(0x3300685F),
-                                blurRadius: 6,
-                                offset: Offset(0, 4)),
-                            BoxShadow(
-                                color: Color(0x3300685F),
-                                blurRadius: 4,
-                                offset: Offset(0, 2)),
-                          ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
+                          const SizedBox(width: 6),
+                          const Text('🌱', style: TextStyle(fontSize: 18)),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        _subtitle,
+                        style: const TextStyle(
+                            fontSize: 15,
+                            height: 22 / 15,
+                            color: AppColors.mute),
+                      ),
+                      const SizedBox(height: 16),
+                      ..._summarySection(),
+                      _TipCard(text: widget.tip),
+                      const SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Container(
+                          width: double.infinity, // #fix-overflow
+                          height: 54,
+                          decoration: BoxDecoration(
+                            color: AppColors.brand,
                             borderRadius: BorderRadius.circular(12),
-                            onTap: widget.onStartScreening ??
-                                () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const ScreeningStep1Page(),
-                                    ),
-                                  );
-                                },
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.add_moderator_outlined,
-                                    size: 18, color: Colors.white),
-                                SizedBox(width: 8),
-                                Flexible( // #fix-overflow
-                                  child: Text('Mulai Skrining Baru',
-                                      maxLines: 1, // #fix-overflow
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          height: 22 / 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white)),
-                                ),
-                              ],
+                            boxShadow: const [
+                              BoxShadow(
+                                  color: Color(0x3300685F),
+                                  blurRadius: 6,
+                                  offset: Offset(0, 4)),
+                              BoxShadow(
+                                  color: Color(0x3300685F),
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2)),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(12),
+                              onTap: widget.onStartScreening ??
+                                  () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const ScreeningStep1Page(),
+                                      ),
+                                    );
+                                  },
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.add_moderator_outlined,
+                                      size: 18, color: Colors.white),
+                                  SizedBox(width: 8),
+                                  Flexible( // #fix-overflow
+                                    child: Text('Mulai Skrining Baru',
+                                        maxLines: 1, // #fix-overflow
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            height: 22 / 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white)),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -223,19 +299,116 @@ BoxDecoration _card() => BoxDecoration(
       ],
     );
 
+class _LoadingCard extends StatelessWidget {
+  const _LoadingCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: 'Memuat ringkasan kesehatan',
+      child: Container(
+        width: double.infinity,
+        height: 220,
+        decoration: _card(),
+        alignment: Alignment.center,
+        child: const CircularProgressIndicator(color: AppColors.brand2),
+      ),
+    );
+  }
+}
+
+class _EmptyCard extends StatelessWidget {
+  const _EmptyCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: _card(),
+      child: const Column(
+        children: [
+          Icon(Icons.assignment_outlined, size: 40, color: AppColors.brand2),
+          SizedBox(height: 12),
+          Text('Belum ada pemeriksaan',
+              style: TextStyle(
+                  fontSize: 18,
+                  height: 26 / 18,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ink)),
+          SizedBox(height: 6),
+          Text(
+            'Lakukan pemeriksaan pertama Anda untuk melihat hasil dan perkembangan kesehatan di sini.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontSize: 15, height: 22 / 15, color: AppColors.slate),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ErrorCard extends StatelessWidget {
+  const _ErrorCard({required this.message, required this.onRetry});
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: _card(),
+      child: Column(
+        children: [
+          const Icon(Icons.cloud_off_outlined, size: 40, color: AppColors.mute),
+          const SizedBox(height: 12),
+          const Text('Ringkasan belum bisa dimuat',
+              style: TextStyle(
+                  fontSize: 18,
+                  height: 26 / 18,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ink)),
+          const SizedBox(height: 6),
+          Text(message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  fontSize: 15, height: 22 / 15, color: AppColors.slate)),
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh_rounded, size: 20),
+            label: const Text('Coba Lagi'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.brand,
+              side: const BorderSide(color: AppColors.brand, width: 1.5),
+              minimumSize: const Size(0, 48),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _LastCheckCard extends StatelessWidget {
   const _LastCheckCard({
     required this.percent,
     required this.date,
     required this.risk,
-    required this.idealWeight,
-    required this.bmiNote,
+    required this.infoLabel,
+    required this.infoValue,
+    required this.infoNote,
   });
   final double percent;
   final String date;
   final Risk risk;
-  final String idealWeight;
-  final String bmiNote;
+  final String infoLabel;
+  final String infoValue;
+  final String infoNote;
 
   @override
   Widget build(BuildContext context) {
@@ -361,11 +534,11 @@ class _LastCheckCard extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           color: AppColors.ink),
                       children: [
-                        const TextSpan(text: 'Berat badan ideal: '),
+                        TextSpan(text: infoLabel),
                         TextSpan(
-                            text: idealWeight,
+                            text: infoValue,
                             style: const TextStyle(fontWeight: FontWeight.w700)),
-                        TextSpan(text: ' ($bmiNote)'),
+                        TextSpan(text: ' ($infoNote)'),
                       ],
                     ),
                     textAlign: TextAlign.center,
@@ -388,6 +561,10 @@ class _TrendCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fontFamily = DefaultTextStyle.of(context).style.fontFamily;
+    final canDraw = values.length >= 2;
+    // Legenda hanya untuk tingkat risiko yang muncul di grafik.
+    final levels = <Risk>{for (final v in values) riskOf(v)};
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -417,51 +594,71 @@ class _TrendCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const _Legend(color: AppColors.ok, text: 'Rendah'),
-                const SizedBox(width: 8),
-                const _Legend(color: AppColors.mid, text: 'Sedang'),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: SizedBox(
-              height: 112,
-              width: double.infinity,
-              child: CustomPaint(
-                  painter:
-                      _TrendPainter(values: values, fontFamily: fontFamily)),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                for (var i = 0; i < labels.length; i++)
-                  SizedBox(
-                    width: 40,
-                    child: Text(
-                      labels[i],
-                      textAlign: TextAlign.center,
-                      style: i == labels.length - 1
-                          ? const TextStyle(
-                              fontSize: 14,
-                              height: 18 / 14,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.brand)
-                          : const TextStyle(
-                              fontSize: 12,
-                              height: 16 / 12,
-                              letterSpacing: .24,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.mute),
+                for (final level in Risk.values)
+                  if (levels.contains(level)) ...[
+                    const SizedBox(width: 8),
+                    _Legend(
+                      color: level.color,
+                      text: level.label.replaceFirst('Risiko ', ''),
                     ),
-                  ),
+                  ],
               ],
             ),
           ),
+          if (!canDraw)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: Center(
+                child: Text(
+                  'Lakukan minimal 2 pemeriksaan untuk melihat perkembangan Anda.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 14, height: 20 / 14, color: AppColors.slate),
+                ),
+              ),
+            )
+          else ...[
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: SizedBox(
+                height: 112,
+                width: double.infinity,
+                child: CustomPaint(
+                    painter:
+                        _TrendPainter(values: values, fontFamily: fontFamily)),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  for (var i = 0; i < labels.length; i++)
+                    SizedBox(
+                      width: 48,
+                      child: Text(
+                        labels[i],
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        style: i == labels.length - 1
+                            ? const TextStyle(
+                                fontSize: 14,
+                                height: 18 / 14,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.brand)
+                            : const TextStyle(
+                                fontSize: 12,
+                                height: 16 / 12,
+                                letterSpacing: .24,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.mute),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
