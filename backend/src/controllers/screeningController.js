@@ -114,23 +114,69 @@ async function submitScreening(req, res) {
 
 async function getScreeningHistory(req, res) {
   try {
+    const hasPagination = req.query.page !== undefined || req.query.limit !== undefined;
+    let page;
+    let limit;
+
+    if (hasPagination) {
+      page = req.query.page === undefined ? 1 : Number(req.query.page);
+      limit = req.query.limit === undefined ? 20 : Number(req.query.limit);
+
+      if (
+        !Number.isSafeInteger(page) ||
+        page < 1 ||
+        !Number.isSafeInteger(limit) ||
+        limit < 1 ||
+        limit > 100
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: 'Parameter page harus >= 1 dan limit harus antara 1-100.',
+        });
+      }
+    }
+
+    const offset = hasPagination ? (page - 1) * limit : 0;
+    if (hasPagination && !Number.isSafeInteger(offset)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Nilai offset pagination terlalu besar.',
+      });
+    }
+
+    const paginationSql = hasPagination ? 'LIMIT ? OFFSET ?' : '';
+    const paginationParams = hasPagination ? [limit + 1, offset] : [];
     const [results] = await db.execute(
       `SELECT
          id,
          created_at,
          risk_percent,
          risk_label,
+         risk_percent AS risk_percentage,
+         risk_label AS risk_level,
          bmi
        FROM screening_results
        WHERE user_id = ?
-       ORDER BY created_at DESC, id DESC`,
-      [req.user.id]
+       ORDER BY created_at DESC, id DESC
+       ${paginationSql}`,
+      [req.user.id, ...paginationParams]
     );
+    const hasMore = hasPagination && results.length > limit;
+    if (hasMore) results.pop();
 
     return res.json({
       success: true,
       message: 'Riwayat screening berhasil diambil.',
       data: results,
+      ...(hasPagination
+        ? {
+            pagination: {
+              page,
+              limit,
+              hasMore,
+            },
+          }
+        : {}),
     });
   } catch (error) {
     console.error('Screening history error:', error.message);
