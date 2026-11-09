@@ -4,9 +4,8 @@ const { screeningSchema } = require('../validators/screeningValidator');
 const { calculateBmi, generateRecommendations } = require('../services/screeningService');
 const { predictDiabetesRisk } = require('../services/mlService');
 
-async function submitScreening(req, res) {
+async function predictScreening(req, res) {
   try {
-    // 1. Validasi input dengan Zod
     const parsed = screeningSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({
@@ -17,11 +16,8 @@ async function submitScreening(req, res) {
     }
 
     const form = parsed.data;
-
-    // 2. Hitung BMI di backend (jangan percaya nilai dari client)
     const bmi = calculateBmi(form.height_cm, form.weight_kg);
 
-    // 3. Siapkan fitur untuk ML API (nama key sesuai kontrak ML)
     const mlFeatures = {
       HighBP: form.high_bp,
       HighChol: form.high_chol,
@@ -40,9 +36,82 @@ async function submitScreening(req, res) {
       Age: form.age,
     };
 
-    // 4. Panggil ML API
     const prediction = await predictDiabetesRisk(mlFeatures);
     const { risk_percent, risk_label } = prediction;
+    const recommendations = generateRecommendations(form, risk_label, bmi);
+
+    return res.json({
+      success: true,
+      message: 'Prediksi berhasil.',
+      data: {
+        risk_percent,
+        risk_label,
+        bmi,
+        recommendations,
+      },
+    });
+  } catch (error) {
+    console.error('Predict screening error:', error.message);
+
+    if (error.message.includes('ML API') || error.message.includes('ML_API_URL')) {
+      return res.status(502).json({
+        success: false,
+        message: 'Layanan prediksi tidak tersedia saat ini. Coba beberapa saat lagi.',
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan pada server.',
+    });
+  }
+}
+
+async function submitScreening(req, res) {
+  try {
+    // 1. Validasi input dengan Zod
+    const parsed = screeningSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        message: 'Data skrining tidak valid.',
+        errors: parsed.error.flatten().fieldErrors,
+      });
+    }
+
+    const form = parsed.data;
+
+    // 2. Hitung BMI di backend (jangan percaya nilai dari client)
+    const bmi = calculateBmi(form.height_cm, form.weight_kg);
+
+    let risk_percent = form.risk_percent;
+    let risk_label = form.risk_label;
+
+    if (risk_percent === undefined || risk_label === undefined) {
+      // 3. Siapkan fitur untuk ML API (nama key sesuai kontrak ML)
+      const mlFeatures = {
+        HighBP: form.high_bp,
+        HighChol: form.high_chol,
+        BMI: bmi,
+        Smoker: form.smoker,
+        Stroke: form.stroke,
+        HeartDiseaseorAttack: form.heart_disease,
+        PhysActivity: form.phys_activity,
+        Fruits: form.fruits,
+        Veggies: form.veggies,
+        GenHlth: form.gen_hlth,
+        MentHlth: form.ment_hlth,
+        PhysHlth: form.phys_hlth,
+        DiffWalk: form.diff_walk,
+        Sex: form.sex,
+        Age: form.age,
+      };
+
+      // 4. Panggil ML API jika nilai belum dikirim dari prediksi sebelumnya
+      const prediction = await predictDiabetesRisk(mlFeatures);
+      risk_percent = prediction.risk_percent;
+      risk_label = prediction.risk_label;
+    }
 
     // 5. Simpan ke screening_results
     const [insertResult] = await db.execute(
@@ -266,6 +335,7 @@ async function getScreeningRecommendations(req, res) {
 
 module.exports = {
   submitScreening,
+  predictScreening,
   getScreeningHistory,
   getScreeningDetail,
   getScreeningRecommendations,

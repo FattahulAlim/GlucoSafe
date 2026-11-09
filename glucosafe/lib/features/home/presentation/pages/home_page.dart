@@ -9,6 +9,7 @@ import '../../../../core/services/screening_service.dart';
 import '../../../../core/services/storage_service.dart';
 import '../../../history/presentation/pages/history_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
+import '../../../screening/domain/screening_state.dart';
 import '../../../screening/presentation/pages/screening_step1_page.dart';
 import '../../domain/home_summary.dart';
 
@@ -235,6 +236,7 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(12),
                               onTap: widget.onStartScreening ??
                                   () {
+                                    resetScreeningForm();
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(

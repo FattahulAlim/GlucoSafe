@@ -13,8 +13,8 @@ class ScreeningService {
   final _apiClient = ApiClient();
   final _storage = StorageService();
 
-  /// Mengirim hasil skrining ke backend via POST /api/screenings
-  Future<ApiResponse<ScreeningResult>> submitScreening(ScreeningForm form) async {
+  /// Melakukan prediksi hasil skrining via POST /api/screenings/predict (tanpa simpan ke DB)
+  Future<ApiResponse<ScreeningResult>> predictScreening(ScreeningForm form) async {
     final token = await _storage.getToken();
     if (token == null || token.isEmpty) {
       return ApiResponse<ScreeningResult>(
@@ -26,6 +26,39 @@ class ScreeningService {
     try {
       final payload = form.toBackendJson();
       return await _apiClient.post<ScreeningResult>(
+        '${ApiConfig.screeningsPath}/predict',
+        payload,
+        token: token,
+        fromJson: (json) => ScreeningResult.fromJson(json as Map<String, dynamic>),
+      );
+    } catch (e) {
+      return ApiResponse<ScreeningResult>(
+        success: false,
+        message: 'Gagal memproses prediksi: ${e.toString()}',
+      );
+    }
+  }
+
+  /// Menyimpan hasil skrining ke riwayat DB via POST /api/screenings
+  Future<ApiResponse<ScreeningResult>> saveScreening({
+    required ScreeningForm form,
+    double? riskPercent,
+    String? riskLabel,
+  }) async {
+    final token = await _storage.getToken();
+    if (token == null || token.isEmpty) {
+      return ApiResponse<ScreeningResult>(
+        success: false,
+        message: 'Pengguna belum login. Silakan login terlebih dahulu.',
+      );
+    }
+
+    try {
+      final payload = form.toBackendJson();
+      if (riskPercent != null) payload['risk_percent'] = riskPercent;
+      if (riskLabel != null) payload['risk_label'] = riskLabel;
+
+      return await _apiClient.post<ScreeningResult>(
         ApiConfig.screeningsPath,
         payload,
         token: token,
@@ -34,9 +67,14 @@ class ScreeningService {
     } catch (e) {
       return ApiResponse<ScreeningResult>(
         success: false,
-        message: 'Gagal memproses data skrining: ${e.toString()}',
+        message: 'Gagal menyimpan ke riwayat: ${e.toString()}',
       );
     }
+  }
+
+  /// Mengirim hasil skrining ke backend via POST /api/screenings
+  Future<ApiResponse<ScreeningResult>> submitScreening(ScreeningForm form) async {
+    return saveScreening(form: form);
   }
 
   /// Mengambil riwayat skrining pengguna via GET /api/screenings
