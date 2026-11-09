@@ -1,6 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
+import '../../../../core/network/api_client.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../data/dummy_user_database.dart';
+import '../../data/auth_service.dart';
 import '../../../home/presentation/pages/home_page.dart';
 import './register_page.dart';
 import '../../../screening/domain/screening_state.dart';
@@ -20,6 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscureText = true;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isSubmitting = false;
   String? _emailErrorText;
 
   @override
@@ -41,8 +44,9 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _login() {
+  Future<void> _login() async {
     final email = _emailController.text.trim();
+    if (_isSubmitting) return;
     if (email.isEmpty || _emailErrorText != null) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -51,16 +55,23 @@ class _LoginPageState extends State<LoginPage> {
         );
       return;
     }
-    if (DummyUserDatabase.instance.login(email, _passwordController.text) ==
-        null) {
+
+    setState(() => _isSubmitting = true);
+    try {
+      await AuthService().login(
+        email: email,
+        password: _passwordController.text,
+      );
+    } on ApiException catch (error) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(content: Text('Email atau kata sandi salah')),
-        );
+        ..showSnackBar(SnackBar(content: Text(error.message)));
       return;
     }
-    // TODO: panggil API login (Anggota 3) sebelum pindah halaman.
+    if (!mounted) return;
+    setState(() => _isSubmitting = false);
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
@@ -69,9 +80,7 @@ class _LoginPageState extends State<LoginPage> {
             resetScreeningForm(); // mulai dari isian kosong
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => const ScreeningStep1Page(),
-              ),
+              MaterialPageRoute(builder: (_) => const ScreeningStep1Page()),
             );
           },
         ),
@@ -81,9 +90,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   OutlineInputBorder _border(Color c, [double w = 1]) => OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: c, width: w),
-      );
+    borderRadius: BorderRadius.circular(12),
+    borderSide: BorderSide(color: c, width: w),
+  );
 
   InputDecoration _decoration(String hint, {Widget? suffix, String? error}) {
     return InputDecoration(
@@ -94,7 +103,12 @@ class _LoginPageState extends State<LoginPage> {
       filled: true,
       fillColor: Colors.white,
       isDense: true,
-      contentPadding: EdgeInsets.fromLTRB(17, 15.5, suffix != null ? 4 : 17, 15.5),
+      contentPadding: EdgeInsets.fromLTRB(
+        17,
+        15.5,
+        suffix != null ? 4 : 17,
+        15.5,
+      ),
       suffixIcon: suffix,
       suffixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
       border: _border(AppColors.border),
@@ -106,15 +120,15 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _label(String text) => Text(
-        text,
-        style: const TextStyle(
-          fontSize: 13,
-          height: 16 / 13,
-          letterSpacing: .13,
-          fontWeight: FontWeight.w500,
-          color: AppColors.ink,
-        ),
-      );
+    text,
+    style: const TextStyle(
+      fontSize: 13,
+      height: 16 / 13,
+      letterSpacing: .13,
+      fontWeight: FontWeight.w500,
+      color: AppColors.ink,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +144,9 @@ class _LoginPageState extends State<LoginPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Logo + judul
-                  const Center(child: _LogoBox(size: 48, radius: 8, padding: 6)),
+                  const Center(
+                    child: _LogoBox(size: 48, radius: 8, padding: 6),
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     'GlucoSafe',
@@ -147,7 +163,11 @@ class _LoginPageState extends State<LoginPage> {
                   const Text(
                     'Masuk ke akun Anda',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.slate),
+                    style: TextStyle(
+                      fontSize: 14,
+                      height: 20 / 14,
+                      color: AppColors.slate,
+                    ),
                   ),
                   const SizedBox(height: 32),
 
@@ -167,7 +187,10 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       });
                     },
-                    decoration: _decoration('nama@email.com', error: _emailErrorText),
+                    decoration: _decoration(
+                      'nama@email.com',
+                      error: _emailErrorText,
+                    ),
                   ),
                   const SizedBox(height: 24),
 
@@ -180,8 +203,13 @@ class _LoginPageState extends State<LoginPage> {
                         onTap: () {
                           ScaffoldMessenger.of(context)
                             ..hideCurrentSnackBar()
-                            ..showSnackBar(const SnackBar(
-                                content: Text('Halaman lupa kata sandi belum dibuat')));
+                            ..showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Halaman lupa kata sandi belum dibuat',
+                                ),
+                              ),
+                            );
                         },
                         child: const Text(
                           'Lupa kata sandi?',
@@ -212,7 +240,8 @@ class _LoginPageState extends State<LoginPage> {
                               ? Icons.visibility_off_outlined
                               : Icons.visibility_outlined,
                         ),
-                        onPressed: () => setState(() => _obscureText = !_obscureText),
+                        onPressed: () =>
+                            setState(() => _obscureText = !_obscureText),
                       ),
                     ),
                   ),
@@ -220,7 +249,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   // Tombol Masuk
                   ElevatedButton(
-                    onPressed: _login,
+                    onPressed: _isSubmitting ? null : _login,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.brand2,
                       foregroundColor: Colors.white,
@@ -232,25 +261,36 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'Masuk',
-                      style: TextStyle(
-                        fontSize: 16,
-                        height: 24 / 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text(
+                            'Masuk',
+                            style: TextStyle(
+                              fontSize: 16,
+                              height: 24 / 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
                   const SizedBox(height: 32),
 
                   // Footer
-                  Wrap( // #fix-overflow
+                  Wrap(
+                    // #fix-overflow
                     alignment: WrapAlignment.center,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       const Text(
                         'Belum punya akun? ',
-                        style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.slate),
+                        style: TextStyle(
+                          fontSize: 14,
+                          height: 20 / 14,
+                          color: AppColors.slate,
+                        ),
                       ),
                       GestureDetector(
                         onTap: _goToRegister,
@@ -280,7 +320,11 @@ class _LoginPageState extends State<LoginPage> {
 /// Kotak logo putih. Jika file logo belum ada, tampil logo pengganti.
 /// Untuk logo asli: taruh PNG di assets/images/logo.png lalu daftarkan di pubspec.yaml.
 class _LogoBox extends StatelessWidget {
-  const _LogoBox({required this.size, required this.radius, required this.padding});
+  const _LogoBox({
+    required this.size,
+    required this.radius,
+    required this.padding,
+  });
   final double size;
   final double radius;
   final double padding;
@@ -295,7 +339,11 @@ class _LogoBox extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(radius),
         boxShadow: const [
-          BoxShadow(color: Color(0x0D000000), blurRadius: 2, offset: Offset(0, 1)),
+          BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 2,
+            offset: Offset(0, 1),
+          ),
         ],
       ),
       child: Image.asset(
@@ -310,7 +358,11 @@ class _LogoBox extends StatelessWidget {
               end: Alignment.bottomRight,
             ),
           ),
-          child: const Icon(Icons.water_drop_rounded, color: Colors.white, size: 20),
+          child: const Icon(
+            Icons.water_drop_rounded,
+            color: Colors.white,
+            size: 20,
+          ),
         ),
       ),
     );

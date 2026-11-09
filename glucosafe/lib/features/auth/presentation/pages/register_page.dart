@@ -1,6 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
+import '../../../../core/network/api_client.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../data/dummy_user_database.dart';
+import '../../data/auth_service.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -21,6 +23,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String? _emailErrorText;
   String? _passwordErrorText;
   String? _confirmErrorText;
+  bool _isSubmitting = false;
 
   void _clearFields() {
     _nameController.clear();
@@ -46,8 +49,8 @@ class _RegisterPageState extends State<RegisterPage> {
       _emailErrorText = email.isEmpty
           ? 'Email wajib diisi'
           : (!email.endsWith('@gmail.com')
-              ? 'Email harus berakhiran @gmail.com'
-              : null);
+                ? 'Email harus berakhiran @gmail.com'
+                : null);
       _passwordErrorText = pass.length < 8 ? 'Minimal 8 karakter' : null;
       _confirmErrorText = confirm != pass ? 'Kata sandi tidak sama' : null;
     });
@@ -58,20 +61,26 @@ class _RegisterPageState extends State<RegisterPage> {
         _confirmErrorText == null;
   }
 
-  void _submit() {
+  Future<void> _submit() async {
+    if (_isSubmitting) return;
     if (!_validate()) return;
 
-    final user = DummyUser(
-      name: _nameController.text.trim(),
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    );
-    if (!DummyUserDatabase.instance.register(user)) {
-      setState(() {
-        _emailErrorText = 'Email sudah terdaftar';
-      });
+    setState(() => _isSubmitting = true);
+    try {
+      await AuthService().register(
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+    } on ApiException catch (error) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
       return;
     }
+    if (!mounted) return;
+    setState(() => _isSubmitting = false);
 
     // #fix-overflow: margin bawah dihitung dari tinggi layar; nilainya bisa
     // negatif saat keyboard terbuka sehingga menuSnackBar gagal dirender.
@@ -132,7 +141,12 @@ class _RegisterPageState extends State<RegisterPage> {
       fillColor: Colors.white,
       suffixIcon: suffix,
       isDense: true,
-      contentPadding: EdgeInsets.fromLTRB(17, 15.5, suffix != null ? 4 : 17, 15.5),
+      contentPadding: EdgeInsets.fromLTRB(
+        17,
+        15.5,
+        suffix != null ? 4 : 17,
+        15.5,
+      ),
       suffixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
       border: border(AppColors.border),
       enabledBorder: border(AppColors.border),
@@ -143,24 +157,24 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _label(String text) => Text(
-        text,
-        style: const TextStyle(
-          fontSize: 13,
-          height: 16 / 13,
-          letterSpacing: .13,
-          fontWeight: FontWeight.w500,
-          color: AppColors.ink,
-        ),
-      );
+    text,
+    style: const TextStyle(
+      fontSize: 13,
+      height: 16 / 13,
+      letterSpacing: .13,
+      fontWeight: FontWeight.w500,
+      color: AppColors.ink,
+    ),
+  );
 
   Widget _eye(bool obscure, VoidCallback onTap) => IconButton(
-        onPressed: onTap,
-        icon: Icon(
-          obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-          size: 20,
-          color: AppColors.slate,
-        ),
-      );
+    onPressed: onTap,
+    icon: Icon(
+      obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+      size: 20,
+      color: AppColors.slate,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +189,9 @@ class _RegisterPageState extends State<RegisterPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Center(child: _LogoBox(size: 48, radius: 8, padding: 6)),
+                  const Center(
+                    child: _LogoBox(size: 48, radius: 8, padding: 6),
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     'GlucoSafe',
@@ -253,7 +269,8 @@ class _RegisterPageState extends State<RegisterPage> {
                       suffix: _eye(
                         _obscurePassword,
                         () => setState(
-                            () => _obscurePassword = !_obscurePassword),
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
                       ),
                     ),
                   ),
@@ -273,8 +290,10 @@ class _RegisterPageState extends State<RegisterPage> {
                       errorText: _confirmErrorText,
                       suffix: _eye(
                         _obscureConfirmPassword,
-                        () => setState(() =>
-                            _obscureConfirmPassword = !_obscureConfirmPassword),
+                        () => setState(
+                          () => _obscureConfirmPassword =
+                              !_obscureConfirmPassword,
+                        ),
                       ),
                     ),
                   ),
@@ -283,7 +302,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   // Tombol Daftar
                   SizedBox(
                     child: ElevatedButton(
-                      onPressed: _submit,
+                      onPressed: _isSubmitting ? null : _submit,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.brand2,
                         foregroundColor: Colors.white,
@@ -295,20 +314,27 @@ class _RegisterPageState extends State<RegisterPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text(
-                        'Daftar',
-                        style: TextStyle(
-                          fontSize: 16,
-                          height: 24 / 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      child: _isSubmitting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text(
+                              'Daftar',
+                              style: TextStyle(
+                                fontSize: 16,
+                                height: 24 / 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // Footer Login
-                  Wrap( // #fix-overflow
+                  Wrap(
+                    // #fix-overflow
                     alignment: WrapAlignment.center,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [

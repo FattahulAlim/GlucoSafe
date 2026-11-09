@@ -10,6 +10,7 @@ const {
   getScreeningRecommendations,
 } = require('../controllers/screeningController');
 
+router.get('/history', authMiddleware, getScreeningHistory);
 router.get('/', authMiddleware, getScreeningHistory);
 router.get('/:id/recommendations', authMiddleware, getScreeningRecommendations);
 router.get('/:id', authMiddleware, getScreeningDetail);

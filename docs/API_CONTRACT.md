@@ -12,6 +12,8 @@ http://10.0.2.2:3000/api
 Untuk perangkat fisik, gunakan IP lokal komputer backend.
 Semua perangkat harus terhubung ke jaringan yang dapat saling
 mengakses.
+Untuk mengubah URL default aplikasi, jalankan Flutter dengan
+`--dart-define=API_BASE_URL=http://<host>:3000/api`.
 
 ## Format Response
 
@@ -83,12 +85,19 @@ Mengembalikan profil pengguna yang sedang login.
 
 ## 5. Get Screening History
 
-GET /screenings
+GET /screenings/history
 
 Auth:
 Authorization: Bearer <JWT_TOKEN>
 
-Mengembalikan riwayat screening milik pengguna yang login.
+Mengembalikan riwayat screening milik pengguna yang login, urut dari yang
+terbaru. Setiap data berisi `id`, `created_at`, `risk_percentage`,
+`risk_level`, dan `bmi`.
+
+Pagination opsional:
+`GET /screenings/history?page=1&limit=20` (limit maksimum 100).
+Response tetap menggunakan array `data`; jika pagination digunakan, response
+juga menyertakan `pagination` berisi `page`, `limit`, dan `hasMore`.
 
 ## 6. Get Screening Detail
 
