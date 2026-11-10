@@ -63,7 +63,9 @@ void main() {
     );
 
     // Tekan tombol Keluar dari Akun
-    await tester.tap(find.text('Keluar dari Akun'));
+    final logoutButton = find.text('Keluar dari Akun');
+    await tester.ensureVisible(logoutButton);
+    await tester.tap(logoutButton);
     await tester.pumpAndSettle();
 
     // Pastikan efek BackdropFilter untuk blur ada
