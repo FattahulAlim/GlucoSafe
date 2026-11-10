@@ -33,7 +33,7 @@ test.afterEach(() => {
 });
 
 test('memanggil Flask /api/predict dan memetakan respons nyata', async () => {
-  process.env.ML_API_URL = 'http://127.0.0.1:8000';
+  process.env.ML_API_URL = 'http://127.0.0.1:5000';
   delete process.env.ML_MOCK_MODE;
   let request;
   global.fetch = async (url, options) => {
@@ -48,7 +48,7 @@ test('memanggil Flask /api/predict dan memetakan respons nyata', async () => {
 
   const result = await predictDiabetesRisk(features);
 
-  assert.equal(request.url, 'http://127.0.0.1:8000/api/predict');
+  assert.equal(request.url, 'http://127.0.0.1:5000/api/predict');
   assert.deepEqual(JSON.parse(request.options.body), { features });
   assert.deepEqual(result, {
     risk_percent: 42.5,
@@ -66,7 +66,7 @@ test('menolak mode mock pada endpoint skrining nyata', async () => {
 });
 
 test('menolak respons ML tanpa skor valid', async () => {
-  process.env.ML_API_URL = 'http://127.0.0.1:8000';
+  process.env.ML_API_URL = 'http://127.0.0.1:5000';
   delete process.env.ML_MOCK_MODE;
   global.fetch = async () => new Response(JSON.stringify({
     success: true,
