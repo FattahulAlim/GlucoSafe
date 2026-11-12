@@ -97,33 +97,3 @@ CREATE TABLE IF NOT EXISTS recommendations (
 
   INDEX idx_rec_result_id (result_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-
--- ============================================================
---  CONTOH DATA (opsional — hapus sebelum production)
--- ============================================================
-
--- User dummy
-INSERT INTO users (name, email, password) VALUES
-  ('Rahmawati', 'rahma@email.com', '$2b$12$dummy_hash_ganti_dengan_bcrypt');
-
--- Hasil skrining dummy
-INSERT INTO screening_results (
-  user_id, risk_percent, risk_label,
-  sex, age, height_cm, weight_kg, bmi,
-  high_bp, high_chol, stroke, heart_disease, diff_walk,
-  smoker, phys_activity, fruits, veggies,
-  gen_hlth, ment_hlth, phys_hlth
-) VALUES (
-  1, 28.00, 'Rendah',
-  1, 5, 165.0, 70.0, 25.7,
-  0, 0, 0, 0, 0,
-  0, 1, 1, 1,
-  2, 0, 0
-);
-
--- Rekomendasi dummy untuk hasil di atas
-INSERT INTO recommendations (result_id, category, title, description) VALUES
-  (1, 'Nutrisi',         'Perbanyak Buah & Sayur',    'Konsumsi minimal 5 porsi buah dan sayuran setiap hari untuk menjaga kadar gula darah.'),
-  (1, 'Aktivitas Fisik', 'Olahraga Rutin 30 Menit',   'Lakukan aktivitas aerobik sedang seperti jalan cepat selama 30 menit, minimal 5 hari per minggu.'),
-  (1, 'Pemeriksaan',     'Cek Gula Darah Berkala',    'Lakukan pemeriksaan gula darah minimal sekali setahun meski belum ada gejala.');

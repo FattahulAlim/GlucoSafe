@@ -25,7 +25,6 @@ class PredictionResult:
     model_version: str
     risk_percent: Optional[float] = None
     confidence_score: Optional[float] = None
-    is_dummy: bool = False
 
 
 class ModelService:
@@ -180,7 +179,6 @@ class ModelService:
             model_version=self.version,
             risk_percent=risk_percent,
             confidence_score=confidence,
-            is_dummy=False,
         )
 
     def predict_matrix(self, rows_list: List[List[Any]]) -> List[Dict[str, Any]]:
