@@ -15,4 +15,5 @@ web-flask/.venv/
 web-flask/instance/
 web-flask/.pytest_cache/
 web-flask/**/__pycache__/
+web-flask/model/artifacts_backup_*/
 

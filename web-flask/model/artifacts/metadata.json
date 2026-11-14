@@ -1,6 +1,6 @@
 {
-  "version": "v1.0-svm",
-  "algorithm": "Support Vector Machine (RBF)",
+  "version": "v1.1-ann",
+  "algorithm": "Artificial Neural Network (MLPClassifier)",
   "features": [
     "HighBP",
     "HighChol",
@@ -27,7 +27,10 @@
     "high": 65.0
   },
   "metrics": {
-    "accuracy": 0.7378,
-    "training_samples": 15000
+    "accuracy": 0.7362,
+    "precision": 0.7238,
+    "recall": 0.8077,
+    "f1": 0.7635,
+    "roc_auc": 0.8062
   }
 }
