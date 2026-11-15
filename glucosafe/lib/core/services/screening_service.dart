@@ -1,6 +1,7 @@
 import '../config/api_config.dart';
 import '../models/api_response.dart';
 import '../../features/screening/domain/screening_form.dart';
+import '../../features/screening/domain/recommendation_item.dart';
 import '../../features/screening/domain/screening_result.dart';
 import 'api_client.dart';
 import 'storage_service.dart';
@@ -62,7 +63,8 @@ class ScreeningService {
         ApiConfig.screeningsPath,
         payload,
         token: token,
-        fromJson: (json) => ScreeningResult.fromJson(json as Map<String, dynamic>),
+        fromJson: (json) =>
+            ScreeningResult.fromJson(json as Map<String, dynamic>),
       );
     } catch (e) {
       return ApiResponse<ScreeningResult>(
@@ -114,8 +116,39 @@ class ScreeningService {
     return await _apiClient.get<ScreeningResult>(
       '${ApiConfig.screeningsPath}/$id',
       token: token,
-      fromJson: (json) => ScreeningResult.fromJson(json as Map<String, dynamic>),
+      fromJson: (json) =>
+          ScreeningResult.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Mengambil rekomendasi berdasarkan ID skrining.
+  Future<ApiResponse<List<RecommendationItem>>> getRecommendations(
+    int id,
+  ) async {
+    final token = await _storage.getToken();
+    if (token == null || token.isEmpty) {
+      return const ApiResponse<List<RecommendationItem>>(
+        success: false,
+        message: 'Pengguna belum login.',
+      );
+    }
+
+    return _apiClient.get<List<RecommendationItem>>(
+      '${ApiConfig.screeningsPath}/$id/recommendations',
+      token: token,
+      fromJson: (json) {
+        if (json is! List) {
+          throw const FormatException('Format rekomendasi tidak valid.');
+        }
+        return json.map((item) {
+          if (item is! Map<String, dynamic>) {
+            throw const FormatException(
+              'Format salah satu rekomendasi tidak valid.',
+            );
+          }
+          return RecommendationItem.fromJson(item);
+        }).toList();
+      },
     );
   }
 }
-

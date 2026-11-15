@@ -9,6 +9,7 @@ class ScreeningResult {
   final double? heightCm;
   final double? weightKg;
   final List<RecommendationItem> recommendations;
+  final Map<String, dynamic> additionalFields;
 
   const ScreeningResult({
     required this.id,
@@ -19,6 +20,7 @@ class ScreeningResult {
     this.heightCm,
     this.weightKg,
     this.recommendations = const [],
+    this.additionalFields = const {},
   });
 
   /// MySQL sering mengirim kolom DECIMAL sebagai teks ("28.00"),
@@ -30,6 +32,18 @@ class ScreeningResult {
   }
 
   factory ScreeningResult.fromJson(Map<String, dynamic> json) {
+    const knownFields = {
+      'id',
+      'created_at',
+      'risk_percent',
+      'risk_percentage',
+      'risk_label',
+      'risk_level',
+      'bmi',
+      'height_cm',
+      'weight_kg',
+      'recommendations',
+    };
     final rawRecs = json['recommendations'];
     List<RecommendationItem> recList = [];
     if (rawRecs is List) {
@@ -49,6 +63,10 @@ class ScreeningResult {
       heightCm: _toDouble(json['height_cm']),
       weightKg: _toDouble(json['weight_kg']),
       recommendations: recList,
+      additionalFields: {
+        for (final entry in json.entries)
+          if (!knownFields.contains(entry.key)) entry.key: entry.value,
+      },
     );
   }
 
@@ -59,7 +77,10 @@ class ScreeningResult {
       'risk_percent': riskPercent,
       'risk_label': riskLabel,
       'bmi': bmi,
+      'height_cm': heightCm,
+      'weight_kg': weightKg,
       'recommendations': recommendations.map((r) => r.toJson()).toList(),
+      ...additionalFields,
     };
   }
 }
