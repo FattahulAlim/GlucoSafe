@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS users (
   name        VARCHAR(100)    NOT NULL,
   email       VARCHAR(150)    NOT NULL,
   password    VARCHAR(255)    NOT NULL,          -- bcrypt hash
+  photo_url   VARCHAR(255)    DEFAULT NULL,
   created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP
                                 ON UPDATE CURRENT_TIMESTAMP,
