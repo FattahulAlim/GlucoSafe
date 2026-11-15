@@ -1,14 +1,13 @@
-
 const db = require('../config/database');
 const bcrypt = require('bcrypt');
+const fs = require('fs'); 
+const path = require('path'); 
 
 async function getMe(req, res) {
   try {
     const [users] = await db.execute(
-      `SELECT id, name, email, created_at
-       FROM users
-       WHERE id = ?
-       LIMIT 1`,
+      `SELECT id, name, email, photo_url, created_at
+       FROM users WHERE id = ? LIMIT 1`, 
       [req.user.id]
     );
 
@@ -26,11 +25,7 @@ async function getMe(req, res) {
     });
   } catch (error) {
     console.error('Get profile error:', error.message);
-
-    return res.status(500).json({
-      success: false,
-      message: 'Terjadi kesalahan pada server.',
-    });
+    return res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
   }
 }
 
@@ -39,23 +34,16 @@ async function updateProfile(req, res) {
     const { name, email } = req.body;
 
     if (!name || !email) {
-      return res.status(400).json({
-        success: false,
-        message: 'Nama dan email wajib diisi.',
-      });
+      return res.status(400).json({ success: false, message: 'Nama dan email wajib diisi.' });
     }
 
-    // Cek apakah email sudah dipakai user lain
     const [existing] = await db.execute(
       `SELECT id FROM users WHERE email = ? AND id != ? LIMIT 1`,
       [email, req.user.id]
     );
 
     if (existing.length > 0) {
-      return res.status(409).json({
-        success: false,
-        message: 'Email sudah terdaftar oleh pengguna lain.',
-      });
+      return res.status(409).json({ success: false, message: 'Email sudah terdaftar oleh pengguna lain.' });
     }
 
     await db.execute(
@@ -64,7 +52,7 @@ async function updateProfile(req, res) {
     );
 
     const [updated] = await db.execute(
-      `SELECT id, name, email, created_at FROM users WHERE id = ? LIMIT 1`,
+      `SELECT id, name, email, photo_url, created_at FROM users WHERE id = ? LIMIT 1`,
       [req.user.id]
     );
 
@@ -75,11 +63,7 @@ async function updateProfile(req, res) {
     });
   } catch (error) {
     console.error('Update profile error:', error.message);
-
-    return res.status(500).json({
-      success: false,
-      message: 'Terjadi kesalahan pada server.',
-    });
+    return res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
   }
 }
 
@@ -88,74 +72,84 @@ async function changePassword(req, res) {
     const { currentPassword, newPassword, confirmNewPassword } = req.body;
 
     if (
-      typeof currentPassword !== 'string' ||
-      typeof newPassword !== 'string' ||
-      typeof confirmNewPassword !== 'string' ||
-      !currentPassword.trim() ||
-      !newPassword.trim() ||
-      !confirmNewPassword.trim()
+      typeof currentPassword !== 'string' || typeof newPassword !== 'string' || typeof confirmNewPassword !== 'string' ||
+      !currentPassword.trim() || !newPassword.trim() || !confirmNewPassword.trim()
     ) {
-      return res.status(400).json({
-        success: false,
-        message: 'Kata sandi lama, kata sandi baru, dan konfirmasi kata sandi baru wajib diisi.',
-      });
+      return res.status(400).json({ success: false, message: 'Kata sandi lama, kata sandi baru, dan konfirmasi wajib diisi.' });
     }
 
     if (newPassword.length < 8) {
-      return res.status(400).json({
-        success: false,
-        message: 'Kata sandi baru minimal 8 karakter.',
-      });
+      return res.status(400).json({ success: false, message: 'Kata sandi baru minimal 8 karakter.' });
     }
 
     if (newPassword !== confirmNewPassword) {
-      return res.status(400).json({
-        success: false,
-        message: 'Kata sandi baru dan konfirmasi kata sandi baru tidak cocok.',
-      });
+      return res.status(400).json({ success: false, message: 'Kata sandi baru dan konfirmasi tidak cocok.' });
     }
 
-    const [users] = await db.execute(
-      `SELECT id, password FROM users WHERE id = ? LIMIT 1`,
-      [req.user.id]
-    );
+    const [users] = await db.execute(`SELECT id, password FROM users WHERE id = ? LIMIT 1`, [req.user.id]);
 
     if (users.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Pengguna tidak ditemukan.',
-      });
+      return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan.' });
     }
 
     const user = users[0];
     const currentPasswordValid = await bcrypt.compare(currentPassword, user.password);
 
     if (!currentPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: 'Kata sandi lama tidak sesuai.',
-      });
+      return res.status(401).json({ success: false, message: 'Kata sandi lama tidak sesuai.' });
     }
 
     const newPasswordHash = await bcrypt.hash(newPassword.trim(), 12);
+    await db.execute(`UPDATE users SET password = ? WHERE id = ?`, [newPasswordHash, req.user.id]);
 
-    await db.execute(
-      `UPDATE users SET password = ? WHERE id = ?`,
-      [newPasswordHash, req.user.id]
-    );
-
-    return res.json({
-      success: true,
-      message: 'Kata sandi berhasil diperbarui.',
-    });
+    return res.json({ success: true, message: 'Kata sandi berhasil diperbarui.' });
   } catch (error) {
     console.error('Change password error:', error.message);
-
-    return res.status(500).json({
-      success: false,
-      message: 'Terjadi kesalahan pada server.',
-    });
+    return res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
   }
 }
 
-module.exports = { getMe, updateProfile, changePassword };
+async function uploadPhoto(req, res) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'Tidak ada file yang diunggah.' });
+    }
+
+    const photoUrl = `/uploads/avatars/${req.file.filename}`;
+
+    // Hapus foto lama jika ada
+    const [users] = await db.execute('SELECT photo_url FROM users WHERE id = ?', [req.user.id]);
+    if (users[0].photo_url) {
+      const oldPath = path.join(__dirname, '../../', users[0].photo_url);
+      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+    }
+
+    await db.execute('UPDATE users SET photo_url = ? WHERE id = ?', [photoUrl, req.user.id]);
+
+    return res.json({
+      success: true,
+      message: 'Foto profil berhasil diperbarui.',
+      data: { photo_url: photoUrl }
+    });
+  } catch (error) {
+    console.error('Upload photo error:', error.message);
+    return res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
+  }
+}
+
+async function deletePhoto(req, res) {
+  try {
+    const [users] = await db.execute('SELECT photo_url FROM users WHERE id = ?', [req.user.id]);
+    if (users[0].photo_url) {
+      const oldPath = path.join(__dirname, '../../', users[0].photo_url);
+      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      await db.execute('UPDATE users SET photo_url = NULL WHERE id = ?', [req.user.id]);
+    }
+    return res.json({ success: true, message: 'Foto profil berhasil dihapus.' });
+  } catch (error) {
+    console.error('Delete photo error:', error.message);
+    return res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
+  }
+}
+
+module.exports = { getMe, updateProfile, changePassword, uploadPhoto, deletePhoto };

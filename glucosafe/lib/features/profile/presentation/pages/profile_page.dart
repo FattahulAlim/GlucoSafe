@@ -61,6 +61,7 @@ class _ProfilePageState extends State<ProfilePage> {
           name: localUser.name,
           email: localUser.email,
           initials: UserProfile.extractInitials(localUser.name),
+          photoUrl: localUser.photoUrl,
         );
         _isLoading = false;
       });
@@ -76,6 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
             name: u.name,
             email: u.email,
             initials: UserProfile.extractInitials(u.name),
+            photoUrl: u.photoUrl,
           );
           _isLoading = false;
         });
@@ -180,7 +182,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           ProfileAvatar(
                             initials: _currentProfile.initials,
-                            photoAsset: _currentProfile.photoAsset,
+                            photoUrl: _currentProfile.photoUrl,
                             size: 92,
                             showVerifiedBadge: _currentProfile.isVerified,
                           ),
