@@ -150,4 +150,26 @@ class ApiClient {
       );
     }
   }
+
+  Future<ApiResponse<T>> delete<T>(
+    String path, {
+    T Function(dynamic)? fromJson,
+    String? token,
+  }) async {
+    try {
+      final url = Uri.parse('${ApiConfig.baseUrl}$path');
+      final headers = token != null ? ApiConfig.headersWithAuth(token) : ApiConfig.headers;
+
+      final response = await http.delete(url, headers: headers).timeout(ApiConfig.timeout);
+      final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200) {
+        return ApiResponse<T>.fromJson(jsonResponse, fromJson);
+      } else {
+        return ApiResponse<T>(success: false, message: jsonResponse['message'] as String? ?? 'Terjadi kesalahan');
+      }
+    } catch (e) {
+      return ApiResponse<T>(success: false, message: 'Terjadi kesalahan: ${e.toString()}');
+    }
+  }
 }

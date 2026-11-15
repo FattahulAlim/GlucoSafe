@@ -8,6 +8,7 @@ class UserProfile {
   final String lastRiskStatus;
   final bool isVerified;
   final String? photoAsset;
+  final String? photoUrl;
 
   const UserProfile({
     required this.name,
@@ -18,6 +19,7 @@ class UserProfile {
     this.lastRiskStatus = 'Tidak Berisiko',
     this.isVerified = true,
     this.photoAsset,
+    this.photoUrl,
   });
 
   /// Data profil default sesuai desain (Rahmawati)
@@ -50,6 +52,7 @@ class UserProfile {
     String? lastRiskStatus,
     bool? isVerified,
     String? photoAsset,
+    String? photoUrl,
   }) {
     return UserProfile(
       name: name ?? this.name,
@@ -60,6 +63,7 @@ class UserProfile {
       lastRiskStatus: lastRiskStatus ?? this.lastRiskStatus,
       isVerified: isVerified ?? this.isVerified,
       photoAsset: photoAsset ?? this.photoAsset,
+      photoUrl: photoUrl ?? this.photoUrl,
     );
   }
 }

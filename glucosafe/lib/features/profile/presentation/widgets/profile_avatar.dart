@@ -1,14 +1,13 @@
 ﻿import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/config/api_config.dart'; 
 
-/// Widget Avatar Profil yang reusable.
-/// Mendukung inisial teks (seperti 'RW'), background kustom,
-/// badge verifikasi di pojok kanan bawah, serta fallback gambar.
 class ProfileAvatar extends StatelessWidget {
   const ProfileAvatar({
     super.key,
     this.initials = 'RW',
     this.photoAsset,
+    this.photoUrl,
     this.size = 88.0,
     this.fontSize,
     this.backgroundColor = const Color(0xFF7DE6CE),
@@ -20,37 +19,17 @@ class ProfileAvatar extends StatelessWidget {
     this.onBadgeTap,
   });
 
-  /// Inisial nama pengguna (misal: 'RW')
   final String initials;
-
-  /// Path asset foto pengguna jika tersedia (opsional)
   final String? photoAsset;
-
-  /// Diameter lingkaran avatar
+  final String? photoUrl; 
   final double size;
-
-  /// Ukuran font untuk inisial (otomatis disesuaikan jika null)
   final double? fontSize;
-
-  /// Warna latar lingkaran avatar
   final Color backgroundColor;
-
-  /// Warna teks inisial
   final Color textColor;
-
-  /// Apakah menampilkan badge terverifikasi (centang hijau) di pojok bawah
   final bool showVerifiedBadge;
-
-  /// Apakah menampilkan badge kamera di pojok bawah
   final bool showCameraBadge;
-
-  /// Icon badge kustom (opsional)
   final IconData? badgeIcon;
-
-  /// Warna latar badge verifikasi
   final Color badgeColor;
-
-  /// Aksi ketika badge ditekan (opsional)
   final VoidCallback? onBadgeTap;
 
   @override
@@ -73,20 +52,10 @@ class ProfileAvatar extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
-            child: photoAsset != null && photoAsset!.isNotEmpty
-                ? ClipOval(
-                    child: Image.asset(
-                      photoAsset!,
-                      width: size,
-                      height: size,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => _buildInitials(effectiveFontSize),
-                    ),
-                  )
-                : _buildInitials(effectiveFontSize),
+            child: _buildAvatarContent(effectiveFontSize),
           ),
 
-          // Badge Pojok Kanan Bawah (Verifikasi atau Kamera)
+          // Badge Pojok Kanan Bawah
           if (showVerifiedBadge || showCameraBadge || badgeIcon != null)
             Positioned(
               right: 0,
@@ -113,10 +82,7 @@ class ProfileAvatar extends StatelessWidget {
                   ),
                   alignment: Alignment.center,
                   child: Icon(
-                    badgeIcon ??
-                        (showCameraBadge
-                            ? Icons.camera_alt_outlined
-                            : Icons.check_rounded),
+                    badgeIcon ?? (showCameraBadge ? Icons.camera_alt_outlined : Icons.check_rounded),
                     size: badgeSize * 0.62,
                     color: Colors.white,
                   ),
@@ -126,6 +92,41 @@ class ProfileAvatar extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildAvatarContent(double textFontSize) {
+    // Prioritas 1: Foto dari internet (server backend)
+    if (photoUrl != null && photoUrl!.isNotEmpty) {
+      final fullUrl = photoUrl!.startsWith('http') 
+          ? photoUrl! 
+          : '${ApiConfig.baseUrl}$photoUrl'; // Gabungkan dengan baseUrl jika relatif
+
+      return ClipOval(
+        child: Image.network(
+          fullUrl,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => _buildInitials(textFontSize),
+        ),
+      );
+    }
+    
+    // Prioritas 2: Foto dari asset lokal (jika ada)
+    if (photoAsset != null && photoAsset!.isNotEmpty) {
+      return ClipOval(
+        child: Image.asset(
+          photoAsset!,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => _buildInitials(textFontSize),
+        ),
+      );
+    }
+
+    // Prioritas 3: Inisial (cadangan)
+    return _buildInitials(textFontSize);
   }
 
   Widget _buildInitials(double textFontSize) {
