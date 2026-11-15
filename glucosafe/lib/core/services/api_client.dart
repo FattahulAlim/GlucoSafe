@@ -59,11 +59,20 @@ class ApiClient {
 
   Future<ApiResponse<T>> get<T>(
     String path, {
+    Map<String, dynamic>? queryParameters,
     T Function(dynamic)? fromJson,
     String? token,
   }) async {
     try {
-      final url = Uri.parse('${ApiConfig.baseUrl}$path');
+      final baseUri = Uri.parse('${ApiConfig.baseUrl}$path');
+      final url = queryParameters != null && queryParameters.isNotEmpty
+          ? baseUri.replace(
+              queryParameters: {
+                ...baseUri.queryParameters,
+                ...queryParameters.map((k, v) => MapEntry(k, v.toString())),
+              },
+            )
+          : baseUri;
       final headers = token != null
           ? ApiConfig.headersWithAuth(token)
           : ApiConfig.headers;

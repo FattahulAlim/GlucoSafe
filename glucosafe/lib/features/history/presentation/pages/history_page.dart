@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../domain/history_record.dart';
+import '../../../../core/models/api_response.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/headbar.dart';
 import '../../../../core/widgets/navbar.dart';
@@ -19,11 +20,16 @@ class HistoryPage extends StatefulWidget {
     this.onOpenHome,
     this.onOpenProfile,
     this.onSelectRecord,
+    this.loadHistory,
   });
 
   final VoidCallback? onOpenHome;
   final VoidCallback? onOpenProfile;
   final ValueChanged<HistoryRecord>? onSelectRecord;
+  final Future<ApiResponse<List<Map<String, dynamic>>>> Function({
+    int? page,
+    int? limit,
+  })? loadHistory;
 
   @override
   State<HistoryPage> createState() => _HistoryPageState();
@@ -31,24 +37,58 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   final HistoryService _historyService = HistoryService();
+  final ScrollController _scrollController = ScrollController();
+  final int _pageSize = 20;
+
   List<HistoryRecord> _records = [];
   bool _isLoading = true;
+  bool _isLoadingMore = false;
+  bool _hasMore = true;
+  int _currentPage = 1;
+  int? _totalCount;
   String? _errorMessage;
+  String? _loadMoreError;
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     _loadHistory();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    if (maxScroll - currentScroll <= 200) {
+      if (!_isLoading && !_isLoadingMore && _hasMore) {
+        _loadMore();
+      }
+    }
   }
 
   Future<void> _loadHistory() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
+      _loadMoreError = null;
+      _currentPage = 1;
+      _hasMore = true;
     });
 
     try {
-      final response = await _historyService.getHistory();
+      final fetcher = widget.loadHistory ?? _historyService.getHistory;
+      final response = await fetcher(
+        page: 1,
+        limit: _pageSize,
+      );
       if (!mounted) return;
       if (!response.success || response.data == null) {
         setState(() => _errorMessage = response.message);
@@ -58,7 +98,18 @@ class _HistoryPageState extends State<HistoryPage> {
         for (var index = 0; index < response.data!.length; index++)
           HistoryRecord.fromJson(response.data![index], isLatest: index == 0),
       ];
-      setState(() => _records = records);
+
+      final hasMore = response.pagination != null
+          ? (response.pagination!['hasMore'] as bool? ?? false)
+          : (records.length >= _pageSize);
+      final total = (response.pagination?['total'] as num?)?.toInt();
+
+      setState(() {
+        _records = records;
+        _hasMore = hasMore;
+        _totalCount = total ?? records.length;
+        _currentPage = 1;
+      });
     } on FormatException catch (error) {
       if (!mounted) return;
       setState(() => _errorMessage = error.message);
@@ -73,6 +124,66 @@ class _HistoryPageState extends State<HistoryPage> {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  Future<void> _loadMore() async {
+    if (_isLoadingMore || !_hasMore || _isLoading) return;
+
+    setState(() {
+      _isLoadingMore = true;
+      _loadMoreError = null;
+    });
+
+    final nextPage = _currentPage + 1;
+
+    try {
+      final fetcher = widget.loadHistory ?? _historyService.getHistory;
+      final response = await fetcher(
+        page: nextPage,
+        limit: _pageSize,
+      );
+      if (!mounted) return;
+      if (!response.success || response.data == null) {
+        setState(() => _loadMoreError = response.message);
+        _showMessage(context, 'Gagal memuat riwayat: ${response.message}');
+        return;
+      }
+
+      final newRecords = [
+        for (var item in response.data!)
+          HistoryRecord.fromJson(item, isLatest: false),
+      ];
+
+      final hasMore = response.pagination != null
+          ? (response.pagination!['hasMore'] as bool? ?? false)
+          : (newRecords.length >= _pageSize);
+      final total = (response.pagination?['total'] as num?)?.toInt();
+
+      setState(() {
+        _records.addAll(newRecords);
+        _currentPage = nextPage;
+        _hasMore = hasMore;
+        if (total != null) _totalCount = total;
+      });
+    } on FormatException catch (error) {
+      if (!mounted) return;
+      setState(() => _loadMoreError = error.message);
+      _showMessage(context, 'Format data tidak valid: ${error.message}');
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _loadMoreError = error.toString());
+      _showMessage(context, 'Gagal memuat riwayat tambahan.');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingMore = false);
+      }
+    }
+  }
+
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -103,6 +214,7 @@ class _HistoryPageState extends State<HistoryPage> {
               child: RefreshIndicator(
                 onRefresh: _loadHistory,
                 child: SingleChildScrollView(
+                  controller: _scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                   child: Column(
@@ -117,7 +229,7 @@ class _HistoryPageState extends State<HistoryPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              'Total ${_records.length} Pemeriksaan',
+                              'Total ${_totalCount ?? _records.length} Pemeriksaan',
                               style: const TextStyle(
                                 fontSize: 16,
                                 height: 22 / 16,
@@ -242,6 +354,39 @@ class _HistoryPageState extends State<HistoryPage> {
             );
           },
         ),
+        if (_isLoadingMore) ...[
+          const SizedBox(height: 16),
+          const Center(
+            child: SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2.5),
+            ),
+          ),
+        ],
+        if (_loadMoreError != null) ...[
+          const SizedBox(height: 12),
+          Center(
+            child: TextButton.icon(
+              onPressed: _loadMore,
+              icon: const Icon(Icons.refresh, size: 18),
+              label: const Text('Gagal memuat riwayat berikutnya. Coba lagi'),
+            ),
+          ),
+        ],
+        if (!_hasMore && _records.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          const Center(
+            child: Text(
+              'Semua riwayat telah dimuat',
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.mute,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
         const SizedBox(height: 20),
         Row(
           children: [

@@ -233,6 +233,15 @@ async function getScreeningHistory(req, res) {
     const hasMore = hasPagination && results.length > limit;
     if (hasMore) results.pop();
 
+    let totalCount;
+    if (hasPagination) {
+      const [countRows] = await db.execute(
+        'SELECT COUNT(*) AS total FROM screening_results WHERE user_id = ?',
+        [req.user.id]
+      );
+      totalCount = countRows && countRows[0] ? Number(countRows[0].total) : results.length;
+    }
+
     return res.json({
       success: true,
       message: 'Riwayat screening berhasil diambil.',
@@ -242,6 +251,7 @@ async function getScreeningHistory(req, res) {
             pagination: {
               page,
               limit,
+              total: totalCount,
               hasMore,
             },
           }
