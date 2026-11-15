@@ -160,11 +160,16 @@ test('screeningController.getScreeningHistory: tolak parameter pagination invali
 });
 
 test('screeningController.getScreeningHistory: kembalikan riwayat dengan metadata pagination', async () => {
-  db.execute = async () => [[
-    { id: 10, created_at: '2026-11-10', risk_percent: 15, risk_label: 'Rendah', bmi: 22.1 },
-    { id: 9, created_at: '2026-11-09', risk_percent: 40, risk_label: 'Sedang', bmi: 26.0 },
-    { id: 8, created_at: '2026-11-08', risk_percent: 70, risk_label: 'Tinggi', bmi: 31.2 }, // extra row for hasMore
-  ]];
+  db.execute = async (sql) => {
+    if (sql && sql.includes('COUNT(*)')) {
+      return [[{ total: 3 }]];
+    }
+    return [[
+      { id: 10, created_at: '2026-11-10', risk_percent: 15, risk_label: 'Rendah', bmi: 22.1 },
+      { id: 9, created_at: '2026-11-09', risk_percent: 40, risk_label: 'Sedang', bmi: 26.0 },
+      { id: 8, created_at: '2026-11-08', risk_percent: 70, risk_label: 'Tinggi', bmi: 31.2 }, // extra row for hasMore
+    ]];
+  };
 
   const req = { user: { id: 1 }, query: { page: '1', limit: '2' } };
   const res = createMockRes();
@@ -173,7 +178,7 @@ test('screeningController.getScreeningHistory: kembalikan riwayat dengan metadat
 
   assert.equal(res.statusCode, 200);
   assert.equal(res.body.data.length, 2);
-  assert.deepEqual(res.body.pagination, { page: 1, limit: 2, hasMore: true });
+  assert.deepEqual(res.body.pagination, { page: 1, limit: 2, total: 3, hasMore: true });
 });
 
 test('screeningController.getScreeningDetail: 400 jika ID tidak valid dan 404 jika tidak ditemukan', async () => {
