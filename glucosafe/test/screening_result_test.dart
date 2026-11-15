@@ -33,4 +33,16 @@ void main() {
     expect(result.recommendations.single.title, 'Segera Konsultasi ke Dokter');
     expect(result.recommendations.single.category, 'Pemeriksaan');
   });
+
+  test('ScreeningResult mempertahankan field detail tambahan dari backend', () {
+    final result = ScreeningResult.fromJson({
+      'id': 5,
+      'risk_percent': 38,
+      'risk_label': 'Sedang',
+      'age': 52,
+      'smoking_history': 'never',
+    });
+
+    expect(result.additionalFields, {'age': 52, 'smoking_history': 'never'});
+  });
 }

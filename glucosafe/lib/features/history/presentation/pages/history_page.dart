@@ -8,6 +8,7 @@ import '../../../../core/widgets/navbar.dart';
 import '../../data/history_service.dart';
 import '../../../home/presentation/pages/home_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
+import '../../../screening/presentation/pages/screening_detail_page.dart';
 
 /// Halaman Riwayat GlucoSafe — Tampilan Riwayat Pemeriksaan Berkala.
 /// Simpan di: lib/pages/history_page.dart
@@ -72,12 +73,6 @@ class _HistoryPageState extends State<HistoryPage> {
         setState(() => _isLoading = false);
       }
     }
-  }
-
-  void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -235,9 +230,12 @@ class _HistoryPageState extends State<HistoryPage> {
                 if (widget.onSelectRecord != null) {
                   widget.onSelectRecord!(record);
                 } else {
-                  _showMessage(
+                  Navigator.push(
                     context,
-                    'Membuka detail skrining (${record.percentage} - ${record.date})',
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ScreeningDetailPage(screeningId: record.id),
+                    ),
                   );
                 }
               },
