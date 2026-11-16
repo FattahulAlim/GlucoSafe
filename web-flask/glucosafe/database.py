@@ -51,6 +51,16 @@ def _connect(config: Dict[str, Any]):
             "Driver database PyMySQL belum terpasang. Jalankan: pip install -r requirements.txt"
         ) from exc
 
+    # Persiapan SSL untuk TiDB Cloud / Production DB
+    ssl_config = None
+    if config.get("DB_SSL_CA"):
+        ssl_config = {"ca": config["DB_SSL_CA"]}
+    elif config.get("DB_SSL_DISABLED") not in ("1", "true", "True"):
+        # Jika di cloud (misal Render) tapi tidak ada CA file spesifik,
+        # gunakan default dictionary kosong untuk memicu SSL/TLS standar.
+        # Jika koneksi ke localhost, pastikan DB_SSL_DISABLED=true.
+        ssl_config = {}
+
     try:
         return pymysql.connect(
             host=config.get("DB_HOST", "localhost"),
@@ -62,6 +72,7 @@ def _connect(config: Dict[str, Any]):
             connect_timeout=5,
             autocommit=False,
             cursorclass=pymysql.cursors.DictCursor,
+            ssl=ssl_config,
         )
     except Exception as exc:  # pragma: no cover - depends on environment
         raise DatabaseError(f"Gagal terhubung ke database MySQL: {exc}") from exc

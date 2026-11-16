@@ -133,10 +133,12 @@ def build_model(name):
             hidden_layer_sizes=(64, 32, 16),
             activation="relu",
             solver="adam",
-            alpha=1e-4,
-            max_iter=200,
+            alpha=0.001, # L2 regularizer tuned
+            batch_size=128, # Tuned batch size
+            learning_rate_init=0.001,
+            max_iter=100,
             early_stopping=True,
-            n_iter_no_change=10,
+            n_iter_no_change=15,
             random_state=RANDOM_STATE,
         )
     if name == "rf":
@@ -193,7 +195,7 @@ def export(name, model, preprocessor, metrics, out_dir):
         "algorithm": ALGO_LABELS[name],
         "features": FEATURE_COLUMNS,
         "label_map": {"0": "Rendah", "1": "Tinggi"},
-        "thresholds": {"medium": 35.0, "high": 65.0},
+        "thresholds": {"medium": 20.0, "high": 45.0},
         "metrics": {
             key: round(metrics[key], 4)
             for key in ("accuracy", "precision", "recall", "f1", "roc_auc")
