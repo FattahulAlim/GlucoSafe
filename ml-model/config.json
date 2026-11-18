@@ -1,0 +1,41 @@
+{
+  "threshold": 0.45,
+  "fitur_urut": [
+    "HighBP",
+    "HighChol",
+    "BMI",
+    "Smoker",
+    "Stroke",
+    "HeartDiseaseorAttack",
+    "PhysActivity",
+    "Fruits",
+    "Veggies",
+    "GenHlth",
+    "MentHlth",
+    "PhysHlth",
+    "DiffWalk",
+    "Sex",
+    "Age"
+  ],
+  "num_cols": [
+    "BMI",
+    "Age",
+    "GenHlth",
+    "MentHlth",
+    "PhysHlth"
+  ],
+  "bmi_clip": [
+    11.5,
+    47.5
+  ],
+  "best_params": {
+    "units1": 64,
+    "units2": 32,
+    "units3": 16,
+    "dropout": 0.4,
+    "lr": 0.001,
+    "batch_size": 128,
+    "l2": 0.001
+  },
+  "epochs": 40
+}
