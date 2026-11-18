@@ -213,8 +213,9 @@ async function getScreeningHistory(req, res) {
       });
     }
 
-    const paginationSql = hasPagination ? 'LIMIT ? OFFSET ?' : '';
-    const paginationParams = hasPagination ? [limit + 1, offset] : [];
+    // TiDB tidak mendukung placeholder LIMIT/OFFSET di prepared statement,
+    // jadi limit & offset ditulis langsung (sudah divalidasi Number.isSafeInteger).
+    const paginationSql = hasPagination ? `LIMIT ${limit + 1} OFFSET ${offset}` : '';
     const [results] = await db.execute(
       `SELECT
          id,
@@ -228,7 +229,7 @@ async function getScreeningHistory(req, res) {
        WHERE user_id = ?
        ORDER BY created_at DESC, id DESC
        ${paginationSql}`,
-      [req.user.id, ...paginationParams]
+      [req.user.id]
     );
     const hasMore = hasPagination && results.length > limit;
     if (hasMore) results.pop();
