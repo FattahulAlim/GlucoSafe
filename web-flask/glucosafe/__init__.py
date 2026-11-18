@@ -36,6 +36,8 @@ def create_app(test_config=None):
         DB_USER=os.environ.get("DB_USER", "root"),
         DB_PASSWORD=os.environ.get("DB_PASSWORD", ""),
         DB_NAME=os.environ.get("DB_NAME", "glucosafe"),
+        DB_SSL_CA=os.environ.get("DB_SSL_CA"),
+        DB_SSL_DISABLED=os.environ.get("DB_SSL_DISABLED", "0"),
         SCREENING_USER_ID=int(os.environ.get("SCREENING_USER_ID", "1")),
     )
 

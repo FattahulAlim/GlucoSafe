@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../data/dummy_user_database.dart';
+import '../../../../core/services/auth_service.dart';
+import '../../../../core/models/auth_models.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -12,11 +13,13 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isLoading = false;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  final _authService = AuthService();
   String? _nameErrorText;
   String? _emailErrorText;
   String? _passwordErrorText;
@@ -58,47 +61,73 @@ class _RegisterPageState extends State<RegisterPage> {
         _confirmErrorText == null;
   }
 
-  void _submit() {
+  void _submit() async {
     if (!_validate()) return;
 
-    final user = DummyUser(
-      name: _nameController.text.trim(),
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    );
-    if (!DummyUserDatabase.instance.register(user)) {
-      setState(() {
-        _emailErrorText = 'Email sudah terdaftar';
-      });
-      return;
+    setState(() => _isLoading = true);
+
+    try {
+      final request = RegisterRequest(
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      final response = await _authService.register(request);
+
+      if (!mounted) return;
+
+      setState(() => _isLoading = false);
+
+      if (response.success) {
+        // #fix-overflow: margin bawah dihitung dari tinggi layar; nilainya bisa
+        // negatif saat keyboard terbuka sehingga menuSnackBar gagal dirender.
+        // Batasi agar tidak pernah negatif.
+        final screenHeight = MediaQuery.of(context).size.height;
+        final bottomMargin = (screenHeight - 150).clamp(0.0, double.infinity);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Pendaftaran berhasil! Silakan login.',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+            ),
+            backgroundColor: AppColors.brand2,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.only(
+              bottom: bottomMargin,
+              left: 20,
+              right: 20,
+            ),
+            duration: const Duration(seconds: 3),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        );
+
+        _clearFields();
+        Navigator.pop(context);
+      } else {
+        if (response.message.contains('sudah terdaftar')) {
+          setState(() {
+            _emailErrorText = 'Email sudah terdaftar';
+          });
+        } else {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(content: Text(response.message)),
+            );
+        }
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text('Terjadi kesalahan: ${e.toString()}')),
+        );
     }
-
-    // #fix-overflow: margin bawah dihitung dari tinggi layar; nilainya bisa
-    // negatif saat keyboard terbuka sehingga menuSnackBar gagal dirender.
-    // Batasi agar tidak pernah negatif.
-    final screenHeight = MediaQuery.of(context).size.height;
-    final bottomMargin = (screenHeight - 150).clamp(0.0, double.infinity);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text(
-          'Pendaftaran berhasil! Silakan login.',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
-        ),
-        backgroundColor: AppColors.brand2,
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.only(
-          bottom: bottomMargin, // #fix-overflow
-          left: 20,
-          right: 20,
-        ),
-        duration: const Duration(seconds: 3),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-
-    _clearFields();
-    Navigator.pop(context);
   }
 
   @override
@@ -283,7 +312,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   // Tombol Daftar
                   SizedBox(
                     child: ElevatedButton(
-                      onPressed: _submit,
+                      onPressed: _isLoading ? null : _submit,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.brand2,
                         foregroundColor: Colors.white,
@@ -295,14 +324,23 @@ class _RegisterPageState extends State<RegisterPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text(
-                        'Daftar',
-                        style: TextStyle(
-                          fontSize: 16,
-                          height: 24 / 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Text(
+                              'Daftar',
+                              style: TextStyle(
+                                fontSize: 16,
+                                height: 24 / 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 24),

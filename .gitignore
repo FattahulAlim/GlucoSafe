@@ -6,6 +6,8 @@ backend/.env.*
 !backend/.env.example
 backend/coverage/
 backend/npm-debug.log*
+backend/uploads/
+backend/node_modules/
 
 # Flask Web / Data Preprocessing
 web-flask/.env
@@ -15,4 +17,5 @@ web-flask/.venv/
 web-flask/instance/
 web-flask/.pytest_cache/
 web-flask/**/__pycache__/
+web-flask/model/artifacts_backup_*/
 

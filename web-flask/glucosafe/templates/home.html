@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Olah Dataset &mdash; GlucoSafe{% endblock %}
 {% block content %}
+<script src="{{ url_for('static', filename='js/upload.js') }}" defer></script>
 <section class="hero">
   <div class="hero-copy">
     <p class="eyebrow">Dataset Pipeline &bull; GlucoSafe Mobile</p>
@@ -32,8 +33,8 @@
             <path d="m7 9 5-5 5 5"></path>
             <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path>
           </svg>
-          <span class="file-title">Unggah Dataset</span>
-          <span class="file-hint">Maksimal {{ max_rows_display }} baris &bull; ekstensi .csv</span>
+          <span class="file-title">Pilih Dataset CSV</span>
+          <span id="selected-file" class="selected-file" aria-live="polite">Belum ada file dipilih</span>
           <input type="file" id="csv_file" name="csv_file" accept=".csv,text/csv" required>
         </label>
       </div>

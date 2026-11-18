@@ -47,6 +47,8 @@ def _get_db_config() -> Dict[str, Any]:
         "DB_USER": current_app.config.get("DB_USER", "root"),
         "DB_PASSWORD": current_app.config.get("DB_PASSWORD", ""),
         "DB_NAME": current_app.config.get("DB_NAME", "glucosafe"),
+        "DB_SSL_CA": current_app.config.get("DB_SSL_CA"),
+        "DB_SSL_DISABLED": current_app.config.get("DB_SSL_DISABLED"),
     }
 
 

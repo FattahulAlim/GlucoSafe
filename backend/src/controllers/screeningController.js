@@ -4,9 +4,8 @@ const { screeningSchema } = require('../validators/screeningValidator');
 const { calculateBmi, generateRecommendations } = require('../services/screeningService');
 const { predictDiabetesRisk } = require('../services/mlService');
 
-async function submitScreening(req, res) {
+async function predictScreening(req, res) {
   try {
-    // 1. Validasi input dengan Zod
     const parsed = screeningSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({
@@ -17,11 +16,8 @@ async function submitScreening(req, res) {
     }
 
     const form = parsed.data;
-
-    // 2. Hitung BMI di backend (jangan percaya nilai dari client)
     const bmi = calculateBmi(form.height_cm, form.weight_kg);
 
-    // 3. Siapkan fitur untuk ML API (nama key sesuai kontrak ML)
     const mlFeatures = {
       HighBP: form.high_bp,
       HighChol: form.high_chol,
@@ -40,9 +36,82 @@ async function submitScreening(req, res) {
       Age: form.age,
     };
 
-    // 4. Panggil ML API
     const prediction = await predictDiabetesRisk(mlFeatures);
     const { risk_percent, risk_label } = prediction;
+    const recommendations = generateRecommendations(form, risk_label, bmi);
+
+    return res.json({
+      success: true,
+      message: 'Prediksi berhasil.',
+      data: {
+        risk_percent,
+        risk_label,
+        bmi,
+        recommendations,
+      },
+    });
+  } catch (error) {
+    console.error('Predict screening error:', error.message);
+
+    if (error.message.includes('ML API') || error.message.includes('ML_API_URL')) {
+      return res.status(502).json({
+        success: false,
+        message: 'Layanan prediksi tidak tersedia saat ini. Coba beberapa saat lagi.',
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan pada server.',
+    });
+  }
+}
+
+async function submitScreening(req, res) {
+  try {
+    // 1. Validasi input dengan Zod
+    const parsed = screeningSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        message: 'Data skrining tidak valid.',
+        errors: parsed.error.flatten().fieldErrors,
+      });
+    }
+
+    const form = parsed.data;
+
+    // 2. Hitung BMI di backend (jangan percaya nilai dari client)
+    const bmi = calculateBmi(form.height_cm, form.weight_kg);
+
+    let risk_percent = form.risk_percent;
+    let risk_label = form.risk_label;
+
+    if (risk_percent === undefined || risk_label === undefined) {
+      // 3. Siapkan fitur untuk ML API (nama key sesuai kontrak ML)
+      const mlFeatures = {
+        HighBP: form.high_bp,
+        HighChol: form.high_chol,
+        BMI: bmi,
+        Smoker: form.smoker,
+        Stroke: form.stroke,
+        HeartDiseaseorAttack: form.heart_disease,
+        PhysActivity: form.phys_activity,
+        Fruits: form.fruits,
+        Veggies: form.veggies,
+        GenHlth: form.gen_hlth,
+        MentHlth: form.ment_hlth,
+        PhysHlth: form.phys_hlth,
+        DiffWalk: form.diff_walk,
+        Sex: form.sex,
+        Age: form.age,
+      };
+
+      // 4. Panggil ML API jika nilai belum dikirim dari prediksi sebelumnya
+      const prediction = await predictDiabetesRisk(mlFeatures);
+      risk_percent = prediction.risk_percent;
+      risk_label = prediction.risk_label;
+    }
 
     // 5. Simpan ke screening_results
     const [insertResult] = await db.execute(
@@ -114,23 +183,79 @@ async function submitScreening(req, res) {
 
 async function getScreeningHistory(req, res) {
   try {
+    const hasPagination = req.query.page !== undefined || req.query.limit !== undefined;
+    let page;
+    let limit;
+
+    if (hasPagination) {
+      page = req.query.page === undefined ? 1 : Number(req.query.page);
+      limit = req.query.limit === undefined ? 20 : Number(req.query.limit);
+
+      if (
+        !Number.isSafeInteger(page) ||
+        page < 1 ||
+        !Number.isSafeInteger(limit) ||
+        limit < 1 ||
+        limit > 100
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: 'Parameter page harus >= 1 dan limit harus antara 1-100.',
+        });
+      }
+    }
+
+    const offset = hasPagination ? (page - 1) * limit : 0;
+    if (hasPagination && !Number.isSafeInteger(offset)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Nilai offset pagination terlalu besar.',
+      });
+    }
+
+    const paginationSql = hasPagination ? 'LIMIT ? OFFSET ?' : '';
+    const paginationParams = hasPagination ? [limit + 1, offset] : [];
     const [results] = await db.execute(
       `SELECT
          id,
          created_at,
          risk_percent,
          risk_label,
+         risk_percent AS risk_percentage,
+         risk_label AS risk_level,
          bmi
        FROM screening_results
        WHERE user_id = ?
-       ORDER BY created_at DESC, id DESC`,
-      [req.user.id]
+       ORDER BY created_at DESC, id DESC
+       ${paginationSql}`,
+      [req.user.id, ...paginationParams]
     );
+    const hasMore = hasPagination && results.length > limit;
+    if (hasMore) results.pop();
+
+    let totalCount;
+    if (hasPagination) {
+      const [countRows] = await db.execute(
+        'SELECT COUNT(*) AS total FROM screening_results WHERE user_id = ?',
+        [req.user.id]
+      );
+      totalCount = countRows && countRows[0] ? Number(countRows[0].total) : results.length;
+    }
 
     return res.json({
       success: true,
       message: 'Riwayat screening berhasil diambil.',
       data: results,
+      ...(hasPagination
+        ? {
+            pagination: {
+              page,
+              limit,
+              total: totalCount,
+              hasMore,
+            },
+          }
+        : {}),
     });
   } catch (error) {
     console.error('Screening history error:', error.message);
@@ -220,6 +345,7 @@ async function getScreeningRecommendations(req, res) {
 
 module.exports = {
   submitScreening,
+  predictScreening,
   getScreeningHistory,
   getScreeningDetail,
   getScreeningRecommendations,

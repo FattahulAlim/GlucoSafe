@@ -1,6 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../domain/screening_state.dart';
 import './screening_step_4_page.dart';
 
 class ScreeningStep3Page extends StatefulWidget {
@@ -15,6 +16,25 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
   bool? _isExercising;
   bool? _eatFruits;
   bool? _eatVegetables;
+
+  @override
+  void initState() {
+    super.initState();
+    final form = screeningFormNotifier.value;
+    if (form.smoker != null) _isSmoking = form.smoker == 1;
+    if (form.physActivity != null) _isExercising = form.physActivity == 1;
+    if (form.fruits != null) _eatFruits = form.fruits == 1;
+    if (form.veggies != null) _eatVegetables = form.veggies == 1;
+  }
+
+  void _saveToNotifier() {
+    updateScreeningForm((f) => f.copyWith(
+          smoker: _isSmoking == null ? null : (_isSmoking! ? 1 : 0),
+          physActivity: _isExercising == null ? null : (_isExercising! ? 1 : 0),
+          fruits: _eatFruits == null ? null : (_eatFruits! ? 1 : 0),
+          veggies: _eatVegetables == null ? null : (_eatVegetables! ? 1 : 0),
+        ));
+  }
 
   Widget _buildToggleQuestion({
     required String question,
@@ -57,7 +77,10 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
               children: [
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => onChanged(false),
+                    onTap: () {
+                      onChanged(false);
+                      _saveToNotifier();
+                    },
                     child: Container(
                       decoration: BoxDecoration(
                         color: value == false
@@ -79,7 +102,10 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
                 ),
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => onChanged(true),
+                    onTap: () {
+                      onChanged(true);
+                      _saveToNotifier();
+                    },
                     child: Container(
                       decoration: BoxDecoration(
                         color: value == true
@@ -109,6 +135,11 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
 
   @override
   Widget build(BuildContext context) {
+    final bool canContinue = _isSmoking != null &&
+        _isExercising != null &&
+        _eatFruits != null &&
+        _eatVegetables != null;
+
     return Scaffold(
       backgroundColor: AppColors.formBg,
       appBar: AppBar(
@@ -116,7 +147,10 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.ink),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            _saveToNotifier();
+            Navigator.pop(context);
+          },
         ),
         title: Row(
           children: [
@@ -167,7 +201,7 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const [
-                    Expanded( // #fix-overflow
+                    Expanded(
                       child: Text(
                         'LANGKAH 3 DARI 4',
                         style: TextStyle(
@@ -259,13 +293,16 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
           // Bottom Buttons
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: AppColors.formBg),
+            decoration: const BoxDecoration(color: AppColors.formBg),
             child: Row(
               children: [
                 Expanded(
                   flex: 1,
                   child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      _saveToNotifier();
+                      Navigator.pop(context);
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.inactiveBg,
                       foregroundColor: AppColors.ink,
@@ -285,17 +322,22 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
                 Expanded(
                   flex: 2,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const ScreeningStep4Page(),
-                        ),
-                      );
-                    },
+                    onPressed: canContinue
+                        ? () {
+                            _saveToNotifier();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const ScreeningStep4Page(),
+                              ),
+                            );
+                          }
+                        : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.brand,
                       foregroundColor: Colors.white,
+                      disabledBackgroundColor: AppColors.disabled,
+                      disabledForegroundColor: Colors.white,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(

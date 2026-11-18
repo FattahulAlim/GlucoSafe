@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../data/dummy_user_database.dart';
+import '../../../../core/services/auth_service.dart';
+import '../../../../core/models/auth_models.dart';
 import '../../../home/presentation/pages/home_page.dart';
 import './register_page.dart';
 import '../../../screening/domain/screening_state.dart';
@@ -18,8 +19,10 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _obscureText = true;
+  bool _isLoading = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final _authService = AuthService();
   String? _emailErrorText;
 
   @override
@@ -41,8 +44,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _login() {
+  void _login() async {
     final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
     if (email.isEmpty || _emailErrorText != null) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -51,33 +56,60 @@ class _LoginPageState extends State<LoginPage> {
         );
       return;
     }
-    if (DummyUserDatabase.instance.login(email, _passwordController.text) ==
-        null) {
+
+    if (password.isEmpty) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
-          const SnackBar(content: Text('Email atau kata sandi salah')),
+          const SnackBar(content: Text('Kata sandi wajib diisi')),
         );
       return;
     }
-    // TODO: panggil API login (Anggota 3) sebelum pindah halaman.
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (context) => HomePage(
-          onStartScreening: () {
-            resetScreeningForm(); // mulai dari isian kosong
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const ScreeningStep1Page(),
-              ),
-            );
-          },
-        ),
-      ),
-      (route) => false, // hapus Welcome dan Login dari riwayat navigasi
-    );
+
+    setState(() => _isLoading = true);
+
+    try {
+      final request = LoginRequest(email: email, password: password);
+      final response = await _authService.login(request);
+
+      if (!mounted) return;
+
+      setState(() => _isLoading = false);
+
+      if (response.success && response.data != null) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(
+              onStartScreening: () {
+                resetScreeningForm();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ScreeningStep1Page(),
+                  ),
+                );
+              },
+            ),
+          ),
+          (route) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(content: Text(response.message)),
+          );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text('Terjadi kesalahan: ${e.toString()}')),
+        );
+    }
   }
 
   OutlineInputBorder _border(Color c, [double w = 1]) => OutlineInputBorder(
@@ -220,7 +252,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   // Tombol Masuk
                   ElevatedButton(
-                    onPressed: _login,
+                    onPressed: _isLoading ? null : _login,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.brand2,
                       foregroundColor: Colors.white,
@@ -232,14 +264,23 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'Masuk',
-                      style: TextStyle(
-                        fontSize: 16,
-                        height: 24 / 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            'Masuk',
+                            style: TextStyle(
+                              fontSize: 16,
+                              height: 24 / 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
                   const SizedBox(height: 32),
 
