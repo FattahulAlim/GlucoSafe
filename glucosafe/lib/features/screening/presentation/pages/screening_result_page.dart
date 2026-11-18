@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../../domain/recommendation_item.dart';
 import '../../domain/risk_level.dart';
+import '../../domain/screening_answer_formatter.dart';
+import '../../domain/screening_form.dart';
 import '../../domain/screening_result.dart';
 import '../../domain/screening_state.dart';
 import '../../../../core/services/screening_service.dart';
@@ -20,12 +22,14 @@ class ScreeningResultPage extends StatefulWidget {
   const ScreeningResultPage({
     super.key,
     this.result,
+    this.form,
     this.indicatorCount = 15,
     this.onSaveToHistory,
     this.onRestartScreening,
   });
 
   final ScreeningResult? result;
+  final ScreeningForm? form;
   final int indicatorCount;
   final VoidCallback? onSaveToHistory;
   final VoidCallback? onRestartScreening;
@@ -134,10 +138,16 @@ class _ScreeningResultPageState extends State<ScreeningResultPage> {
                     _ResultSummaryCard(
                       percent: actualPercent,
                       statusText: actualStatus,
+                      riskLabel: screeningResult.riskLabel,
                       indicatorCount: widget.indicatorCount,
                     ),
 
                     const SizedBox(height: 24),
+
+                    if (widget.form case final screeningForm?) ...[
+                      _ScreeningAnswersCard(form: screeningForm),
+                      const SizedBox(height: 24),
+                    ],
 
                     // Section Title: Rekomendasi Langkah Nyata
                     Row(
@@ -321,11 +331,13 @@ class _ResultSummaryCard extends StatelessWidget {
   const _ResultSummaryCard({
     required this.percent,
     required this.statusText,
+    required this.riskLabel,
     required this.indicatorCount,
   });
 
   final double percent;
   final String statusText;
+  final String riskLabel;
   final int indicatorCount;
 
   @override
@@ -379,7 +391,7 @@ class _ResultSummaryCard extends StatelessWidget {
                     const SizedBox(
                       width: 90,
                       child: Text(
-                        'Kemungkinan\ndiabetes',
+                        'Skor skrining\noleh model',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 12,
@@ -478,18 +490,27 @@ class _ResultSummaryCard extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // Paragraph Penjelasan
+          // Penjelasan hasil
           Text(
-            percent < 30
-                ? 'Hasil skrining saat ini berada dalam batas normal. Pertahankan kebiasaan hidup sehat, olahraga rutin, dan konsumsi makanan bergizi.'
-                : percent < 60
-                    ? 'Hasil skrining menunjukkan beberapa faktor risiko. Disarankan untuk memantau asupan gula, memperbanyak aktivitas fisik, dan cek kesehatan secara berkala.'
-                    : 'Hasil skrining menunjukkan potensi risiko tinggi. Sangat dianjurkan untuk segera berkonsultasi dengan dokter atau fasilitas kesehatan terdekat.',
+            _riskExplanation(riskLabel),
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 14,
               height: 20 / 14,
               color: AppColors.slate,
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          const Text(
+            'Persentase ini adalah perkiraan model dari jawabanmu, '
+            'bukan kepastian atau diagnosis diabetes.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              height: 16 / 12,
+              color: AppColors.mute,
             ),
           ),
 
@@ -522,7 +543,7 @@ class _ResultSummaryCard extends StatelessWidget {
                 const SizedBox(width: 10),
                 Flexible(
                   child: Text(
-                    'Berdasarkan $indicatorCount Indikator Kesehatan Lengkap',
+                    'Dinilai dari $indicatorCount indikator kesehatan pada jawabanmu',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 13,
@@ -533,6 +554,133 @@ class _ResultSummaryCard extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _riskExplanation(String riskLabel) => switch (riskLabel.toLowerCase()) {
+  'rendah' => 'Model mengelompokkan hasil jawabanmu ke kategori risiko rendah. Tetap jaga pola hidup sehat dan periksa gula darah secara berkala.',
+  'sedang' => 'Model mengelompokkan hasil jawabanmu ke kategori risiko sedang. Perbaiki kebiasaan sehat dan pertimbangkan pemeriksaan gula darah.',
+  'tinggi' => 'Model mengelompokkan hasil jawabanmu ke kategori risiko tinggi. Disarankan berkonsultasi dengan tenaga kesehatan untuk pemeriksaan lebih lanjut.',
+  _ => 'Kategori ini merupakan hasil penilaian model berdasarkan jawaban skriningmu.',
+};
+
+class _ScreeningAnswersCard extends StatelessWidget {
+  const _ScreeningAnswersCard({required this.form});
+
+  final ScreeningForm form;
+
+  @override
+  Widget build(BuildContext context) {
+    final groups = <String, List<MapEntry<String, String>>>{
+      'Data diri': [
+        _answer('sex', form.sex),
+        _answer('age', form.age),
+        _answer('height_cm', form.heightCm),
+        _answer('weight_kg', form.weightKg),
+        _answer('bmi', form.bmiRounded),
+      ],
+      'Riwayat kesehatan': [
+        _answer('high_bp', form.highBp),
+        _answer('high_chol', form.highChol),
+        _answer('stroke', form.stroke),
+        _answer('heart_disease', form.heartDiseaseOrAttack),
+        _answer('diff_walk', form.diffWalk),
+      ],
+      'Kebiasaan sehari-hari': [
+        _answer('smoker', form.smoker),
+        _answer('phys_activity', form.physActivity),
+        _answer('fruits', form.fruits),
+        _answer('veggies', form.veggies),
+      ],
+      'Kondisi kesehatan': [
+        _answer('gen_hlth', form.genHlth),
+        _answer('ment_hlth', form.mentHlth),
+        _answer('phys_hlth', form.physHlth),
+      ],
+    };
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0F0F172A),
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Ringkasan jawaban skrining',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppColors.ink,
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Berikut data yang kamu isi dan digunakan dalam penilaian.',
+            style: TextStyle(fontSize: 13, color: AppColors.slate),
+          ),
+          for (final group in groups.entries) ...[
+            const SizedBox(height: 16),
+            Text(
+              group.key,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: AppColors.greenText,
+              ),
+            ),
+            for (final answer in group.value)
+              _AnswerRow(label: answer.key, value: answer.value),
+          ],
+        ],
+      ),
+    );
+  }
+
+  MapEntry<String, String> _answer(String key, dynamic value) =>
+      MapEntry(screeningAnswerLabel(key), formatScreeningAnswer(key, value));
+}
+
+class _AnswerRow extends StatelessWidget {
+  const _AnswerRow({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Text(label, style: const TextStyle(color: AppColors.slate)),
+          ),
+          const SizedBox(width: 12),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: AppColors.ink,
+              ),
             ),
           ),
         ],
