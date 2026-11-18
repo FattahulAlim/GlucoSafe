@@ -4,6 +4,7 @@ import '../../../../core/models/api_response.dart';
 import '../../../../core/services/screening_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/headbar.dart';
+import '../../domain/screening_answer_formatter.dart';
 import '../../domain/recommendation_item.dart';
 import '../../domain/screening_result.dart';
 
@@ -101,6 +102,65 @@ class _ScreeningDetailPageState extends State<ScreeningDetailPage> {
     );
   }
 
+  Widget _buildExitButtons() {
+    return Column(
+      children: [
+        // Tombol Kembali
+        SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: ElevatedButton.icon(
+            onPressed: () => Navigator.maybePop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.brand,
+              foregroundColor: Colors.white,
+              elevation: 1,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            icon: const Icon(Icons.arrow_back_rounded, size: 20),
+            label: const Text(
+              'Kembali',
+              style: TextStyle(
+                fontSize: 16,
+                height: 22 / 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Tombol Beranda
+        SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: OutlinedButton.icon(
+            onPressed: () =>
+                Navigator.of(context).popUntil((route) => route.isFirst),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.brand,
+              side: const BorderSide(color: AppColors.brand, width: 1.5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            icon: const Icon(Icons.home_rounded, size: 20),
+            label: const Text(
+              'Beranda',
+              style: TextStyle(
+                fontSize: 16,
+                height: 22 / 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildContent() {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -180,6 +240,8 @@ class _ScreeningDetailPageState extends State<ScreeningDetailPage> {
                 child: _RecommendationCard(item: recommendation),
               ),
             ),
+          const SizedBox(height: 12),
+          _buildExitButtons(),
         ],
       ),
     );
@@ -250,6 +312,13 @@ class _ScreeningSummaryCard extends StatelessWidget {
               ),
             ),
           ),
+          const Padding(
+            padding: EdgeInsets.only(top: 8),
+            child: Text(
+              'Persentase adalah perkiraan model dari jawaban, bukan diagnosis medis.',
+              style: TextStyle(fontSize: 13, color: AppColors.slate),
+            ),
+          ),
           if (screening.bmi != null) ...[
             const SizedBox(height: 16),
             _SummaryField(
@@ -284,8 +353,17 @@ class _AdditionalFieldsCard extends StatelessWidget {
         .where(
           (entry) =>
               entry.value != null &&
-              entry.key != 'user_id' &&
-              entry.key != 'updated_at',
+              !const {
+                'id',
+                'user_id',
+                'updated_at',
+                'created_at',
+                'risk_percent',
+                'risk_label',
+                'bmi',
+                'height_cm',
+                'weight_kg',
+              }.contains(entry.key),
         )
         .toList();
     if (visibleFields.isEmpty) return const SizedBox.shrink();
@@ -308,7 +386,7 @@ class _AdditionalFieldsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Informasi Skrining',
+            'Jawaban skrining',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
@@ -316,10 +394,14 @@ class _AdditionalFieldsCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
+          const Text(
+            'Data berikut adalah jawaban yang digunakan dalam penilaian.',
+            style: TextStyle(fontSize: 13, color: AppColors.slate),
+          ),
           for (final field in visibleFields)
             _SummaryField(
-              label: _formatLabel(field.key),
-              value: field.value.toString(),
+              label: screeningAnswerLabel(field.key),
+              value: formatScreeningAnswer(field.key, field.value),
             ),
         ],
       ),
@@ -486,23 +568,6 @@ String _formatDate(DateTime date) {
 
 String _formatNumber(double number) =>
     number.toStringAsFixed(2).replaceFirst(RegExp(r'\.?0+$'), '');
-
-String _formatLabel(String key) {
-  final spaced = key
-      .replaceAll('_', ' ')
-      .replaceAllMapped(
-        RegExp(r'([a-z])([A-Z])'),
-        (match) => '${match[1]} ${match[2]}',
-      );
-  return spaced
-      .split(' ')
-      .map(
-        (word) => word.isEmpty
-            ? word
-            : '${word[0].toUpperCase()}${word.substring(1)}',
-      )
-      .join(' ');
-}
 
 Color _riskBackground(String riskLabel) => switch (riskLabel.toLowerCase()) {
   'tinggi' => AppColors.redBg,

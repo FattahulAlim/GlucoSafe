@@ -43,7 +43,8 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
 
   void _saveToNotifier() {
     updateScreeningForm((f) => f.copyWith(
-          genHlth: _generalHealthIndex == null ? null : _generalHealthIndex! + 1,
+          genHlth:
+              _generalHealthIndex == null ? null : _generalHealthIndex! + 1,
           mentHlth: _mentalHealthDays.toInt(),
           physHlth: _physicalHealthDays.toInt(),
         ));
@@ -66,7 +67,8 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
     if (!form.isComplete) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Mohon lengkapi seluruh langkah skrining sebelum melanjutkan.'),
+          content: Text(
+              'Mohon lengkapi seluruh langkah skrining sebelum melanjutkan.'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -91,6 +93,7 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
           MaterialPageRoute(
             builder: (context) => ScreeningResultPage(
               result: screeningResult,
+              form: form,
             ),
           ),
         );
@@ -334,10 +337,12 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.ink),
-          onPressed: _isLoading ? null : () {
-            _saveToNotifier();
-            Navigator.pop(context);
-          },
+          onPressed: _isLoading
+              ? null
+              : () {
+                  _saveToNotifier();
+                  Navigator.pop(context);
+                },
         ),
         title: Row(
           children: [
@@ -489,7 +494,8 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                               height: 24,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2.5,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
                               ),
                             )
                           : FittedBox(
@@ -516,10 +522,12 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                   // Back to previous step
                   Center(
                     child: TextButton.icon(
-                      onPressed: _isLoading ? null : () {
-                        _saveToNotifier();
-                        Navigator.pop(context);
-                      },
+                      onPressed: _isLoading
+                          ? null
+                          : () {
+                              _saveToNotifier();
+                              Navigator.pop(context);
+                            },
                       icon: const Icon(
                         Icons.arrow_back,
                         size: 18,
