@@ -23,7 +23,6 @@ class AuthService {
       await _storage.saveToken(response.data!.token);
       await _storage.saveUser(response.data!.user);
     }
-
     return response;
   }
 
