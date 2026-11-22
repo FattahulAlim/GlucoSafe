@@ -9,15 +9,14 @@ ScreeningResult _rec(
   double percent, {
   double? bmi = 25.7,
   double? height = 165,
-}) =>
-    ScreeningResult(
-      id: id,
-      createdAt: date,
-      riskPercent: percent,
-      riskLabel: 'Rendah',
-      bmi: bmi,
-      heightCm: height,
-    );
+}) => ScreeningResult(
+  id: id,
+  createdAt: date,
+  riskPercent: percent,
+  riskLabel: 'Rendah',
+  bmi: bmi,
+  heightCm: height,
+);
 
 void main() {
   test('tanpa riwayat menghasilkan null', () {
@@ -66,8 +65,9 @@ void main() {
   });
 
   test('berat badan ideal dihitung dari tinggi', () {
-    final summary =
-        HomeSummary.fromHistory([_rec(1, DateTime(2026, 10, 14), 28)])!;
+    final summary = HomeSummary.fromHistory([
+      _rec(1, DateTime(2026, 10, 14), 28),
+    ])!;
 
     expect(summary.infoLabel, 'Berat badan ideal: ');
     expect(summary.infoValue, '50–68 kg');
@@ -75,8 +75,9 @@ void main() {
   });
 
   test('tanpa tinggi, baris info memakai BMI terakhir', () {
-    final summary = HomeSummary.fromHistory(
-        [_rec(1, DateTime(2026, 10, 14), 28, height: null)])!;
+    final summary = HomeSummary.fromHistory([
+      _rec(1, DateTime(2026, 10, 14), 28, height: null),
+    ])!;
 
     expect(summary.infoLabel, 'BMI terakhir: ');
     expect(summary.infoValue, '25.7');

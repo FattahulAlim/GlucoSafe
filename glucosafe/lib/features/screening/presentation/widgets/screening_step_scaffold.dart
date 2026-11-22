@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
 import '../../../profile/presentation/pages/profile_page.dart';
 import '../../../../core/theme/app_colors.dart';
 
@@ -37,13 +38,14 @@ class ScreeningStepScaffold extends StatelessWidget {
             children: [
               _Header(
                 onBack: onBack ?? () => Navigator.of(context).maybePop(),
-                onProfile: onProfileTap ??
+                onProfile:
+                    onProfileTap ??
                     () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ProfilePage(),
-                          ),
-                        ),
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfilePage(),
+                      ),
+                    ),
               ),
               Expanded(
                 child: SingleChildScrollView(
@@ -64,7 +66,8 @@ class ScreeningStepScaffold extends StatelessWidget {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Expanded( // #fix-overflow
+                                    Expanded(
+                                      // #fix-overflow
                                       child: Text(
                                         'LANGKAH $step DARI $totalSteps',
                                         style: const TextStyle(
@@ -217,8 +220,11 @@ class _Logo extends StatelessWidget {
               end: Alignment.bottomRight,
             ),
           ),
-          child: const Icon(Icons.water_drop_rounded,
-              color: Colors.white, size: 22),
+          child: const Icon(
+            Icons.water_drop_rounded,
+            color: Colors.white,
+            size: 22,
+          ),
         ),
       ),
     );

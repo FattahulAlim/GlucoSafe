@@ -126,10 +126,12 @@ class ScreeningForm {
     return ScreeningForm(
       sex: identical(sex, _unset) ? this.sex : sex as int?,
       age: identical(age, _unset) ? this.age : age as int?,
-      heightCm:
-          identical(heightCm, _unset) ? this.heightCm : heightCm as double?,
-      weightKg:
-          identical(weightKg, _unset) ? this.weightKg : weightKg as double?,
+      heightCm: identical(heightCm, _unset)
+          ? this.heightCm
+          : heightCm as double?,
+      weightKg: identical(weightKg, _unset)
+          ? this.weightKg
+          : weightKg as double?,
       highBp: identical(highBp, _unset) ? this.highBp : highBp as int?,
       highChol: identical(highChol, _unset) ? this.highChol : highChol as int?,
       stroke: identical(stroke, _unset) ? this.stroke : stroke as int?,

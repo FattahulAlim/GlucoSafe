@@ -5,17 +5,19 @@ import 'package:glucosafe/core/models/api_response.dart';
 import 'package:glucosafe/features/history/presentation/pages/history_page.dart';
 
 Map<String, dynamic> _makeRecordJson(int id) => {
-      'id': id,
-      'created_at': '2026-11-0${(id % 8) + 1} 10:00:00',
-      'risk_percent': '25.00',
-      'risk_label': 'Rendah',
-      'bmi': '22.0',
-    };
+  'id': id,
+  'created_at': '2026-11-0${(id % 8) + 1} 10:00:00',
+  'risk_percent': '25.00',
+  'risk_label': 'Rendah',
+  'bmi': '22.0',
+};
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  testWidgets('HistoryPage initial load & infinite scroll load more test', (tester) async {
+  testWidgets('HistoryPage initial load & infinite scroll load more test', (
+    tester,
+  ) async {
     final requestedPages = <int>[];
 
     Future<ApiResponse<List<Map<String, dynamic>>>> mockLoader({
@@ -30,24 +32,14 @@ void main() {
           success: true,
           message: 'ok',
           data: List.generate(20, (i) => _makeRecordJson(100 - i)),
-          pagination: {
-            'page': 1,
-            'limit': 20,
-            'total': 25,
-            'hasMore': true,
-          },
+          pagination: {'page': 1, 'limit': 20, 'total': 25, 'hasMore': true},
         );
       } else if (p == 2) {
         return ApiResponse(
           success: true,
           message: 'ok',
           data: List.generate(5, (i) => _makeRecordJson(80 - i)),
-          pagination: {
-            'page': 2,
-            'limit': 20,
-            'total': 25,
-            'hasMore': false,
-          },
+          pagination: {'page': 2, 'limit': 20, 'total': 25, 'hasMore': false},
         );
       }
 
@@ -64,11 +56,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: HistoryPage(
-          loadHistory: mockLoader,
-        ),
-      ),
+      MaterialApp(home: HistoryPage(loadHistory: mockLoader)),
     );
     await tester.pumpAndSettle();
 
@@ -77,7 +65,10 @@ void main() {
     expect(find.text('Total 25 Pemeriksaan'), findsOneWidget);
 
     // Scroll ke bawah untuk memicu load more
-    await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -3000));
+    await tester.drag(
+      find.byType(SingleChildScrollView),
+      const Offset(0, -3000),
+    );
     await tester.pump();
     await tester.pumpAndSettle();
 

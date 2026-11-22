@@ -14,19 +14,21 @@ Future<void> _pumpHome(
   addTearDown(tester.view.reset);
 
   await tester.pumpWidget(
-    MaterialApp(home: HomePage(userName: 'Rahma', loadHistory: loader)),
+    MaterialApp(
+      home: HomePage(userName: 'Rahma', loadHistory: loader),
+    ),
   );
   await tester.pumpAndSettle();
 }
 
 ScreeningResult _rec(int id, DateTime date, double percent) => ScreeningResult(
-      id: id,
-      createdAt: date,
-      riskPercent: percent,
-      riskLabel: 'Rendah',
-      bmi: 25.7,
-      heightCm: 165,
-    );
+  id: id,
+  createdAt: date,
+  riskPercent: percent,
+  riskLabel: 'Rendah',
+  bmi: 25.7,
+  heightCm: 165,
+);
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
@@ -64,8 +66,9 @@ void main() {
     expect(find.text('Perkembangan Anda'), findsNothing);
   });
 
-  testWidgets('gagal memuat menampilkan pesan dan bisa dicoba lagi',
-      (tester) async {
+  testWidgets('gagal memuat menampilkan pesan dan bisa dicoba lagi', (
+    tester,
+  ) async {
     var calls = 0;
     await _pumpHome(tester, () async {
       calls++;

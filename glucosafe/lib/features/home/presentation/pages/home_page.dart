@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
 import '../../../screening/domain/risk_level.dart';
 import '../../../screening/domain/screening_result.dart';
 import '../../../../core/models/api_response.dart';
@@ -24,8 +25,7 @@ class HomePage extends StatefulWidget {
   const HomePage({
     super.key,
     this.userName,
-    this.tip =
-        'Berjalan santai 30 menit sehari dapat meningkatkan sensitivitas insulin dan menjaga kebugaran tubuh.',
+    this.tip = 'Berjalan santai 30 menit sehari dapat meningkatkan sensitivitas insulin dan menjaga kebugaran tubuh.',
     this.onStartScreening,
     this.onOpenProfile,
     this.onOpenHistory,
@@ -139,8 +139,7 @@ class _HomePageState extends State<HomePage> {
             infoNote: summary.infoNote,
           ),
           const SizedBox(height: 16),
-          _TrendCard(
-              values: summary.trendValues, labels: summary.trendLabels),
+          _TrendCard(values: summary.trendValues, labels: summary.trendLabels),
           const SizedBox(height: 16),
         ];
     }
@@ -158,7 +157,8 @@ class _HomePageState extends State<HomePage> {
           children: [
             HeadBar(
               title: 'Beranda',
-              onProfile: widget.onOpenProfile ??
+              onProfile:
+                  widget.onOpenProfile ??
                   () async {
                     await Navigator.push(
                       context,
@@ -203,9 +203,10 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         _subtitle,
                         style: const TextStyle(
-                            fontSize: 15,
-                            height: 22 / 15,
-                            color: AppColors.mute),
+                          fontSize: 15,
+                          height: 22 / 15,
+                          color: AppColors.mute,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       ..._summarySection(),
@@ -221,20 +222,23 @@ class _HomePageState extends State<HomePage> {
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: const [
                               BoxShadow(
-                                  color: Color(0x3300685F),
-                                  blurRadius: 6,
-                                  offset: Offset(0, 4)),
+                                color: Color(0x3300685F),
+                                blurRadius: 6,
+                                offset: Offset(0, 4),
+                              ),
                               BoxShadow(
-                                  color: Color(0x3300685F),
-                                  blurRadius: 4,
-                                  offset: Offset(0, 2)),
+                                color: Color(0x3300685F),
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
                             ],
                           ),
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
                               borderRadius: BorderRadius.circular(12),
-                              onTap: widget.onStartScreening ??
+                              onTap:
+                                  widget.onStartScreening ??
                                   () {
                                     resetScreeningForm();
                                     Navigator.push(
@@ -248,18 +252,25 @@ class _HomePageState extends State<HomePage> {
                               child: const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.add_moderator_outlined,
-                                      size: 18, color: Colors.white),
+                                  Icon(
+                                    Icons.add_moderator_outlined,
+                                    size: 18,
+                                    color: Colors.white,
+                                  ),
                                   SizedBox(width: 8),
-                                  Flexible( // #fix-overflow
-                                    child: Text('Mulai Skrining Baru',
-                                        maxLines: 1, // #fix-overflow
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            height: 22 / 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white)),
+                                  Flexible(
+                                    // #fix-overflow
+                                    child: Text(
+                                      'Mulai Skrining Baru',
+                                      maxLines: 1, // #fix-overflow
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        height: 22 / 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -274,7 +285,8 @@ class _HomePageState extends State<HomePage> {
             ),
             NavBar(
               currentIndex: 0,
-              onHistory: widget.onOpenHistory ??
+              onHistory:
+                  widget.onOpenHistory ??
                   () {
                     Navigator.pushReplacement(
                       context,
@@ -293,13 +305,12 @@ class _HomePageState extends State<HomePage> {
 
 // ───────────────────────── Kartu ─────────────────────────
 BoxDecoration _card() => BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
-      boxShadow: const [
-        BoxShadow(
-            color: Color(0x0F0F172A), blurRadius: 4, offset: Offset(0, 2)),
-      ],
-    );
+  color: Colors.white,
+  borderRadius: BorderRadius.circular(12),
+  boxShadow: const [
+    BoxShadow(color: Color(0x0F0F172A), blurRadius: 4, offset: Offset(0, 2)),
+  ],
+);
 
 class _LoadingCard extends StatelessWidget {
   const _LoadingCard();
@@ -332,18 +343,24 @@ class _EmptyCard extends StatelessWidget {
         children: [
           Icon(Icons.assignment_outlined, size: 40, color: AppColors.brand2),
           SizedBox(height: 12),
-          Text('Belum ada pemeriksaan',
-              style: TextStyle(
-                  fontSize: 18,
-                  height: 26 / 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.ink)),
+          Text(
+            'Belum ada pemeriksaan',
+            style: TextStyle(
+              fontSize: 18,
+              height: 26 / 18,
+              fontWeight: FontWeight.w600,
+              color: AppColors.ink,
+            ),
+          ),
           SizedBox(height: 6),
           Text(
             'Lakukan pemeriksaan pertama Anda untuk melihat hasil dan perkembangan kesehatan di sini.',
             textAlign: TextAlign.center,
             style: TextStyle(
-                fontSize: 15, height: 22 / 15, color: AppColors.slate),
+              fontSize: 15,
+              height: 22 / 15,
+              color: AppColors.slate,
+            ),
           ),
         ],
       ),
@@ -366,17 +383,25 @@ class _ErrorCard extends StatelessWidget {
         children: [
           const Icon(Icons.cloud_off_outlined, size: 40, color: AppColors.mute),
           const SizedBox(height: 12),
-          const Text('Ringkasan belum bisa dimuat',
-              style: TextStyle(
-                  fontSize: 18,
-                  height: 26 / 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.ink)),
+          const Text(
+            'Ringkasan belum bisa dimuat',
+            style: TextStyle(
+              fontSize: 18,
+              height: 26 / 18,
+              fontWeight: FontWeight.w600,
+              color: AppColors.ink,
+            ),
+          ),
           const SizedBox(height: 6),
-          Text(message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 15, height: 22 / 15, color: AppColors.slate)),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 15,
+              height: 22 / 15,
+              color: AppColors.slate,
+            ),
+          ),
           const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: onRetry,
@@ -387,7 +412,8 @@ class _ErrorCard extends StatelessWidget {
               side: const BorderSide(color: AppColors.brand, width: 1.5),
               minimumSize: const Size(0, 48),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
         ],
@@ -422,31 +448,40 @@ class _LastCheckCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.event_available_outlined,
-                  size: 14, color: AppColors.brand),
+              const Icon(
+                Icons.event_available_outlined,
+                size: 14,
+                color: AppColors.brand,
+              ),
               const SizedBox(width: 6),
               Expanded(
-                child: Text('Pemeriksaan Terakhir • $date',
-                    style: const TextStyle(
-                        fontSize: 12,
-                        height: 16 / 12,
-                        letterSpacing: .24,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.mute)),
+                child: Text(
+                  'Pemeriksaan Terakhir • $date',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    height: 16 / 12,
+                    letterSpacing: .24,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.mute,
+                  ),
+                ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                    color: AppColors.pillLav,
-                    borderRadius: BorderRadius.circular(999)),
-                child: const Text('Rutin',
-                    style: TextStyle(
-                        fontSize: 12,
-                        height: 16 / 12,
-                        letterSpacing: .24,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.ink)),
+                  color: AppColors.pillLav,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: const Text(
+                  'Rutin',
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 16 / 12,
+                    letterSpacing: .24,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.ink,
+                  ),
+                ),
               ),
             ],
           ),
@@ -458,26 +493,33 @@ class _LastCheckCard extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 CustomPaint(
-                    size: const Size(160, 160),
-                    painter: _RingPainter(percent: percent, color: risk.color)),
+                  size: const Size(160, 160),
+                  painter: _RingPainter(percent: percent, color: risk.color),
+                ),
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('${percent.round()}%',
-                        style: const TextStyle(
-                            fontSize: 40,
-                            height: 44 / 40,
-                            letterSpacing: -1,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.ink)),
+                    Text(
+                      '${percent.round()}%',
+                      style: const TextStyle(
+                        fontSize: 40,
+                        height: 44 / 40,
+                        letterSpacing: -1,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.ink,
+                      ),
+                    ),
                     const SizedBox(
                       width: 86,
-                      child: Text('Kemungkinan diabetes',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 13,
-                              height: 18 / 13,
-                              color: AppColors.slate)),
+                      child: Text(
+                        'Kemungkinan diabetes',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 13,
+                          height: 18 / 13,
+                          color: AppColors.slate,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -489,7 +531,9 @@ class _LastCheckCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             decoration: BoxDecoration(
-                color: risk.bgColor, borderRadius: BorderRadius.circular(999)),
+              color: risk.bgColor,
+              borderRadius: BorderRadius.circular(999),
+            ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -497,49 +541,66 @@ class _LastCheckCard extends StatelessWidget {
                   width: 10,
                   height: 10,
                   decoration: BoxDecoration(
-                      color: risk.color.withAlpha(191), shape: BoxShape.circle),
+                    color: risk.color.withAlpha(191),
+                    shape: BoxShape.circle,
+                  ),
                 ),
                 const SizedBox(width: 8),
-                Text(risk.label,
-                    style: TextStyle(
-                        fontSize: 14,
-                        height: 18 / 14,
-                        fontWeight: FontWeight.w600,
-                        color: risk.badgeText)),
+                Text(
+                  risk.label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 18 / 14,
+                    fontWeight: FontWeight.w600,
+                    color: risk.badgeText,
+                  ),
+                ),
               ],
             ),
           ),
           const SizedBox(height: 12),
-          Text(risk.message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 15, height: 22 / 15, color: AppColors.ink)),
+          Text(
+            risk.message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 15,
+              height: 22 / 15,
+              color: AppColors.ink,
+            ),
+          ),
           const SizedBox(height: 16),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
             decoration: BoxDecoration(
-                color: AppColors.infoBg, borderRadius: BorderRadius.circular(8)),
+              color: AppColors.infoBg,
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.monitor_weight_outlined,
-                    size: 14, color: AppColors.ink),
+                const Icon(
+                  Icons.monitor_weight_outlined,
+                  size: 14,
+                  color: AppColors.ink,
+                ),
                 const SizedBox(width: 8),
                 Flexible(
                   child: Text.rich(
                     TextSpan(
                       style: const TextStyle(
-                          fontSize: 12,
-                          height: 16 / 12,
-                          letterSpacing: .24,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.ink),
+                        fontSize: 12,
+                        height: 16 / 12,
+                        letterSpacing: .24,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.ink,
+                      ),
                       children: [
                         TextSpan(text: infoLabel),
                         TextSpan(
-                            text: infoValue,
-                            style: const TextStyle(fontWeight: FontWeight.w700)),
+                          text: infoValue,
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
                         TextSpan(text: ' ($infoNote)'),
                       ],
                     ),
@@ -582,17 +643,23 @@ class _TrendCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Perkembangan Anda',
-                          style: TextStyle(
-                              fontSize: 18,
-                              height: 26 / 18,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.ink)),
-                      Text('${values.length} Pemeriksaan Terakhir',
-                          style: const TextStyle(
-                              fontSize: 13,
-                              height: 18 / 13,
-                              color: AppColors.mute)),
+                      const Text(
+                        'Perkembangan Anda',
+                        style: TextStyle(
+                          fontSize: 18,
+                          height: 26 / 18,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.ink,
+                        ),
+                      ),
+                      Text(
+                        '${values.length} Pemeriksaan Terakhir',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          height: 18 / 13,
+                          color: AppColors.mute,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -615,7 +682,10 @@ class _TrendCard extends StatelessWidget {
                   'Lakukan minimal 2 pemeriksaan untuk melihat perkembangan Anda.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontSize: 14, height: 20 / 14, color: AppColors.slate),
+                    fontSize: 14,
+                    height: 20 / 14,
+                    color: AppColors.slate,
+                  ),
                 ),
               ),
             )
@@ -626,8 +696,11 @@ class _TrendCard extends StatelessWidget {
                 height: 112,
                 width: double.infinity,
                 child: CustomPaint(
-                    painter:
-                        _TrendPainter(values: values, fontFamily: fontFamily)),
+                  painter: _TrendPainter(
+                    values: values,
+                    fontFamily: fontFamily,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 4),
@@ -648,13 +721,15 @@ class _TrendCard extends StatelessWidget {
                                 fontSize: 14,
                                 height: 18 / 14,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.brand)
+                                color: AppColors.brand,
+                              )
                             : const TextStyle(
                                 fontSize: 12,
                                 height: 16 / 12,
                                 letterSpacing: .24,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.mute),
+                                color: AppColors.mute,
+                              ),
                       ),
                     ),
                 ],
@@ -674,18 +749,24 @@ class _Legend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-          const SizedBox(width: 4),
-          Text(text,
-              style: const TextStyle(
-                  fontSize: 11, height: 16.5 / 11, color: AppColors.mute)),
-        ],
-      );
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Container(
+        width: 8,
+        height: 8,
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      ),
+      const SizedBox(width: 4),
+      Text(
+        text,
+        style: const TextStyle(
+          fontSize: 11,
+          height: 16.5 / 11,
+          color: AppColors.mute,
+        ),
+      ),
+    ],
+  );
 }
 
 class _TipCard extends StatelessWidget {
@@ -702,7 +783,10 @@ class _TipCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
           BoxShadow(
-              color: Color(0x0D000000), blurRadius: 1, offset: Offset(0, 1)),
+            color: Color(0x0D000000),
+            blurRadius: 1,
+            offset: Offset(0, 1),
+          ),
         ],
       ),
       child: Row(
@@ -711,10 +795,15 @@ class _TipCard extends StatelessWidget {
           Container(
             width: 44,
             height: 44,
-            decoration:
-                const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-            child: const Icon(Icons.directions_walk_rounded,
-                size: 22, color: AppColors.tipTitle),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.directions_walk_rounded,
+              size: 22,
+              color: AppColors.tipTitle,
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -723,26 +812,35 @@ class _TipCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Text('Tips Hari Ini',
-                        style: TextStyle(
-                            fontSize: 14,
-                            height: 18 / 14,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.tipTitle)),
+                    const Text(
+                      'Tips Hari Ini',
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 18 / 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.tipTitle,
+                      ),
+                    ),
                     const SizedBox(width: 6),
                     Container(
-                        width: 6,
-                        height: 6,
-                        decoration: const BoxDecoration(
-                            color: AppColors.tipDot, shape: BoxShape.circle)),
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        color: AppColors.tipDot,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 3),
-                Text(text,
-                    style: const TextStyle(
-                        fontSize: 15,
-                        height: 20.63 / 15,
-                        color: AppColors.tipBody)),
+                Text(
+                  text,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    height: 20.63 / 15,
+                    color: AppColors.tipBody,
+                  ),
+                ),
               ],
             ),
           ),
@@ -796,7 +894,14 @@ class _TrendPainter extends CustomPainter {
   final List<double> values;
   final String? fontFamily;
 
-  void _text(Canvas c, String s, double cx, double cy, TextStyle st, double maxW) {
+  void _text(
+    Canvas c,
+    String s,
+    double cx,
+    double cy,
+    TextStyle st,
+    double maxW,
+  ) {
     final tp = TextPainter(
       text: TextSpan(text: s, style: st),
       textDirection: TextDirection.ltr,
@@ -879,7 +984,11 @@ class _TrendPainter extends CustomPainter {
     for (var i = 0; i < n; i++) {
       final risk = riskOf(values[i]);
       final isLast = i == n - 1;
-      canvas.drawCircle(pts[i], isLast ? 5.5 : 4.5, Paint()..color = risk.color);
+      canvas.drawCircle(
+        pts[i],
+        isLast ? 5.5 : 4.5,
+        Paint()..color = risk.color,
+      );
       _text(
         canvas,
         '${values[i].round()}%',

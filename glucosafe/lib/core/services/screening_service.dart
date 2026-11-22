@@ -15,7 +15,9 @@ class ScreeningService {
   final _storage = StorageService();
 
   /// Melakukan prediksi hasil skrining via POST /api/screenings/predict (tanpa simpan ke DB)
-  Future<ApiResponse<ScreeningResult>> predictScreening(ScreeningForm form) async {
+  Future<ApiResponse<ScreeningResult>> predictScreening(
+    ScreeningForm form,
+  ) async {
     final token = await _storage.getToken();
     if (token == null || token.isEmpty) {
       return ApiResponse<ScreeningResult>(
@@ -30,7 +32,8 @@ class ScreeningService {
         '${ApiConfig.screeningsPath}/predict',
         payload,
         token: token,
-        fromJson: (json) => ScreeningResult.fromJson(json as Map<String, dynamic>),
+        fromJson: (json) =>
+            ScreeningResult.fromJson(json as Map<String, dynamic>),
       );
     } catch (e) {
       return ApiResponse<ScreeningResult>(
@@ -75,7 +78,9 @@ class ScreeningService {
   }
 
   /// Mengirim hasil skrining ke backend via POST /api/screenings
-  Future<ApiResponse<ScreeningResult>> submitScreening(ScreeningForm form) async {
+  Future<ApiResponse<ScreeningResult>> submitScreening(
+    ScreeningForm form,
+  ) async {
     return saveScreening(form: form);
   }
 

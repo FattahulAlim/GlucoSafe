@@ -1,10 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_colors.dart';
 
-enum ProfileActionButtonType {
-  outline,
-  destructive,
-}
+enum ProfileActionButtonType { outline, destructive }
 
 /// Widget tombol aksi pada profil (seperti 'Edit Profil' dan 'Keluar dari Akun').
 class ProfileActionButton extends StatelessWidget {
@@ -53,9 +51,7 @@ class ProfileActionButton extends StatelessWidget {
         ? const Color(0xFF991B1B)
         : AppColors.brand2;
 
-    final bgColor = isDestructive
-        ? const Color(0xFFFFDED9)
-        : Colors.white;
+    final bgColor = isDestructive ? const Color(0xFFFFDED9) : Colors.white;
 
     final border = isDestructive
         ? Border.all(color: Colors.transparent, width: 0)
@@ -76,11 +72,7 @@ class ProfileActionButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                size: 20,
-                color: primaryColor,
-              ),
+              Icon(icon, size: 20, color: primaryColor),
               const SizedBox(width: 8),
               Text(
                 text,

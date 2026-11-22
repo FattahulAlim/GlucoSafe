@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../../../core/models/auth_models.dart';
@@ -49,8 +50,8 @@ class _RegisterPageState extends State<RegisterPage> {
       _emailErrorText = email.isEmpty
           ? 'Email wajib diisi'
           : (!email.endsWith('@gmail.com')
-              ? 'Email harus berakhiran @gmail.com'
-              : null);
+                ? 'Email harus berakhiran @gmail.com'
+                : null);
       _passwordErrorText = pass.length < 8 ? 'Minimal 8 karakter' : null;
       _confirmErrorText = confirm != pass ? 'Kata sandi tidak sama' : null;
     });
@@ -90,17 +91,18 @@ class _RegisterPageState extends State<RegisterPage> {
           SnackBar(
             content: const Text(
               'Pendaftaran berhasil! Silakan login.',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             backgroundColor: AppColors.brand2,
             behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.only(
-              bottom: bottomMargin,
-              left: 20,
-              right: 20,
-            ),
+            margin: EdgeInsets.only(bottom: bottomMargin, left: 20, right: 20),
             duration: const Duration(seconds: 3),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         );
 
@@ -114,9 +116,7 @@ class _RegisterPageState extends State<RegisterPage> {
         } else {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(content: Text(response.message)),
-            );
+            ..showSnackBar(SnackBar(content: Text(response.message)));
         }
       }
     } catch (e) {
@@ -161,7 +161,12 @@ class _RegisterPageState extends State<RegisterPage> {
       fillColor: Colors.white,
       suffixIcon: suffix,
       isDense: true,
-      contentPadding: EdgeInsets.fromLTRB(17, 15.5, suffix != null ? 4 : 17, 15.5),
+      contentPadding: EdgeInsets.fromLTRB(
+        17,
+        15.5,
+        suffix != null ? 4 : 17,
+        15.5,
+      ),
       suffixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
       border: border(AppColors.border),
       enabledBorder: border(AppColors.border),
@@ -172,24 +177,24 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _label(String text) => Text(
-        text,
-        style: const TextStyle(
-          fontSize: 13,
-          height: 16 / 13,
-          letterSpacing: .13,
-          fontWeight: FontWeight.w500,
-          color: AppColors.ink,
-        ),
-      );
+    text,
+    style: const TextStyle(
+      fontSize: 13,
+      height: 16 / 13,
+      letterSpacing: .13,
+      fontWeight: FontWeight.w500,
+      color: AppColors.ink,
+    ),
+  );
 
   Widget _eye(bool obscure, VoidCallback onTap) => IconButton(
-        onPressed: onTap,
-        icon: Icon(
-          obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-          size: 20,
-          color: AppColors.slate,
-        ),
-      );
+    onPressed: onTap,
+    icon: Icon(
+      obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+      size: 20,
+      color: AppColors.slate,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +209,9 @@ class _RegisterPageState extends State<RegisterPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Center(child: _LogoBox(size: 48, radius: 8, padding: 6)),
+                  const Center(
+                    child: _LogoBox(size: 48, radius: 8, padding: 6),
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     'GlucoSafe',
@@ -282,7 +289,8 @@ class _RegisterPageState extends State<RegisterPage> {
                       suffix: _eye(
                         _obscurePassword,
                         () => setState(
-                            () => _obscurePassword = !_obscurePassword),
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
                       ),
                     ),
                   ),
@@ -302,8 +310,10 @@ class _RegisterPageState extends State<RegisterPage> {
                       errorText: _confirmErrorText,
                       suffix: _eye(
                         _obscureConfirmPassword,
-                        () => setState(() =>
-                            _obscureConfirmPassword = !_obscureConfirmPassword),
+                        () => setState(
+                          () => _obscureConfirmPassword =
+                              !_obscureConfirmPassword,
+                        ),
                       ),
                     ),
                   ),
@@ -330,7 +340,9 @@ class _RegisterPageState extends State<RegisterPage> {
                               width: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             )
                           : const Text(
@@ -346,7 +358,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 24),
 
                   // Footer Login
-                  Wrap( // #fix-overflow
+                  Wrap(
+                    // #fix-overflow
                     alignment: WrapAlignment.center,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [

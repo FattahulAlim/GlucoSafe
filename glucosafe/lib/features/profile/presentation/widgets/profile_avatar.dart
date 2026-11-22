@@ -1,6 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/config/api_config.dart'; 
+import '../../../../core/config/api_config.dart';
 
 class ProfileAvatar extends StatelessWidget {
   const ProfileAvatar({
@@ -21,7 +22,7 @@ class ProfileAvatar extends StatelessWidget {
 
   final String initials;
   final String? photoAsset;
-  final String? photoUrl; 
+  final String? photoUrl;
   final double size;
   final double? fontSize;
   final Color backgroundColor;
@@ -82,7 +83,10 @@ class ProfileAvatar extends StatelessWidget {
                   ),
                   alignment: Alignment.center,
                   child: Icon(
-                    badgeIcon ?? (showCameraBadge ? Icons.camera_alt_outlined : Icons.check_rounded),
+                    badgeIcon ??
+                        (showCameraBadge
+                            ? Icons.camera_alt_outlined
+                            : Icons.check_rounded),
                     size: badgeSize * 0.62,
                     color: Colors.white,
                   ),
@@ -97,8 +101,8 @@ class ProfileAvatar extends StatelessWidget {
   Widget _buildAvatarContent(double textFontSize) {
     // Prioritas 1: Foto dari internet (server backend)
     if (photoUrl != null && photoUrl!.isNotEmpty) {
-      final fullUrl = photoUrl!.startsWith('http') 
-          ? photoUrl! 
+      final fullUrl = photoUrl!.startsWith('http')
+          ? photoUrl!
           : '${ApiConfig.baseUrl}$photoUrl'; // Gabungkan dengan baseUrl jika relatif
 
       return ClipOval(
@@ -107,11 +111,12 @@ class ProfileAvatar extends StatelessWidget {
           width: size,
           height: size,
           fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => _buildInitials(textFontSize),
+          errorBuilder: (context, error, stackTrace) =>
+              _buildInitials(textFontSize),
         ),
       );
     }
-    
+
     // Prioritas 2: Foto dari asset lokal (jika ada)
     if (photoAsset != null && photoAsset!.isNotEmpty) {
       return ClipOval(
@@ -120,7 +125,8 @@ class ProfileAvatar extends StatelessWidget {
           width: size,
           height: size,
           fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => _buildInitials(textFontSize),
+          errorBuilder: (context, error, stackTrace) =>
+              _buildInitials(textFontSize),
         ),
       );
     }

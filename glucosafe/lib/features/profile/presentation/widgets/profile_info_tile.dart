@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_colors.dart';
 
 /// Item baris informasi profil yang reusable.
@@ -50,11 +51,7 @@ class ProfileInfoTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           alignment: Alignment.center,
-          child: Icon(
-            icon,
-            size: 22,
-            color: iconColor,
-          ),
+          child: Icon(icon, size: 22, color: iconColor),
         ),
         const SizedBox(width: 14),
 

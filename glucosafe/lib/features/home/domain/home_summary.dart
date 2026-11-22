@@ -3,8 +3,18 @@ import '../../screening/domain/screening_options.dart';
 import '../../screening/domain/screening_result.dart';
 
 const List<String> _monthNames = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
-  'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'Mei',
+  'Jun',
+  'Jul',
+  'Agu',
+  'Sep',
+  'Okt',
+  'Nov',
+  'Des',
 ];
 
 /// Ringkasan Beranda, dihitung dari daftar riwayat skrining pengguna.

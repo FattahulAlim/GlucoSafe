@@ -29,7 +29,8 @@ class HistoryPage extends StatefulWidget {
   final Future<ApiResponse<List<Map<String, dynamic>>>> Function({
     int? page,
     int? limit,
-  })? loadHistory;
+  })?
+  loadHistory;
 
   @override
   State<HistoryPage> createState() => _HistoryPageState();
@@ -85,10 +86,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
     try {
       final fetcher = widget.loadHistory ?? _historyService.getHistory;
-      final response = await fetcher(
-        page: 1,
-        limit: _pageSize,
-      );
+      final response = await fetcher(page: 1, limit: _pageSize);
       if (!mounted) return;
       if (!response.success || response.data == null) {
         setState(() => _errorMessage = response.message);
@@ -138,10 +136,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
     try {
       final fetcher = widget.loadHistory ?? _historyService.getHistory;
-      final response = await fetcher(
-        page: nextPage,
-        limit: _pageSize,
-      );
+      final response = await fetcher(page: nextPage, limit: _pageSize);
       if (!mounted) return;
       if (!response.success || response.data == null) {
         setState(() => _loadMoreError = response.message);

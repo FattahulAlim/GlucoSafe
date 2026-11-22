@@ -28,12 +28,14 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
   }
 
   void _saveToNotifier() {
-    updateScreeningForm((f) => f.copyWith(
-          smoker: _isSmoking == null ? null : (_isSmoking! ? 1 : 0),
-          physActivity: _isExercising == null ? null : (_isExercising! ? 1 : 0),
-          fruits: _eatFruits == null ? null : (_eatFruits! ? 1 : 0),
-          veggies: _eatVegetables == null ? null : (_eatVegetables! ? 1 : 0),
-        ));
+    updateScreeningForm(
+      (f) => f.copyWith(
+        smoker: _isSmoking == null ? null : (_isSmoking! ? 1 : 0),
+        physActivity: _isExercising == null ? null : (_isExercising! ? 1 : 0),
+        fruits: _eatFruits == null ? null : (_eatFruits! ? 1 : 0),
+        veggies: _eatVegetables == null ? null : (_eatVegetables! ? 1 : 0),
+      ),
+    );
   }
 
   Widget _buildToggleQuestion({
@@ -135,7 +137,8 @@ class _ScreeningStep3PageState extends State<ScreeningStep3Page> {
 
   @override
   Widget build(BuildContext context) {
-    final bool canContinue = _isSmoking != null &&
+    final bool canContinue =
+        _isSmoking != null &&
         _isExercising != null &&
         _eatFruits != null &&
         _eatVegetables != null;

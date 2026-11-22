@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import 'login_page.dart';
 import 'register_page.dart';
@@ -127,8 +128,11 @@ class _Hero extends StatelessWidget {
                     end: Alignment.bottomRight,
                   ),
                 ),
-                child: const Icon(Icons.water_drop_rounded,
-                    color: Colors.white, size: 32),
+                child: const Icon(
+                  Icons.water_drop_rounded,
+                  color: Colors.white,
+                  size: 32,
+                ),
               ),
             ),
           ),
@@ -162,7 +166,6 @@ class _Hero extends StatelessWidget {
     );
   }
 }
-
 
 class _ExampleResultCard extends StatelessWidget {
   const _ExampleResultCard();
@@ -210,7 +213,9 @@ class _ExampleResultCard extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.safeBg,
                       borderRadius: BorderRadius.circular(20),
@@ -219,10 +224,14 @@ class _ExampleResultCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         CircleAvatar(
-                            radius: 4, backgroundColor: AppColors.safe),
+                          radius: 4,
+                          backgroundColor: AppColors.safe,
+                        ),
                         SizedBox(width: 6),
-                        Flexible( // #fix-overflow
-                          child: FittedBox( // #fix-overflow
+                        Flexible(
+                          // #fix-overflow
+                          child: FittedBox(
+                            // #fix-overflow
                             fit: BoxFit.scaleDown,
                             child: Text(
                               'Tidak Berisiko',

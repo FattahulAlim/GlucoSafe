@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/user_service.dart';
 import '../../../../core/services/storage_service.dart';
@@ -72,7 +73,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       if (confirmPass.isEmpty) {
         _confirmNewPasswordError = 'Konfirmasi kata sandi wajib diisi';
       } else if (confirmPass != newPass) {
-        _confirmNewPasswordError = 'Konfirmasi kata sandi harus sama dengan kata sandi baru';
+        _confirmNewPasswordError =
+            'Konfirmasi kata sandi harus sama dengan kata sandi baru';
       }
     });
   }
@@ -119,10 +121,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(res.message),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(res.message), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
@@ -229,10 +228,16 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     TextField(
                       controller: _currentPasswordController,
                       obscureText: _obscureCurrentPassword,
-                      style: const TextStyle(fontSize: 14, color: AppColors.ink),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.ink,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'Masukkan kata sandi saat ini',
-                        hintStyle: const TextStyle(fontSize: 14, color: AppColors.hint),
+                        hintStyle: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.hint,
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                         isDense: true,
@@ -247,7 +252,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.brand2, width: 1.5),
+                          borderSide: BorderSide(
+                            color: AppColors.brand2,
+                            width: 1.5,
+                          ),
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -260,8 +268,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           tooltip: _obscureCurrentPassword
                               ? 'Tampilkan kata sandi'
                               : 'Sembunyikan kata sandi',
-                          onPressed: () =>
-                              setState(() => _obscureCurrentPassword = !_obscureCurrentPassword),
+                          onPressed: () => setState(
+                            () => _obscureCurrentPassword =
+                                !_obscureCurrentPassword,
+                          ),
                         ),
                         errorText: _currentPasswordError,
                         errorStyle: const TextStyle(fontSize: 12),
@@ -314,10 +324,16 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     TextField(
                       controller: _newPasswordController,
                       obscureText: _obscureNewPassword,
-                      style: const TextStyle(fontSize: 14, color: AppColors.ink),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.ink,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'Masukkan kata sandi baru',
-                        hintStyle: const TextStyle(fontSize: 14, color: AppColors.hint),
+                        hintStyle: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.hint,
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                         isDense: true,
@@ -332,7 +348,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.brand2, width: 1.5),
+                          borderSide: BorderSide(
+                            color: AppColors.brand2,
+                            width: 1.5,
+                          ),
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -345,8 +364,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           tooltip: _obscureNewPassword
                               ? 'Tampilkan kata sandi'
                               : 'Sembunyikan kata sandi',
-                          onPressed: () =>
-                              setState(() => _obscureNewPassword = !_obscureNewPassword),
+                          onPressed: () => setState(
+                            () => _obscureNewPassword = !_obscureNewPassword,
+                          ),
                         ),
                         errorText: _newPasswordError,
                         errorStyle: const TextStyle(fontSize: 12),
@@ -399,10 +419,16 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     TextField(
                       controller: _confirmNewPasswordController,
                       obscureText: _obscureConfirmNewPassword,
-                      style: const TextStyle(fontSize: 14, color: AppColors.ink),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.ink,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'Konfirmasi kata sandi baru',
-                        hintStyle: const TextStyle(fontSize: 14, color: AppColors.hint),
+                        hintStyle: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.hint,
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                         isDense: true,
@@ -417,7 +443,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.brand2, width: 1.5),
+                          borderSide: BorderSide(
+                            color: AppColors.brand2,
+                            width: 1.5,
+                          ),
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -430,9 +459,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           tooltip: _obscureConfirmNewPassword
                               ? 'Tampilkan kata sandi'
                               : 'Sembunyikan kata sandi',
-                          onPressed: () =>
-                              setState(() => _obscureConfirmNewPassword =
-                                  !_obscureConfirmNewPassword),
+                          onPressed: () => setState(
+                            () => _obscureConfirmNewPassword =
+                                !_obscureConfirmNewPassword,
+                          ),
                         ),
                         errorText: _confirmNewPasswordError,
                         errorStyle: const TextStyle(fontSize: 12),
@@ -477,7 +507,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           child: CircularProgressIndicator(
                             strokeWidth: 2.5,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(0xFF334155)),
+                              Color(0xFF334155),
+                            ),
                           ),
                         )
                       : const Row(

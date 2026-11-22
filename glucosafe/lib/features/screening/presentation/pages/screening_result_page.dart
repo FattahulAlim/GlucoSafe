@@ -74,9 +74,7 @@ class _ScreeningResultPageState extends State<ScreeningResultPage> {
         _showMessage(context, 'Hasil skrining berhasil disimpan ke riwayat.');
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => const HistoryPage(),
-          ),
+          MaterialPageRoute(builder: (context) => const HistoryPage()),
         );
       } else {
         _showMessage(
@@ -118,9 +116,7 @@ class _ScreeningResultPageState extends State<ScreeningResultPage> {
               onBack: () => Navigator.maybePop(context),
               onProfile: () => Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfilePage(),
-                ),
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
               ),
             ),
 
@@ -252,8 +248,9 @@ class _ScreeningResultPageState extends State<ScreeningResultPage> {
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor:
-                                      AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
                                 ),
                               )
                             : const Icon(
@@ -278,7 +275,8 @@ class _ScreeningResultPageState extends State<ScreeningResultPage> {
                       width: double.infinity,
                       height: 52,
                       child: OutlinedButton.icon(
-                        onPressed: widget.onRestartScreening ??
+                        onPressed:
+                            widget.onRestartScreening ??
                             () {
                               Navigator.pushAndRemoveUntil(
                                 context,
@@ -449,7 +447,10 @@ class _ResultSummaryCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: risk.bgColor,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: risk.color.withValues(alpha: 0.25), width: 1),
+              border: Border.all(
+                color: risk.color.withValues(alpha: 0.25),
+                width: 1,
+              ),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -821,7 +822,8 @@ class _ResultGaugePainter extends CustomPainter {
 
     canvas.drawCircle(center, radius, bgPaint);
 
-    final sweepAngleProgress = sweepAngleFull * (percent.clamp(0.0, 100.0) / 100.0);
+    final sweepAngleProgress =
+        sweepAngleFull * (percent.clamp(0.0, 100.0) / 100.0);
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       startAngle,

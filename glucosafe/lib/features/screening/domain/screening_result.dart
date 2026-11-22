@@ -48,12 +48,16 @@ class ScreeningResult {
     List<RecommendationItem> recList = [];
     if (rawRecs is List) {
       recList = rawRecs
-          .map((item) => RecommendationItem.fromJson(item as Map<String, dynamic>))
+          .map(
+            (item) => RecommendationItem.fromJson(item as Map<String, dynamic>),
+          )
           .toList();
     }
 
     return ScreeningResult(
-      id: json['id'] is num ? (json['id'] as num).toInt() : int.tryParse(json['id']?.toString() ?? '0') ?? 0,
+      id: json['id'] is num
+          ? (json['id'] as num).toInt()
+          : int.tryParse(json['id']?.toString() ?? '0') ?? 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString())
           : null,

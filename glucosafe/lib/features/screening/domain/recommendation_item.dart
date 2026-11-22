@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/theme/app_colors.dart';
 
 /// Model data item rekomendasi pada halaman hasil skrining.
@@ -71,10 +72,6 @@ class RecommendationItem {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'title': title,
-      'category': category,
-      'description': description,
-    };
+    return {'title': title, 'category': category, 'description': description};
   }
 }
