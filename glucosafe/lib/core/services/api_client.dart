@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:http/http.dart' as http;
+
 import '../config/api_config.dart';
 import '../models/api_response.dart';
 
@@ -22,11 +24,7 @@ class ApiClient {
           : ApiConfig.headers;
 
       final response = await http
-          .post(
-            url,
-            headers: headers,
-            body: jsonEncode(body),
-          )
+          .post(url, headers: headers, body: jsonEncode(body))
           .timeout(ApiConfig.timeout);
 
       final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
@@ -42,7 +40,8 @@ class ApiClient {
     } on SocketException {
       return ApiResponse<T>(
         success: false,
-        message: 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.',
+        message:
+            'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.',
       );
     } on http.ClientException {
       return ApiResponse<T>(
@@ -78,10 +77,7 @@ class ApiClient {
           : ApiConfig.headers;
 
       final response = await http
-          .get(
-            url,
-            headers: headers,
-          )
+          .get(url, headers: headers)
           .timeout(ApiConfig.timeout);
 
       final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
@@ -97,7 +93,8 @@ class ApiClient {
     } on SocketException {
       return ApiResponse<T>(
         success: false,
-        message: 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.',
+        message:
+            'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.',
       );
     } on http.ClientException {
       return ApiResponse<T>(
@@ -125,11 +122,7 @@ class ApiClient {
           : ApiConfig.headers;
 
       final response = await http
-          .put(
-            url,
-            headers: headers,
-            body: jsonEncode(body),
-          )
+          .put(url, headers: headers, body: jsonEncode(body))
           .timeout(ApiConfig.timeout);
 
       final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
@@ -145,7 +138,8 @@ class ApiClient {
     } on SocketException {
       return ApiResponse<T>(
         success: false,
-        message: 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.',
+        message:
+            'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.',
       );
     } on http.ClientException {
       return ApiResponse<T>(
@@ -167,18 +161,28 @@ class ApiClient {
   }) async {
     try {
       final url = Uri.parse('${ApiConfig.baseUrl}$path');
-      final headers = token != null ? ApiConfig.headersWithAuth(token) : ApiConfig.headers;
+      final headers = token != null
+          ? ApiConfig.headersWithAuth(token)
+          : ApiConfig.headers;
 
-      final response = await http.delete(url, headers: headers).timeout(ApiConfig.timeout);
+      final response = await http
+          .delete(url, headers: headers)
+          .timeout(ApiConfig.timeout);
       final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
 
       if (response.statusCode == 200) {
         return ApiResponse<T>.fromJson(jsonResponse, fromJson);
       } else {
-        return ApiResponse<T>(success: false, message: jsonResponse['message'] as String? ?? 'Terjadi kesalahan');
+        return ApiResponse<T>(
+          success: false,
+          message: jsonResponse['message'] as String? ?? 'Terjadi kesalahan',
+        );
       }
     } catch (e) {
-      return ApiResponse<T>(success: false, message: 'Terjadi kesalahan: ${e.toString()}');
+      return ApiResponse<T>(
+        success: false,
+        message: 'Terjadi kesalahan: ${e.toString()}',
+      );
     }
   }
 }

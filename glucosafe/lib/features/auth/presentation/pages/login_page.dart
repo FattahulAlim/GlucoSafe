@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../../../core/models/auth_models.dart';
@@ -60,9 +61,7 @@ class _LoginPageState extends State<LoginPage> {
     if (password.isEmpty) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(content: Text('Kata sandi wajib diisi')),
-        );
+        ..showSnackBar(const SnackBar(content: Text('Kata sandi wajib diisi')));
       return;
     }
 
@@ -85,9 +84,7 @@ class _LoginPageState extends State<LoginPage> {
                 resetScreeningForm();
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const ScreeningStep1Page(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const ScreeningStep1Page()),
                 );
               },
             ),
@@ -97,9 +94,7 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(content: Text(response.message)),
-          );
+          ..showSnackBar(SnackBar(content: Text(response.message)));
       }
     } catch (e) {
       if (!mounted) return;
@@ -113,9 +108,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   OutlineInputBorder _border(Color c, [double w = 1]) => OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: c, width: w),
-      );
+    borderRadius: BorderRadius.circular(12),
+    borderSide: BorderSide(color: c, width: w),
+  );
 
   InputDecoration _decoration(String hint, {Widget? suffix, String? error}) {
     return InputDecoration(
@@ -126,7 +121,12 @@ class _LoginPageState extends State<LoginPage> {
       filled: true,
       fillColor: Colors.white,
       isDense: true,
-      contentPadding: EdgeInsets.fromLTRB(17, 15.5, suffix != null ? 4 : 17, 15.5),
+      contentPadding: EdgeInsets.fromLTRB(
+        17,
+        15.5,
+        suffix != null ? 4 : 17,
+        15.5,
+      ),
       suffixIcon: suffix,
       suffixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
       border: _border(AppColors.border),
@@ -138,15 +138,15 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _label(String text) => Text(
-        text,
-        style: const TextStyle(
-          fontSize: 13,
-          height: 16 / 13,
-          letterSpacing: .13,
-          fontWeight: FontWeight.w500,
-          color: AppColors.ink,
-        ),
-      );
+    text,
+    style: const TextStyle(
+      fontSize: 13,
+      height: 16 / 13,
+      letterSpacing: .13,
+      fontWeight: FontWeight.w500,
+      color: AppColors.ink,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +162,9 @@ class _LoginPageState extends State<LoginPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Logo + judul
-                  const Center(child: _LogoBox(size: 48, radius: 8, padding: 6)),
+                  const Center(
+                    child: _LogoBox(size: 48, radius: 8, padding: 6),
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     'GlucoSafe',
@@ -179,7 +181,11 @@ class _LoginPageState extends State<LoginPage> {
                   const Text(
                     'Masuk ke akun Anda',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.slate),
+                    style: TextStyle(
+                      fontSize: 14,
+                      height: 20 / 14,
+                      color: AppColors.slate,
+                    ),
                   ),
                   const SizedBox(height: 32),
 
@@ -199,7 +205,10 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       });
                     },
-                    decoration: _decoration('nama@email.com', error: _emailErrorText),
+                    decoration: _decoration(
+                      'nama@email.com',
+                      error: _emailErrorText,
+                    ),
                   ),
                   const SizedBox(height: 24),
 
@@ -212,8 +221,13 @@ class _LoginPageState extends State<LoginPage> {
                         onTap: () {
                           ScaffoldMessenger.of(context)
                             ..hideCurrentSnackBar()
-                            ..showSnackBar(const SnackBar(
-                                content: Text('Halaman lupa kata sandi belum dibuat')));
+                            ..showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Halaman lupa kata sandi belum dibuat',
+                                ),
+                              ),
+                            );
                         },
                         child: const Text(
                           'Lupa kata sandi?',
@@ -244,7 +258,8 @@ class _LoginPageState extends State<LoginPage> {
                               ? Icons.visibility_off_outlined
                               : Icons.visibility_outlined,
                         ),
-                        onPressed: () => setState(() => _obscureText = !_obscureText),
+                        onPressed: () =>
+                            setState(() => _obscureText = !_obscureText),
                       ),
                     ),
                   ),
@@ -270,7 +285,9 @@ class _LoginPageState extends State<LoginPage> {
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             ),
                           )
                         : const Text(
@@ -285,13 +302,18 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 32),
 
                   // Footer
-                  Wrap( // #fix-overflow
+                  Wrap(
+                    // #fix-overflow
                     alignment: WrapAlignment.center,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       const Text(
                         'Belum punya akun? ',
-                        style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.slate),
+                        style: TextStyle(
+                          fontSize: 14,
+                          height: 20 / 14,
+                          color: AppColors.slate,
+                        ),
                       ),
                       GestureDetector(
                         onTap: _goToRegister,
@@ -321,7 +343,11 @@ class _LoginPageState extends State<LoginPage> {
 /// Kotak logo putih. Jika file logo belum ada, tampil logo pengganti.
 /// Untuk logo asli: taruh PNG di assets/images/logo.png lalu daftarkan di pubspec.yaml.
 class _LogoBox extends StatelessWidget {
-  const _LogoBox({required this.size, required this.radius, required this.padding});
+  const _LogoBox({
+    required this.size,
+    required this.radius,
+    required this.padding,
+  });
   final double size;
   final double radius;
   final double padding;
@@ -336,7 +362,11 @@ class _LogoBox extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(radius),
         boxShadow: const [
-          BoxShadow(color: Color(0x0D000000), blurRadius: 2, offset: Offset(0, 1)),
+          BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 2,
+            offset: Offset(0, 1),
+          ),
         ],
       ),
       child: Image.asset(
@@ -351,7 +381,11 @@ class _LogoBox extends StatelessWidget {
               end: Alignment.bottomRight,
             ),
           ),
-          child: const Icon(Icons.water_drop_rounded, color: Colors.white, size: 20),
+          child: const Icon(
+            Icons.water_drop_rounded,
+            color: Colors.white,
+            size: 20,
+          ),
         ),
       ),
     );

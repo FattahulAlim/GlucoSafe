@@ -22,9 +22,9 @@ class PaginationInfo {
   }
 
   Map<String, dynamic> toJson() => {
-        'page': page,
-        'limit': limit,
-        if (total != null) 'total': total,
-        'hasMore': hasMore,
-      };
+    'page': page,
+    'limit': limit,
+    if (total != null) 'total': total,
+    'hasMore': hasMore,
+  };
 }

@@ -1,25 +1,25 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:glucosafe/features/screening/domain/screening_form.dart';
 import 'package:glucosafe/features/screening/domain/screening_options.dart';
 
 ScreeningForm _complete() => const ScreeningForm(
-      sex: 1,
-      age: 6,
-      heightCm: 168,
-      weightKg: 70,
-      highBp: 0,
-      highChol: 0,
-      stroke: 0,
-      heartDiseaseOrAttack: 0,
-      diffWalk: 0,
-      smoker: 0,
-      physActivity: 1,
-      fruits: 1,
-      veggies: 1,
-      genHlth: 2,
-      mentHlth: 3,
-      physHlth: 2,
-    );
+  sex: 1,
+  age: 6,
+  heightCm: 168,
+  weightKg: 70,
+  highBp: 0,
+  highChol: 0,
+  stroke: 0,
+  heartDiseaseOrAttack: 0,
+  diffWalk: 0,
+  smoker: 0,
+  physActivity: 1,
+  fruits: 1,
+  veggies: 1,
+  genHlth: 2,
+  mentHlth: 3,
+  physHlth: 2,
+);
 
 void main() {
   test('BMI 168 cm dan 70 kg bernilai 24.8', () {
@@ -50,16 +50,33 @@ void main() {
       isFalse,
     );
     expect(
-      const ScreeningForm(sex: 1, age: 6, heightCm: 168, weightKg: 70)
-          .isStep1Valid,
+      const ScreeningForm(
+        sex: 1,
+        age: 6,
+        heightCm: 168,
+        weightKg: 70,
+      ).isStep1Valid,
       isTrue,
     );
   });
 
   test('opsi usia: 13 kode berurutan sesuai dataset', () {
     expect(ageOptions.length, 13);
-    expect(ageOptions.map((o) => o.value).toList(),
-        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+    expect(ageOptions.map((o) => o.value).toList(), [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+    ]);
     expect(ageOptions.first.label, '18–24 tahun');
     expect(ageOptions[5].label, '45–49 tahun'); // kode 6
     expect(ageOptions.last.label, '80 tahun atau lebih');

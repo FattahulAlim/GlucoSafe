@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../theme/app_colors.dart';
 
@@ -51,9 +52,7 @@ class HeadBar extends StatelessWidget implements PreferredSizeWidget {
   void _defaultProfileTap(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const ProfilePage(),
-      ),
+      MaterialPageRoute(builder: (context) => const ProfilePage()),
     );
   }
 
@@ -124,7 +123,8 @@ class HeadBar extends StatelessWidget implements PreferredSizeWidget {
 
           // Judul / Subtitle
           Expanded(
-            child: titleWidget ??
+            child:
+                titleWidget ??
                 (subtitle != null
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -174,7 +174,8 @@ class HeadBar extends StatelessWidget implements PreferredSizeWidget {
                     width: 44,
                     height: 44,
                     child: Center(
-                      child: profileAvatar ??
+                      child:
+                          profileAvatar ??
                           const DecoratedBox(
                             decoration: BoxDecoration(
                               color: AppColors.brand,

@@ -5,12 +5,7 @@ import 'package:glucosafe/features/history/domain/paginated_history.dart';
 void main() {
   group('PaginationInfo & ApiResponse Pagination Tests', () {
     test('parses pagination info correctly', () {
-      final json = {
-        'page': 2,
-        'limit': 20,
-        'total': 45,
-        'hasMore': true,
-      };
+      final json = {'page': 2, 'limit': 20, 'total': 45, 'hasMore': true};
 
       final pagination = PaginationInfo.fromJson(json);
       expect(pagination.page, 2);
@@ -33,13 +28,9 @@ void main() {
         'success': true,
         'message': 'Riwayat screening berhasil diambil.',
         'data': [
-          {'id': 1}
+          {'id': 1},
         ],
-        'pagination': {
-          'page': 1,
-          'limit': 20,
-          'hasMore': true,
-        },
+        'pagination': {'page': 1, 'limit': 20, 'hasMore': true},
       };
 
       final response = ApiResponse<List<dynamic>>.fromJson(

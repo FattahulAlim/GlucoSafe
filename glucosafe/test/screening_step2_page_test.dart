@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:glucosafe/features/screening/domain/screening_state.dart';
 import 'package:glucosafe/features/screening/presentation/pages/screening_step2_page.dart';
@@ -14,8 +14,8 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: ScreeningStep2Page()));
 
     ElevatedButton lanjut() => tester.widget<ElevatedButton>(
-          find.widgetWithText(ElevatedButton, 'Lanjut'),
-        );
+      find.widgetWithText(ElevatedButton, 'Lanjut'),
+    );
 
     // Awal: belum ada jawaban, tombol nonaktif.
     expect(lanjut().onPressed, isNull);

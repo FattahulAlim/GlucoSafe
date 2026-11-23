@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
 import '../../domain/screening_form.dart';
 import '../../domain/screening_state.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -156,10 +157,7 @@ class ScreeningStep2Page extends StatelessWidget {
                   child: Center(
                     child: Text(
                       'Jawab semua pertanyaan untuk melanjutkan.',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.slate,
-                      ),
+                      style: TextStyle(fontSize: 14, color: AppColors.slate),
                     ),
                   ),
                 ),
@@ -205,11 +203,7 @@ class _QuestionCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          _YesNoToggle(
-            question: label,
-            value: value,
-            onChanged: onChanged,
-          ),
+          _YesNoToggle(question: label, value: value, onChanged: onChanged),
         ],
       ),
     );
@@ -269,10 +263,7 @@ class _YesNoToggle extends StatelessWidget {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          _segment('Tidak', 0),
-          _segment('Ya', 1),
-        ],
+        children: [_segment('Tidak', 0), _segment('Ya', 1)],
       ),
     );
   }

@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
 import '../theme/app_colors.dart';
 
 /// Komponen Bottom Navigation Bar untuk aplikasi GlucoSafe.

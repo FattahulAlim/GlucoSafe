@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
 import '../../domain/user_profile.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/headbar.dart';
@@ -17,11 +18,7 @@ import '../../../auth/presentation/pages/login_page.dart';
 /// Menampilkan informasi akun pengguna, ringkasan pemeriksaan,
 /// serta opsi edit profil dan keluar dari akun.
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({
-    super.key,
-    this.profile,
-    this.onBack,
-  });
+  const ProfilePage({super.key, this.profile, this.onBack});
 
   /// Data profil pengguna yang ditampilkan. Jika null, mengambil dari backend/storage.
   final UserProfile? profile;

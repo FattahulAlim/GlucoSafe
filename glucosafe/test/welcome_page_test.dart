@@ -12,8 +12,9 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: WelcomePage()));
   }
 
-  testWidgets('menampilkan sapaan, contoh hasil, dan dua tombol',
-      (tester) async {
+  testWidgets('menampilkan sapaan, contoh hasil, dan dua tombol', (
+    tester,
+  ) async {
     await pumpWelcome(tester);
 
     expect(find.text('Selamat Datang di'), findsOneWidget);

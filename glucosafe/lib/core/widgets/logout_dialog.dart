@@ -1,13 +1,12 @@
-﻿import 'dart:ui';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+
 import '../theme/app_colors.dart';
 
 /// Dialog konfirmasi keluar dari akun dengan efek blur pada latar belakang.
 class LogoutDialog extends StatelessWidget {
-  const LogoutDialog({
-    super.key,
-    this.onConfirmLogout,
-  });
+  const LogoutDialog({super.key, this.onConfirmLogout});
 
   /// Aksi ketika tombol 'Keluar' ditekan
   final VoidCallback? onConfirmLogout;
@@ -20,9 +19,8 @@ class LogoutDialog extends StatelessWidget {
     return showDialog<bool>(
       context: context,
       barrierColor: const Color(0x59000000),
-      builder: (dialogContext) => LogoutDialog(
-        onConfirmLogout: onConfirmLogout,
-      ),
+      builder: (dialogContext) =>
+          LogoutDialog(onConfirmLogout: onConfirmLogout),
     );
   }
 
@@ -33,9 +31,7 @@ class LogoutDialog extends StatelessWidget {
       child: Dialog(
         backgroundColor: Colors.white,
         insetPadding: const EdgeInsets.symmetric(horizontal: 28),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         elevation: 8,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 26, 20, 22),

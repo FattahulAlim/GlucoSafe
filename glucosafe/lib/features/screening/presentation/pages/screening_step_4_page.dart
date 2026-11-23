@@ -42,12 +42,13 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
   }
 
   void _saveToNotifier() {
-    updateScreeningForm((f) => f.copyWith(
-          genHlth:
-              _generalHealthIndex == null ? null : _generalHealthIndex! + 1,
-          mentHlth: _mentalHealthDays.toInt(),
-          physHlth: _physicalHealthDays.toInt(),
-        ));
+    updateScreeningForm(
+      (f) => f.copyWith(
+        genHlth: _generalHealthIndex == null ? null : _generalHealthIndex! + 1,
+        mentHlth: _mentalHealthDays.toInt(),
+        physHlth: _physicalHealthDays.toInt(),
+      ),
+    );
   }
 
   Future<void> _submitScreening() async {
@@ -68,7 +69,8 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-              'Mohon lengkapi seluruh langkah skrining sebelum melanjutkan.'),
+            'Mohon lengkapi seluruh langkah skrining sebelum melanjutkan.',
+          ),
           backgroundColor: AppColors.error,
         ),
       );
@@ -91,18 +93,18 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => ScreeningResultPage(
-              result: screeningResult,
-              form: form,
-            ),
+            builder: (context) =>
+                ScreeningResultPage(result: screeningResult, form: form),
           ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(response.message.isNotEmpty
-                ? response.message
-                : 'Gagal mendapatkan prediksi skrining.'),
+            content: Text(
+              response.message.isNotEmpty
+                  ? response.message
+                  : 'Gagal mendapatkan prediksi skrining.',
+            ),
             backgroundColor: AppColors.error,
           ),
         );
@@ -189,8 +191,9 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
-                                color:
-                                    isSelected ? Colors.white : AppColors.mute,
+                                color: isSelected
+                                    ? Colors.white
+                                    : AppColors.mute,
                                 height: 1.2,
                               ),
                             ),
@@ -494,8 +497,9 @@ class _ScreeningStep4PageState extends State<ScreeningStep4Page> {
                               height: 24,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2.5,
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             )
                           : FittedBox(
