@@ -19,3 +19,7 @@ web-flask/.pytest_cache/
 web-flask/**/__pycache__/
 web-flask/model/artifacts_backup_*/
 
+# Firebase credentials
+**/google-services.json
+**/firebase-service-account.json
+
