@@ -152,4 +152,23 @@ async function deletePhoto(req, res) {
   }
 }
 
-module.exports = { getMe, updateProfile, changePassword, uploadPhoto, deletePhoto };
+async function saveFcmToken(req, res) {
+  try {
+    const { fcm_token } = req.body;
+    if (typeof fcm_token !== 'string' || !fcm_token.trim()) {
+      return res.status(400).json({ success: false, message: 'FCM token wajib diisi.' });
+    }
+
+    await db.execute('UPDATE users SET fcm_token = ? WHERE id = ?', [
+      fcm_token.trim(),
+      req.user.id,
+    ]);
+
+    return res.json({ success: true, message: 'FCM token berhasil disimpan.' });
+  } catch (error) {
+    console.error('Save FCM token error:', error.message);
+    return res.status(500).json({ success: false, message: 'Gagal menyimpan FCM token.' });
+  }
+}
+
+module.exports = { getMe, updateProfile, changePassword, uploadPhoto, deletePhoto, saveFcmToken };

@@ -2,6 +2,7 @@ import '../config/api_config.dart';
 import '../models/api_response.dart';
 import '../models/auth_models.dart';
 import 'api_client.dart';
+import 'notification_service.dart';
 import 'storage_service.dart';
 
 class AuthService {
@@ -22,6 +23,7 @@ class AuthService {
     if (response.success && response.data != null) {
       await _storage.saveToken(response.data!.token);
       await _storage.saveUser(response.data!.user);
+      await NotificationService().syncTokenWithBackend();
     }
     return response;
   }
