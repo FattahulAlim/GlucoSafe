@@ -82,8 +82,14 @@ test('userController.updateProfile: 200 berhasil update profil', async () => {
     if (sql.includes('UPDATE users SET')) {
       return [{ affectedRows: 1 }];
     }
-    if (sql.includes('SELECT id, name, email, created_at FROM users')) {
-      return [[{ id: 1, name: 'Siti Baru', email: 'siti_baru@example.com', created_at: '2026-01-01' }]];
+    if (sql.includes('SELECT id, name, email')) {
+      return [[{
+        id: 1,
+        name: 'Siti Baru',
+        email: 'siti_baru@example.com',
+        photo_url: null,
+        created_at: '2026-01-01',
+      }]];
     }
     return [[]];
   };
@@ -96,6 +102,8 @@ test('userController.updateProfile: 200 berhasil update profil', async () => {
   assert.equal(res.statusCode, 200);
   assert.equal(res.body.success, true);
   assert.equal(res.body.data.name, 'Siti Baru');
+  assert.equal(res.body.data.email, 'siti_baru@example.com');
+  assert.equal(res.body.data.photo_url, null);
 });
 
 test('userController.changePassword: 400 jika password baru kurang dari 8 karakter', async () => {
